@@ -1,5 +1,6 @@
 <style lang="less">
 @import "../../../styles/tree&table-common.less";
+@import "./productList.less";
 </style>
 <template>
   <div class="search">
@@ -32,18 +33,18 @@
         <Col :span="span">
           <Row>
             <Form ref="searchForm" :model="searchForm" inline :label-width="100">
-              <Form-item label="日期范围">
-              <DatePicker
-                v-model="selectDate"
-                type="daterange"
-                format="yyyy-MM-dd"
-                clearable
-                @on-change="selectDateRange"
-                placeholder="选择起始时间"
-                style="width: 200px"
-              ></DatePicker>
-            </Form-item>
-              <Form-item>
+              <Form-item label="日期范围：">
+                <DatePicker
+                  v-model="selectDate"
+                  type="daterange"
+                  format="yyyy-MM-dd"
+                  clearable
+                  @on-change="selectDateRange"
+                  placeholder="选择起始时间"
+                  style="width: 200px"
+                ></DatePicker>
+              </Form-item>
+              <Form-item class="hideLabel">
                 <Input
                   type="text"
                   v-model="searchForm.searchKey"
@@ -62,7 +63,7 @@
                   <Option value="0">正常</Option>
                   <Option value="-1">禁用</Option>
                 </Select>
-              </Form-item> -->
+              </Form-item>-->
               <Form-item style="margin-left:-35px;" class="br">
                 <Button @click="handleSearch" type="primary" icon="ios-search">搜索</Button>
                 <Button @click="handleReset">重置</Button>
@@ -73,13 +74,6 @@
             <Button @click="add" type="primary" icon="md-add">添加</Button>
             <Button @click="delAll" icon="md-trash">批量删除</Button>
             <Button @click="getDataList" icon="md-refresh">刷新</Button>
-          </Row>
-          <Row>
-            <Alert show-icon>
-              已选择
-              <span class="select-count">{{selectCount}}</span> 项
-              <a class="select-clear" @click="clearSelectAll">清空</a>
-            </Alert>
           </Row>
           <Row>
             <Table
@@ -111,25 +105,89 @@
       </Row>
     </Card>
 
-    <Modal :title="modalTitle" v-model="modalVisible" :mask-closable="false" :width="500">
-      <Form ref="form" :model="form" :label-width="70" :rules="formValidate">
-        <FormItem label="名称" prop="name">
-          <Input v-model="form.name" />
+    <Modal :title="modalTitle" v-model="modalVisible" :mask-closable="false" :width="1000">
+      <Form ref="form" :model="form" :label-width="140" :rules="formValidate">
+        <FormItem label="产品标题：" prop="title">
+          <Input v-model="form.title" />
+        </FormItem>
+        <FormItem label="简介描述：" prop="describe">
+          <Input v-model="form.describe" />
+        </FormItem>
+        <FormItem label="商品分类：" prop="classify">
+          <div style="display:flex;">
+            <Input
+              v-model="form.classify"
+              placeholder="请点击选择按钮选择商品分类"
+              readonly
+              style="margin-right:10px;"
+            />
+            <Poptip transfer trigger="click" placement="right-start" title="选择商品分类" width="250">
+              <Button icon="md-list">选择商品分类</Button>
+              <div slot="content" style="position:relative;min-height:5vh">
+                <Tree :data="dataEdit" :load-data="loadData" @on-select-change="selectTreeEdit"></Tree>
+                <Spin size="large" fix v-if="loadingEdit"></Spin>
+              </div>
+            </Poptip>
+          </div>
+        </FormItem>
+        <FormItem label="产品展示价格：" prop="price" >
+          <Input v-model="form.price" placeholder="请输入正确金额"/>
+        </FormItem>
+        <FormItem label="库存数量：" prop="amount">
+          <Input v-model="form.amount" placeholder="0~99999"/>
+        </FormItem>
+        <FormItem label="购买限制数量：" prop="limit">
+          <Input v-model="form.limit" placeholder="0~9999"/>
+        </FormItem>
+        <FormItem label="示缩略图片上传：" prop="imgIdList">
+          <Upload
+            multiple
+            :before-upload="handleBeforeUpload"
+            type="drag"
+            :action="uploadFileUrl"
+            :headers="accessToken"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            :format="['jpg','jpeg','png']"
+            :on-format-error="handleFormatError"
+            :show-upload-list="false"
+            :on-remove="handleRmove"
+          >
+            <div style="padding: 20px 0">
+              <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
+              <p>或将照片拖到这里，最多可选5张</p>
+            </div>
+          </Upload>
+        </FormItem>
+        <FormItem label="商品详情：">
+          <quill id="quill" v-model="form.quillData"></quill>
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button type="text" @click="modalVisible=false">取消</Button>
-        <Button type="primary" :loading="submitLoading" @click="handelSubmit">提交</Button>
+        <Button type="Default" @click="modalVisible=false">取消</Button>
+        <Button type="primary" :loading="submitLoading" @click="handelSubmit">保存并发布</Button>
       </div>
     </Modal>
   </div>
 </template>
 
 <script>
+import { uploadFile } from "@/api/index";
+import quill from "@/views/my-components/xboot/quill";
+import { validatePrice, validateAmount, validateLimit } from "@/libs/validate";
 export default {
   name: "productList",
+  components: {
+    quill,
+  },
+  computed: {
+    
+  },
   data() {
     return {
+      accessToken: {},
+      uploadFileUrl: uploadFile,
+      uploadList: [], // 图片列表
       treeLoading: false, // 树加载状态
       maxHeight: "500px",
       loading: false, // 表加载状态
@@ -150,20 +208,44 @@ export default {
         sort: "createTime", // 默认排序字段
         order: "desc", // 默认排序方式
         startDate: "", // 起始时间
-        endDate: "" // 终止时间
+        endDate: "", // 终止时间
       },
       modalType: 0, // 添加或编辑标识
       modalVisible: false, // 添加或编辑显示
       modalTitle: "", // 添加或编辑标题
       form: {
         // 添加或编辑表单对象初始化数据
-        name: "",
+        title: "",
+        quillData: '',
+        describe:'',
+        classify: '',
+        price: '',
+        amount: '',
+        limit: '',
+        imgIdList: [],
         sex: 1,
         type: 0,
       },
       formValidate: {
         // 表单验证规则
-        name: [{ required: true, message: "不能为空", trigger: "blur" }],
+        title: [{ required: true, message: "标题不能为空", trigger: "blur" }],
+        describe: [{ required: true, message: "描述不能为空", trigger: "blur" }],
+        classify: [{ required: true, message: "分类不能为空", trigger: "change" }],
+        price: [
+          { required: true, message: "价格不能为空", trigger: "blur" },
+          { validator: validatePrice, trigger: "blur" },
+        ],
+        amount: [
+          { required: true, message: "数量不能为空", trigger: "blur" },
+          { validator: validateAmount, trigger: "blur" },
+        ],
+        limit: [
+          { required: true, message: "数量不能为空", trigger: "blur" },
+          { validator: validateLimit, trigger: "blur" },
+        ],
+        imgIdList: [
+          { required: true, message: "请上传图片", trigger: "blur" }
+        ]
       },
       columns: [
         // 表头
@@ -178,21 +260,21 @@ export default {
           key: "id",
           align: "center",
           fixed: "left",
+          width:120
         },
         {
           title: "缩略图",
           key: "image",
           align: "center",
+          minWidth: 150,
           // sortable: true,
           render: (h, params) => {
-            console.log(params);
             return h("img", {
               attrs: {
                 src: params.row.image,
                 alt: "加载图片失败",
               },
               style: {
-                cursor: "pointer",
                 width: "70px",
                 height: "70px",
                 "object-fit": "contain",
@@ -209,26 +291,31 @@ export default {
           title: "商品名称",
           key: "title",
           align: "center",
+          minWidth: 150
         },
         {
           title: "描述",
           key: "sellPoint",
           align: "center",
+          minWidth: 200
         },
         {
           title: "单价",
           key: "price",
           align: "center",
+          width: 120
         },
         {
           title: "创建日期",
           key: "created",
           align: "center",
+          width: 120
         },
         {
           title: "更新日期",
           key: "updated",
           align: "center",
+          width: 120
         },
         {
           title: "状态",
@@ -236,22 +323,29 @@ export default {
           align: "center",
           width: 150,
           render: (h, params) => {
-            let re = "";
             if (params.row.status == 1) {
               return h("div", [
-                h("Tag", {
-                  props: {
-                    color: "success",
+                h(
+                  "Tag",
+                  {
+                    props: {
+                      color: "success",
+                    },
                   },
-                },"已发布"),
+                  "已发布"
+                ),
               ]);
             } else if (params.row.status == 0) {
               return h("div", [
-                h("Tag", {
-                  props: {
-                    color: "error",
+                h(
+                  "Tag",
+                  {
+                    props: {
+                      color: "error",
+                    },
                   },
-                },"已下架"),
+                  "已下架"
+                ),
               ]);
             }
           },
@@ -280,7 +374,7 @@ export default {
                     },
                   },
                 },
-                params.row.status ? '下架' : '发布'
+                params.row.status ? "下架" : "发布"
               ),
               h(
                 "Button",
@@ -330,6 +424,10 @@ export default {
       this.getParentList();
       // 获取表单数据
       this.getDataList();
+
+      this.accessToken = {
+        accessToken: this.getStore("accessToken")
+      };
     },
     getParentList() {
       // this.treeLoading = true;
@@ -472,7 +570,7 @@ export default {
     changePage(v) {
       this.searchForm.pageNumber = v;
       this.getDataList();
-      this.clearSelectAll();
+      // this.clearSelectAll();
     },
     changePageSize(v) {
       this.searchForm.pageSize = v;
@@ -604,9 +702,9 @@ export default {
       this.selectList = e;
       this.selectCount = e.length;
     },
-    clearSelectAll() {
+    /* clearSelectAll() {
       this.$refs.table.selectAll(false);
-    },
+    }, */
     add() {
       this.modalType = 0;
       this.modalTitle = "添加";
@@ -691,7 +789,7 @@ export default {
     // ##wu
     // 发布
     publish(v) {
-      let title = v.status ? '下架' : '发布'
+      let title = v.status ? "下架" : "发布";
       this.$Modal.confirm({
         title: title,
         // 记得确认修改此处
@@ -720,6 +818,39 @@ export default {
         this.searchForm.endDate = v[1];
       }
     },
+    // ##wu 文件上传
+    handleBeforeUpload() {
+      const check = this.uploadList.length < 5;
+      if (!check) {
+        this.$Notice.warning({
+          title: "最多只能上传5张图片",
+        });
+      }
+      return check;
+    },
+    handleFormatError(file) {
+      this.$Notice.warning({
+        title: "不支持的文件格式",
+        desc:
+          "所选文件‘ " +
+          file.name +
+          " ’格式不正确, 请选择 'jpg','jpeg','png' 格式文件"
+      });
+    },
+    handleSuccess(res, file) {
+      if (res.success) {
+        this.uploadList.push(res.result)
+      } else {
+        this.$Message.error(res.message);
+      }
+    },
+    handleError(error, file, fileList) {
+      this.loading = false;
+      this.$Message.error(error.toString());
+    },
+    handleRmove(file, fileList) {
+
+    },
     delAll() {
       if (this.selectCount <= 0) {
         this.$Message.warning("您还未选择要删除的数据");
@@ -747,7 +878,7 @@ export default {
           // 模拟请求成功
           this.$Message.success("操作成功");
           this.$Modal.remove();
-          this.clearSelectAll();
+          // this.clearSelectAll();
           this.getDataList();
         },
       });

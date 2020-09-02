@@ -24,6 +24,10 @@ module.exports = {
                 pathRewrite: {
                     '^/admin': '/admin'
                 }
+            },
+            "/item": {
+                target: 'http://192.168.0.56:8888',
+                ws: true,
             }
         }
     },

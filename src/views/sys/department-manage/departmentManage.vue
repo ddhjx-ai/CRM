@@ -356,6 +356,7 @@ export default {
           };
           res.result.unshift(first);
           this.dataEdit = res.result;
+          console.log(this.dataEdit)
         }
       });
     },
@@ -439,6 +440,9 @@ export default {
     },
     handleReset() {
       this.$refs.form.resetFields();
+      for(let key in this.form) {
+        this.form[key] = ''
+      }
       this.form.status = 0;
     },
     showSelect(e) {

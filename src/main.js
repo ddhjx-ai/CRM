@@ -25,9 +25,10 @@ import VueLazyload from 'vue-lazyload'
 import VueClipboard from 'vue-clipboard2'
 import VueApexCharts from 'vue-apexcharts'
 import '@babel/polyfill'
+import Print from 'vue-print-nb'
+Vue.use(Print);  //注册
 
 const WwLogin = window.WwLogin
-
 Vue.prototype.WwLogin = WwLogin
 Vue.config.productionTip = false
 Vue.use(VueLazyload, {

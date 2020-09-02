@@ -73,3 +73,52 @@ export const validateNum = (rule, value, callback) => {
     callback();
   }
 };
+
+/**
+ * 价格验证
+ * @param rule 验证规则(保留两位小数)
+ * @param value 需要验证的值
+ * @param callback 回调函数
+ */
+export const validatePrice = (rule, value, callback) => {
+  const reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
+  if(!reg.test(value)) {
+    callback(new Error('金额必须大于0并且只能精确到分'))
+  }else {
+    callback();
+  }
+};
+
+/**
+ * 库存验证
+ * @param rule 验证规则(最多10w，不能是小数和负数)
+ * @param value 需要验证的值
+ * @param callback 回调函数
+ */
+export const validateAmount = (rule, value, callback) => {
+  const reg = /^(0|[1-9][0-9]*)$/;
+  if(value.length > 5) {
+    callback(new Error('最多可以输入 5 个字符'));
+  } else if(!reg.test(value)) {
+    callback(new Error('总数必须大于等于0，并且不能是小数'))
+  }else {
+    callback();
+  }
+};
+
+/**
+ * 限制数量验证
+ * @param rule 验证规则(最多1w，不能是小数和负数)
+ * @param value 需要验证的值
+ * @param callback 回调函数
+ */
+export const validateLimit = (rule, value, callback) => {
+  const reg = /^(0|[1-9][0-9]*)$/;
+  if(value.length > 4) {
+    callback(new Error('最多可以输入 4 个字符'));
+  } else if(!reg.test(value)) {
+    callback(new Error('总数必须大于等于0，并且不能是小数'))
+  }else {
+    callback();
+  }
+};

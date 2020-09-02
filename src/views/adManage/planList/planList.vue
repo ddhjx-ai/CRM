@@ -151,7 +151,7 @@
 
 <script>
 import { postCrmRequest, removeCrm } from "@/libs/axios";
-import { validateNum } from "@/libs/validate";
+import { validatePrice } from "@/libs/validate";
 import axios from "axios";
 import qs from "qs";
 export default {
@@ -218,11 +218,11 @@ export default {
       formValidate: {
         price: [
           { required: true, message: "价格不能为空", trigger: "blur" },
-          { validator: validateNum, trigger: "blur" },
+          { validator: validatePrice, trigger: "blur" },
         ],
         amount: [
           { required: true, message: "金额不能为空", trigger: "blur" },
-          { validator: validateNum, trigger: "blur" },
+          { validator: validatePrice, trigger: "blur" },
         ],
         owner: [{ required: true, message: "请选择一个业主", trigger: "blur" }],
         startTime: [
