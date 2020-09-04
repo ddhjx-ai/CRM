@@ -5,10 +5,35 @@
 <template>
   <div class="search">
     <Card>
-      <Row class="operation">
-        <Button @click="delAll" icon="md-trash">批量删除</Button>
-        <Button @click="print" type="primary" icon="md-add">打印订单</Button>
-        <Button @click="getDataList" icon="md-refresh">刷新</Button>
+      <Row>
+        <Form ref="searchForm" :model="searchForm" inline :label-width="90" label-position="left">
+          <Form-item label="关键词：" prop="search">
+            <Input
+              type="text"
+              v-model="searchForm.search"
+              placeholder="请输入关键词"
+              clearable
+              style="width: 200px;"
+            />
+          </Form-item>
+          <Form-item style="margin-left:-35px;" class="br">
+            <Button @click="handleSearch" type="primary" icon="ios-search">搜索</Button>
+            <Button @click="handleReset">重置</Button>
+          </Form-item>
+        </Form>
+      </Row>
+      <Row class="operation" type="flex" justify="space-between">
+        <Col>
+          <Button @click="delAll" icon="md-trash">批量删除</Button>
+          <!-- <Button @click="print" type="primary" icon="md-add">打印订单</Button> -->
+          <Button @click="getDataList" icon="md-refresh">刷新</Button>
+        </Col>
+        <Col>
+          <div>
+            共有数据：
+            <span style="font-weight:bold;">{{totalCount}}</span> 条
+          </div>
+        </Col>
       </Row>
       <Row>
         <Table
@@ -24,11 +49,11 @@
       </Row>
       <Row type="flex" justify="end" class="page">
         <Page
-          :current="searchForm.pageNumber"
+          :current="searchForm.page"
           :total="total"
-          :page-size="searchForm.pageSize"
+          :page-size="searchForm.size"
           @on-change="changePage"
-          @on-page-size-change="changePageSize"
+          @on-page-size-change="changesize"
           :page-size-opts="[10,20,50]"
           size="small"
           show-total
@@ -46,7 +71,7 @@
         </FormItem>
       </Form>
       <div slot="footer">
-        <Button type="Default" @click="handleCancel">取消</Button>
+        <Button type="Default" @click="modalVisible = false">取消</Button>
         <Button type="primary" :loading="submitLoading" @click="handleSubmit">提交</Button>
       </div>
     </Modal>
@@ -73,7 +98,7 @@
     </Modal>
 
     <!-- 打印 -->
-    <Modal title="打印预览" v-model="printVisible" :mask-closable="false" :width="850">
+    <!-- <Modal title="打印预览" v-model="printVisible" :mask-closable="false" :width="850">
       <div id="printBox">
         <Row type="flex" justify="center">
           <Col span="24">
@@ -145,7 +170,10 @@
         </Row>
         <Row>
           <Col span="24">
-            <div class="totalPrice" style="margin-top: 20px">运费：￥{{printForm.postFee}} + 支付费用：￥{{printForm.payment}} - 订单折扣：￥0 = 订单总金额：￥{{printForm.payment}}</div>
+            <div
+              class="totalPrice"
+              style="margin-top: 20px"
+            >运费：￥{{printForm.postFee}} + 支付费用：￥{{printForm.payment}} - 订单折扣：￥0 = 订单总金额：￥{{printForm.payment}}</div>
           </Col>
         </Row>
         <Row>
@@ -162,17 +190,20 @@
       <div slot="footer" class="footer">
         <Button type="info" v-print="'#printBox'">打印</Button>
       </div>
-    </Modal>
+    </Modal> -->
   </div>
 </template>
 
 <script>
 import { validatePrice } from "@/libs/validate";
+import { getOrderList, getOrderCount, removeOrder, updateOrder } from "@/libs/businessRoom";
 import Print from "print-js";
+import qs from 'qs';
 export default {
-  name: "orderList",
+  name: "orderPage",
   data() {
     return {
+      totalCount: 0, // 数据总数
       printVisible: false,
       printForm: {},
       printData: [
@@ -247,10 +278,9 @@ export default {
       loading: true, // 表单加载状态
       searchForm: {
         // 搜索框对应data对象
-        pageNumber: 1, // 当前页数
-        pageSize: 10, // 页面大小
-        sort: "createTime", // 默认排序字段
-        order: "desc", // 默认排序方式
+        page: 1, // 当前页数
+        size: 10, // 页面大小
+        search: "",
       },
       modalVisible: false, // 添加或编辑显示
       editForm: {
@@ -271,27 +301,27 @@ export default {
           fixed: "left",
         },
         {
-          title: "账单",
+          title: "订单号",
           key: "orderId",
           width: 120,
           align: "center",
           fixed: "left",
         },
         {
-          title: "支付金额(￥)",
-          key: "orderId",
-          width: 110,
+          title: "产品名称",
+          key: "itemName",
+          minWidth: 150,
+          align: "center",
+        },
+        {
+          title: "支付金额",
+          key: "payment",
+          width: 120,
           align: "center",
         },
         {
           title: "用户账号",
           key: "buyerNick",
-          width: 120,
-          align: "center",
-        },
-        {
-          title: "物流号",
-          key: "shippingCode",
           minWidth: 120,
           align: "center",
         },
@@ -305,27 +335,17 @@ export default {
           title: "创建时间",
           key: "createTime",
           width: 120,
-          sortType: "desc",
+          render: (h, params) => {
+            return h("div", {}, this.formdate(params.row.createTime));
+          },
         },
         {
           title: "支付时间",
           key: "paymentTime",
           width: 120,
-          sortType: "desc",
-        },
-        {
-          title: "关闭时间",
-          key: "closeTime",
-          width: 120,
-          sortType: "desc",
-        },
-        {
-          title: "完成时间",
-          key: "consignTime",
-          width: 120,
-          sortable: true,
-          // 禁止配置的列
-          disabled: true,
+          render: (h, params) => {
+            return h("div", {}, this.formdate(params.row.paymentTime));
+          },
         },
         {
           title: "订单状态",
@@ -333,7 +353,19 @@ export default {
           align: "center",
           width: 120,
           render: (h, params) => {
-            if (params.row.status == 1) {
+            if (params.row.status == 0) {
+              return h("div", [
+                h(
+                  "Tag",
+                  {
+                    props: {
+                      color: "primary",
+                    },
+                  },
+                  "等待付款"
+                ),
+              ]);
+            } else if (params.row.status === 1) {
               return h("div", [
                 h(
                   "Tag",
@@ -342,19 +374,19 @@ export default {
                       color: "success",
                     },
                   },
-                  "已发布"
+                  "已完成"
                 ),
               ]);
-            } else if (params.row.status == 0) {
+            } else if (params.row.status === 2) {
               return h("div", [
                 h(
                   "Tag",
                   {
                     props: {
-                      color: "error",
+                      color: "warning",
                     },
                   },
-                  "已下架"
+                  "已取消"
                 ),
               ]);
             }
@@ -364,10 +396,10 @@ export default {
           title: "操作",
           key: "action",
           align: "center",
-          width: 260,
+          width: 150,
           render: (h, params) => {
             return h("div", [
-              h(
+              /* h(
                 "Button",
                 {
                   props: {
@@ -385,7 +417,7 @@ export default {
                   },
                 },
                 "发货"
-              ),
+              ), */
               h(
                 "Button",
                 {
@@ -424,7 +456,7 @@ export default {
                 },
                 "删除"
               ),
-              h(
+              /* h(
                 "Button",
                 {
                   props: {
@@ -439,7 +471,7 @@ export default {
                   },
                 },
                 "取消订单"
-              ),
+              ), */
             ]);
           },
         },
@@ -447,6 +479,7 @@ export default {
       columnChange: false,
       data: [], // 表单数据
       total: 0, // 表单数据总数
+      updateId: 0, // 编辑的id
     };
   },
   // 表格动态列 计算属性
@@ -454,8 +487,28 @@ export default {
   methods: {
     init() {
       this.getDataList();
+      this.getAllCount();
     },
-    changeColumns(v) {
+    // 获取总数据
+    getAllCount() {
+      getOrderCount().then((res) => {
+        if (res.success) {
+          this.totalCount = res.result;
+        }
+      });
+    },
+    // 时间处理函数
+    formdate(date) {
+      let time = new Date(date);
+      let year = time.getFullYear();
+      let month = (time.getMonth() + 1).toString().padStart(2, "0");
+      let day = time.getDate().toString().padStart(2, "0");
+      let hour = time.getHours().toString().padStart(2, "0");
+      let minute = time.getMinutes().toString().padStart(2, "0");
+      let second = time.getSeconds().toString().padStart(2, "0");
+      return `${year}-${month}-${day} ${hour}:${minute}`;
+    },
+    /* changeColumns(v) {
       this.columns.map((item) => {
         let hide = true;
         for (let i = 0; i < v.length; i++) {
@@ -473,14 +526,14 @@ export default {
       });
       // 触发计算方法
       this.columnChange = !this.columnChange;
-    },
+    }, */
     changePage(v) {
-      this.searchForm.pageNumber = v;
+      this.searchForm.page = v;
       this.getDataList();
       this.clearSelectAll();
     },
-    changePageSize(v) {
-      this.searchForm.pageSize = v;
+    changesize(v) {
+      this.searchForm.size = v;
       this.getDataList();
     },
     changeSort(e) {
@@ -491,78 +544,57 @@ export default {
       }
       this.getDataList();
     },
+    // 获取列表数据
     getDataList() {
       this.loading = true;
-      // 请求后端获取表单数据 请自行修改接口
-      // this.getRequest("请求路径", this.searchForm).then(res => {
-      //   this.loading = false;
-      //   if (res.success) {
-      //     this.data = res.result.content;
-      //     this.total = res.result.totalElements;
-      //   }
-      // });
-      // 以下为模拟数据
-      this.data = [
-        {
-          buyerComment: null,
-          buyerMessage: "清早起床拥抱太阳",
-          buyerNick: "test",
-          closeTime: 1597979655000,
-          consignTime: 1597883105000,
-          createTime: 1597827974000,
-          endTime: null,
-          orderId: "159782797402768",
-          payment: 49,
-          paymentTime: 1597827989000,
-          paymentType: null,
-          postFee: 0,
-          shippingCode: "123",
-          shippingName: "京东快递",
-          status: 5,
-          updateTime: 1597979655000,
-          userId: 62,
-        },
-        {
-          buyerComment: null,
-          buyerMessage: "和工具和开关机",
-          buyerNick: "test",
-          closeTime: 1598338800000,
-          consignTime: null,
-          createTime: 1598252400000,
-          endTime: null,
-          orderId: "159825239969202",
-          payment: 89,
-          paymentTime: null,
-          paymentType: null,
-          postFee: null,
-          shippingCode: null,
-          shippingName: null,
-          status: 5,
-          updateTime: 1598515145000,
-          userId: 62,
-        },
-      ];
-      this.total = this.data.length;
-      this.loading = false;
+      getOrderList(this.searchForm).then((res) => {
+        this.loading = false;
+        if (res.success) {
+          this.data = res.result.list;
+          this.total = res.result.count;
+        }
+      });
+    },
+    // 查询
+    handleSearch() {
+      let data = {
+        page: 1,
+        size: 10,
+        search: this.searchForm.search,
+      };
+      this.loading = true;
+      getOrderList(data).then((res) => {
+        this.loading = false;
+        if (res.success) {
+          this.data = res.result.list;
+          this.total = res.result.count;
+        }
+      });
+    },
+    // 重置
+    handleReset() {
+      this.$refs.searchForm.resetFields();
+      this.searchForm.page = 1;
+      this.searchForm.size = 10;
+      // 重新加载数据
+      this.getDataList();
     },
     handleCancel() {
       this.modalVisible = false;
     },
     handleSubmit() {
       // 编辑
-      // this.postRequest("请求地址", this.form).then(res => {
-      //   this.submitLoading = false;
-      //   if (res.success) {
-      //     this.$Message.success("操作成功");
-      //     this.getDataList();
-      //     this.modalVisible = false;
-      //   }
-      // });
-      // 模拟请求成功
-      this.submitLoading = false;
-      this.$Message.success("操作成功");
-      this.getDataList();
-      this.modalVisible = false;
+      let data = {
+        note: this.editForm.buyerMessage
+      }
+      updateOrder(this.updateId, qs.stringify(data)).then(res => {
+        this.submitLoading = false;
+        if (res.success) {
+          this.$Message.success("操作成功");
+          this.getDataList();
+          this.modalVisible = false;
+        }
+      });
     },
     // 发货提交
     sendSubmit() {
@@ -581,6 +613,7 @@ export default {
       this.modalVisible = false;
     },
     edit(v) {
+      this.updateId = v.orderId;
       this.modalVisible = true;
       this.$refs.editForm.resetFields();
       // 转换null为""
@@ -591,7 +624,7 @@ export default {
       }
       let str = JSON.stringify(v);
       let data = JSON.parse(str);
-      this.editForm = data;
+      this.editForm.buyerMessage = data.buyerMessage
     },
     remove(v) {
       this.$Modal.confirm({
@@ -601,17 +634,13 @@ export default {
         loading: true,
         onOk: () => {
           // 删除
-          // this.deleteRequest("请求地址，如/deleteByIds/" + v.id).then(res => {
-          //   this.$Modal.remove();
-          //   if (res.success) {
-          //     this.$Message.success("操作成功");
-          //     this.getDataList();
-          //   }
-          // });
-          // 模拟请求成功
-          this.$Message.success("操作成功");
-          this.$Modal.remove();
-          this.getDataList();
+          removeOrder([v.orderId]).then((res) => {
+            this.$Modal.remove();
+            if (res.success) {
+              this.$Message.success("操作成功");
+              this.init();
+            }
+          });
         },
       });
     },
@@ -681,25 +710,19 @@ export default {
         content: "您确认要删除所选的 " + this.selectCount + " 条数据?",
         loading: true,
         onOk: () => {
-          let ids = "";
-          this.selectList.forEach(function (e) {
-            ids += e.id + ",";
+          let ids = [];
+          ids = this.selectList.map(function (e) {
+            return e.orderId;
           });
-          ids = ids.substring(0, ids.length - 1);
           // 批量删除
-          // this.deleteRequest("请求地址，如/deleteByIds/" + ids).then(res => {
-          //   this.$Modal.remove();
-          //   if (res.success) {
-          //     this.$Message.success("操作成功");
-          //     this.clearSelectAll();
-          //     this.getDataList();
-          //   }
-          // });
-          // 模拟请求成功
-          this.$Message.success("操作成功");
-          this.$Modal.remove();
-          this.clearSelectAll();
-          this.getDataList();
+          removeOrder(ids).then((res) => {
+            this.$Modal.remove();
+            if (res.success) {
+              this.$Message.success("操作成功");
+              this.clearSelectAll();
+              this.init();
+            }
+          });
         },
       });
     },

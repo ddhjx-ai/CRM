@@ -1,20 +1,18 @@
 const CompressionPlugin = require('compression-webpack-plugin');
-
 module.exports = {
     devServer: {
-        disableHostCheck: true,
         host: '0.0.0.0',
         port: 8888,
-        proxy: {
-            '/xboot': {
-                // target: 'http://presale.chinabidding.cn/osc',  // 请求本地 需要xboot后端项目
+        proxy: /* [
+            {
+                context: ['/item', '/order', '/xboot'],
                 target: 'http://192.168.0.56:8888',
-                // target: 'http://2fcch2.natappfree.cc',
+            }
+        ] */
+        {
+            '/xboot': {
+                target: 'http://192.168.0.56:8888',
                 ws: true,
-                // changeOrigin: true,
-                // pathRewrite: {
-                //     '^/xboot': '/'
-                // }
             },
             '/admin': {
                 target: 'https://crm.chinabidding.cn',
@@ -28,7 +26,11 @@ module.exports = {
             "/item": {
                 target: 'http://192.168.0.56:8888',
                 ws: true,
-            }
+            },
+            '/order-manager': {
+                target: 'http://192.168.0.56:8888',
+                ws: true,
+            },
         }
     },
     // 打包时不生成.map文件 避免看到源码

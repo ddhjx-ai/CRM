@@ -66,7 +66,7 @@
       </div>
     </div>
 
-    <div :id="id" :style="{minHeight: minHeight}"></div>
+    <div :id="id" :style="{height: minHeight}"></div>
 
     <Modal
       title="编辑html代码"
@@ -108,33 +108,33 @@ export default {
   props: {
     id: {
       type: String,
-      default: "quill"
+      default: "quill",
     },
     value: String,
     base64: {
       type: Boolean,
-      default: false
+      default: false,
     },
     minHeight: {
       type: String,
-      default: "300px"
+      default: "300px",
     },
     expandHtml: {
       type: Boolean,
-      default: true
+      default: true,
     },
     expandPreview: {
       type: Boolean,
-      default: true
+      default: true,
     },
     expandClear: {
       type: Boolean,
-      default: true
+      default: true,
     },
     openXss: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
@@ -144,28 +144,28 @@ export default {
       options: {
         theme: "snow",
         modules: {
-          toolbar: `#${this.id}-toolbar`
+          toolbar: `#${this.id}-toolbar`,
         },
-        placeholder: "在这输入内容 ..."
+        placeholder: "在这输入内容 ...",
       },
       data: this.value, // 富文本数据
       dataEdit: "", // 编辑数据
       showHTMLModal: false, // 显示html
       full: false, // html全屏开关
-      fullscreenModal: false // 显示全屏预览
+      fullscreenModal: false, // 显示全屏预览
     };
   },
   methods: {
     initEditor() {
       this.accessToken = {
-        accessToken: this.getStore("accessToken")
+        accessToken: this.getStore("accessToken"),
       };
       editor = new Quill(`#${this.id}`, this.options);
       let that = this;
       if (this.value) {
         editor.pasteHTML(this.value);
       }
-      editor.on("text-change", function(delta, oldDelta, source) {
+      editor.on("text-change", function (delta, oldDelta, source) {
         let html = editor.container.firstChild.innerHTML;
         if (that.openXss) {
           that.data = xss(html);
@@ -182,13 +182,13 @@ export default {
         desc:
           "所选文件‘ " +
           file.name +
-          " ’格式不正确, 请选择 .jpg .jpeg .png .gif .bmp格式文件"
+          " ’格式不正确, 请选择 .jpg .jpeg .png .gif .bmp格式文件",
       });
     },
     handleMaxSize(file) {
       this.$Notice.warning({
         title: "文件大小过大",
-        desc: "所选文件‘ " + file.name + " ’大小过大, 不得超过 5M."
+        desc: "所选文件‘ " + file.name + " ’大小过大, 不得超过 5M.",
       });
     },
     beforeUpload() {
@@ -236,8 +236,12 @@ export default {
           editor.pasteHTML(this.data);
           this.$emit("input", this.data);
           this.$emit("on-change", this.data);
-        }
+        },
       });
+    },
+    clearFromFa() {
+      this.data = "";
+      editor.pasteHTML(this.data);
     },
     setData(value) {
       if (!editor) {
@@ -251,16 +255,16 @@ export default {
         this.$emit("input", this.data);
         this.$emit("on-change", this.data);
       }
-    }
+    },
   },
   watch: {
     value(val) {
       this.setData(val);
-    }
+    },
   },
   mounted() {
     this.initEditor();
-  }
+  },
 };
 </script>
 

@@ -10,44 +10,10 @@
         <Button @click="addSub" type="primary" icon="md-add">添加子级分类</Button>
         <Button @click="addRoot" icon="md-add">添加根节点分类</Button>
         <Button @click="getParentList" icon="md-refresh">刷新</Button>
-        <!-- <Input
-          v-model="searchKey"
-          suffix="ios-search"
-          @on-change="search"
-          placeholder="输入分类名搜索"
-          clearable
-          style="width: 250px"
-          v-show="showType=='list'"
-        />-->
-        <!-- <i-switch v-model="strict" size="large" v-show="showType=='tree'" style="margin-left:5px" v-if="hide">
-          <span slot="open">级联</span>
-          <span slot="close">单选</span>
-        </i-switch>
-        <div style="float: right" v-if="hide">
-          <RadioGroup v-model="showType" type="button">
-            <Radio title="树结构" label="tree">
-              <Icon type="md-list"></Icon>
-            </Radio>
-            <Radio title="列表" label="list">
-              <Icon type="ios-apps"></Icon>
-            </Radio>
-          </RadioGroup>
-        </div>-->
       </Row>
       <Row type="flex" justify="start">
         <Col :md="8" :lg="8" :xl="6">
-          <!-- <Alert show-icon>
-            当前选择编辑：
-            <span class="select-title">{{editTitle}}</span>
-            <a class="select-clear" v-if="form.id" @click="cancelEdit">取消选择</a>
-          </Alert>
-          <Input
-            v-model="searchKey"
-            suffix="ios-search"
-            @on-change="search"
-            placeholder="输入分类名搜索"
-            clearable
-          />-->
+          
           <div class="tree-bar" :style="{maxHeight: maxHeight}">
             <Tree
               ref="tree"
@@ -87,47 +53,6 @@
                 </Poptip>
               </div>
             </FormItem>
-
-            <!-- <FormItem label="部门负责人" prop="mainHeader">
-              <Select
-                :loading="userLoading"
-                not-found-text="该部门暂无用户数据"
-                v-model="form.mainHeader"
-                multiple
-                filterable
-                placeholder="请选择或输入搜索用户"
-              >
-                <Option
-                  v-for="item in users"
-                  :value="item.id"
-                  :key="item.id"
-                  :label="item.nickname"
-                >
-                  <span style="margin-right:10px;">{{ item.nickname }}</span>
-                  <span style="color:#ccc;">{{ item.username }}</span>
-                </Option>
-              </Select>
-            </FormItem>
-            <FormItem label="副负责人" prop="viceHeader">
-              <Select
-                :loading="userLoading"
-                not-found-text="该部门暂无用户数据"
-                v-model="form.viceHeader"
-                multiple
-                filterable
-                placeholder="请选择或输入搜索用户"
-              >
-                <Option
-                  v-for="item in users"
-                  :value="item.id"
-                  :key="item.id"
-                  :label="item.nickname"
-                >
-                  <span style="margin-right:10px;">{{ item.nickname }}</span>
-                  <span style="color:#ccc;">{{ item.username }}</span>
-                </Option>
-              </Select>
-            </FormItem>-->
             <FormItem label="排序值：" prop="sortOrder">
               <Tooltip trigger="hover" placement="right" content="值越小越靠前，支持小数">
                 <InputNumber :max="1000" :min="0" v-model="form.sortOrder"></InputNumber>
@@ -149,27 +74,10 @@
                 type="primary"
                 icon="ios-create-outline"
               >修改并保存</Button>
-              <!-- <Button @click="handleReset">重置</Button> -->
             </Form-item>
           </Form>
         </Col>
       </Row>
-      <!-- <Alert show-icon v-show="showType=='list'">
-        已选择
-        <span class="select-count">{{selectCount}}</span> 项
-        <a class="select-clear" @click="clearSelectAll">清空</a>
-      </Alert>
-      <Table
-        row-key="title"
-        :load-data="loadData"
-        :columns="columns"
-        :data="data"
-        :loading="loading"
-        border
-        ref="table"
-        @on-selection-change="showSelect"
-        v-if="showType=='list'"
-      ></Table>-->
     </Card>
 
     <Modal
@@ -186,10 +94,21 @@
         <FormItem label="分类名称：" prop="name">
           <Input v-model="subForm.name" />
         </FormItem>
-        <FormItem label="是否为父节点：">
-          <i-switch size="large" v-model="subForm.isParent" :true-value="1" :false-value="0">
+        <FormItem label="排序值：" prop="sortOrder">
+          <Tooltip trigger="hover" placement="right" content="值越小越靠前，支持小数">
+            <InputNumber :max="1000" :min="0" v-model="subForm.sortOrder"></InputNumber>
+          </Tooltip>
+        </FormItem>
+        <FormItem label="是否启用：">
+          <i-switch size="large" v-model="subForm.status" :true-value="1" :false-value="0">
             <span slot="open">启用</span>
             <span slot="close">禁用</span>
+          </i-switch>
+        </FormItem>
+        <FormItem label="是否为父节点：">
+          <i-switch size="large" v-model="subForm.isParent" :true-value="1" :false-value="0">
+            <span slot="open">是</span>
+            <span slot="close">否</span>
           </i-switch>
         </FormItem>
         <FormItem label="备注：">
@@ -203,10 +122,27 @@
     </Modal>
 
     <!-- 根节点分类 -->
-    <Modal title="添加根节点分类" v-model="rootVisible" :mask-closable="false" :width="500" @on-cancel="cancelRoot">
+    <Modal
+      title="添加根节点分类"
+      v-model="rootVisible"
+      :mask-closable="false"
+      :width="500"
+      @on-cancel="cancelRoot"
+    >
       <Form ref="rootForm" :model="rootForm" :label-width="130" :rules="formValidate">
         <FormItem label="分类名称：" prop="name">
           <Input v-model="rootForm.name" />
+        </FormItem>
+        <FormItem label="排序值：" prop="sortOrder">
+          <Tooltip trigger="hover" placement="right" content="值越小越靠前，支持小数">
+            <InputNumber :max="1000" :min="0" v-model="rootForm.sortOrder"></InputNumber>
+          </Tooltip>
+        </FormItem>
+        <FormItem label="是否启用：">
+          <i-switch size="large" v-model="rootForm.status" :true-value="1" :false-value="0">
+            <span slot="open">启用</span>
+            <span slot="close">禁用</span>
+          </i-switch>
         </FormItem>
         <FormItem label="是否为父节点：">
           <i-switch size="large" v-model="rootForm.isParent" :true-value="1" :false-value="0">
@@ -236,7 +172,7 @@ import {
   searchDepartment,
   getUserByDepartmentId,
 } from "@/api/index";
-import { getCateList, cateUpdate, cateRemove, cateAdd } from "@/libs/axios";
+import { getCateList, cateUpdate, cateRemove, cateAdd } from "@/libs/businessRoom";
 import qs from "qs";
 export default {
   name: "department-manage",
@@ -244,8 +180,6 @@ export default {
     return {
       rootVisible: false,
       subVisible: false,
-      hide: false,
-      // showType: "tree",
       loading: true,
       maxHeight: "500px",
       strict: true,
@@ -268,11 +202,15 @@ export default {
         name: "",
         isParent: 0,
         remark: "",
+        status: 1,
+        sortOrder: 0,
       },
       rootForm: {
         name: "",
         isParent: 1,
         remarks: "",
+        sortOrder: 1,
+        status: 1,
       },
       formValidate: {
         name: [{ required: true, message: "名称不能为空", trigger: "blur" }],
@@ -296,21 +234,7 @@ export default {
     },
     getParentList() {
       this.loading = true;
-      /* initDepartment().then((res) => {
-        this.loading = false;
-        if (res.success) {
-          res.result.forEach(function (e) {
-            if (e.isParent) {
-              e.loading = false;
-              e.children = [];
-              e._loading = false;
-            }
-          });
-          this.data = res.result;
-        }
-      }); */
       getCateList({ id: 0 }).then((res) => {
-        console.log(res);
         this.loading = false;
         res.forEach((e) => {
           e.title = e.name;
@@ -329,21 +253,6 @@ export default {
       this.loadingEdit = true;
       getCateList({ id: 0 }).then((res) => {
         this.loadingEdit = false;
-        /* if (res.success) {
-          res.result.forEach(function (e) {
-            if (e.isParent) {
-              e.loading = false;
-              e.children = [];
-            }
-          });
-          // 头部加入一级
-          let first = {
-            id: "0",
-            title: "一级分类",
-          };
-          res.result.unshift(first);
-          this.dataEdit = res.result;
-        } */
         res.forEach((e) => {
           e.title = e.name;
           if (e.isParent) {
@@ -360,19 +269,6 @@ export default {
       });
     },
     loadData(item, callback) {
-      /* loadDepartment(item.id).then((res) => {
-        if (res.success) {
-          res.result.forEach(function (e) {
-            if (e.isParent) {
-              e.loading = false;
-              e.children = [];
-              e._loading = false;
-            }
-          });
-          callback(res.result);
-        }
-      }); */
-
       getCateList({ id: item.id }).then((res) => {
         if (res.length > 0) {
           res.forEach((e) => {
@@ -385,20 +281,28 @@ export default {
             }
           });
           callback(res);
+        } else {
+          callback([]);
+          this.$Message.warning("该分类暂未添加子级分类");
         }
       });
     },
     loadData1(item, callback) {
       getCateList({ id: item.id }).then((res) => {
-        res.forEach((e) => {
-          e.title = e.name;
-          if (e.isParent) {
-            e.loading = false;
-            e.children = [];
-            e._loading = false;
-          }
-        });
-        callback(res);
+        if (res.length > 0) {
+          res.forEach((e) => {
+            e.title = e.name;
+            if (e.isParent) {
+              e.loading = false;
+              e.children = [];
+              e._loading = false;
+            }
+          });
+          callback(res);
+        } else {
+          callback([]);
+          this.$Message.warning("该分类暂未添加子级分类");
+        }
       });
     },
     search() {
@@ -428,7 +332,6 @@ export default {
         }
         let str = JSON.stringify(v[0]);
         let data = JSON.parse(str);
-        // data.status = data.status ? 0 : -1;
         data.parentTitle = "";
         this.form = data;
         if (!this.currentParent) {
@@ -436,16 +339,6 @@ export default {
         } else {
           this.form.parentTitle = this.currentParent.title;
         }
-        // 加载部门用户数据
-        /* this.userLoading = true;
-        getUserByDepartmentId(data.id).then(res => {
-          this.userLoading = false;
-          if (res.success) {
-            this.users = res.result;
-            // 回显
-            this.form = data;
-          }
-        }); */
       } else {
         this.cancelEdit();
         this.currentId = "";
@@ -483,13 +376,6 @@ export default {
     cancelSub() {
       this.$refs.subForm.resetFields();
     },
-    /* handleReset() {
-      this.$refs.form.resetFields();
-      for (let key in this.form) {
-        this.form[key] = "";
-      }
-      this.form.status = 0;
-    }, */
     showSelect(e) {
       this.selectList = e;
       this.selectCount = e.length;
@@ -498,15 +384,6 @@ export default {
       this.$refs.table.selectAll(false);
     },
     submitEdit() {
-      /* 
-        id: 581
-parentId: 580
-status: 1
-isParent: true
-name: 摄影摄像
-parentName: 数码
-sortOrder: 1
-      */
       var data = {
         id: this.form.id,
         parentId: this.form.pid,
@@ -523,14 +400,6 @@ sortOrder: 1
             return;
           }
           this.submitLoading = true;
-          /* editDepartment(this.form).then((res) => {
-            this.submitLoading = false;
-            if (res.success) {
-              this.$Message.success("编辑成功");
-              this.init();
-              this.modalVisible = false;
-            }
-          }); */
           cateUpdate(qs.stringify(data)).then((res) => {
             this.submitLoading = false;
             if (res.success) {
@@ -558,6 +427,25 @@ sortOrder: 1
               this.$Message.success("添加成功");
               this.init();
               this.subVisible = false;
+            }
+          });
+        }
+      });
+    },
+    rootSubmit() {
+      this.$refs.rootForm.validate((valid) => {
+        if (valid) {
+          let params = {
+            parentId: 0,
+            ...this.rootForm,
+          };
+          this.submitLoading = true;
+          cateAdd(qs.stringify(params)).then((res) => {
+            this.submitLoading = false;
+            if (res.success) {
+              this.$Message.success("添加成功");
+              this.init();
+              this.rootVisible = false;
             }
           });
         }
@@ -599,21 +487,6 @@ sortOrder: 1
         content: "您确认要删除所选的数据?",
         loading: true,
         onOk: () => {
-          /* let ids = "";
-          this.selectList.forEach(function (e) {
-            ids += e.id + ",";
-          });
-          ids = ids.substring(0, ids.length - 1);
-          deleteDepartment({ ids: ids }).then((res) => {
-            this.$Modal.remove();
-            if (res.success) {
-              this.$Message.success("删除成功");
-              this.selectList = [];
-              this.selectCount = 0;
-              // this.cancelEdit();
-              this.init();
-            }
-          }); */
           cateRemove(this.currentId).then((res) => {
             this.$Modal.remove();
             if (res.success) {

@@ -29,7 +29,7 @@
     <Upload
       ref="upload"
       :multiple="multiple"
-      :show-upload-list="false"
+      :show-upload-list="true"
       :on-success="handleSuccess"
       :on-error="handleError"
       :format="format"
@@ -56,62 +56,63 @@ import "viewerjs/dist/viewer.css";
 import Viewer from "viewerjs";
 import { uploadFile } from "@/api/index";
 import vuedraggable from "vuedraggable";
+import { uploadImgUrl, updateProduct } from "@/libs/businessRoom";
 export default {
   name: "uploadPicThumb",
   components: {
-    vuedraggable
+    vuedraggable,
   },
   props: {
     value: {
-      type: null
+      type: null,
     },
     draggable: {
       type: Boolean,
-      default: true
+      default: true,
     },
     multiple: {
       type: Boolean,
-      default: true
+      default: true,
     },
     maxSize: {
       type: Number,
-      default: 5
+      default: 5,
     },
     limit: {
       type: Number,
-      default: 10
+      default: 10,
     },
     width: {
       type: String,
-      default: "60px"
+      default: "60px",
     },
     height: {
       type: String,
-      default: "60px"
+      default: "60px",
     },
     accept: {
       type: String,
-      default: ".jpg, .jpeg, .png, .gif"
-    }
+      default: ".jpg, .jpeg, .png, .gif",
+    },
   },
   computed: {
     format() {
       if (this.accept) {
         let format = [];
-        this.accept.split(",").forEach(e => {
+        this.accept.split(",").forEach((e) => {
           format.push(e.replace(".", "").replace(" ", ""));
         });
         return format;
       } else {
         return [];
       }
-    }
+    },
   },
   data() {
     return {
       accessToken: {},
-      uploadFileUrl: uploadFile,
-      uploadList: []
+      uploadFileUrl: uploadImgUrl,
+      uploadList: [],
     };
   },
   methods: {
@@ -121,16 +122,16 @@ export default {
     init() {
       this.setData(this.value, true);
       this.accessToken = {
-        accessToken: this.getStore("accessToken")
+        accessToken: this.getStore("accessToken"),
       };
     },
     handleView(v, i) {
       let image = new Image();
       image.src = v;
       let viewer = new Viewer(image, {
-        hidden: function() {
+        hidden: function () {
           viewer.destroy();
-        }
+        },
       });
       viewer.show();
     },
@@ -165,7 +166,7 @@ export default {
           file.name +
           " ’格式不正确, 请选择 " +
           this.accept +
-          " 图片格式文件"
+          " 图片格式文件",
       });
     },
     handleMaxSize(file) {
@@ -176,7 +177,7 @@ export default {
           file.name +
           " ’大小过大, 不得超过 " +
           this.maxSize +
-          "M."
+          "M.",
       });
     },
     handleBeforeUpload() {
@@ -204,7 +205,7 @@ export default {
         this.$emit("on-change", v);
       } else {
         let v = [];
-        this.uploadList.forEach(e => {
+        this.uploadList.forEach((e) => {
           v.push(e.url);
         });
         this.$emit("input", v);
@@ -224,7 +225,7 @@ export default {
         this.uploadList = [];
         let item = {
           url: v,
-          status: "finished"
+          status: "finished",
         };
         this.uploadList.push(item);
         this.$emit("on-change", v);
@@ -239,7 +240,7 @@ export default {
           for (let i = 0; i < this.limit; i++) {
             let item = {
               url: v[i],
-              status: "finished"
+              status: "finished",
             };
             this.uploadList.push(item);
           }
@@ -249,26 +250,26 @@ export default {
           }
           this.$Message.warning("最多只能上传" + this.limit + "张图片");
         } else {
-          v.forEach(e => {
+          v.forEach((e) => {
             let item = {
               url: e,
-              status: "finished"
+              status: "finished",
             };
             this.uploadList.push(item);
           });
           this.$emit("on-change", v);
         }
       }
-    }
+    },
   },
   watch: {
     value(val) {
       this.setData(val);
-    }
+    },
   },
   mounted() {
     this.init();
-  }
+  },
 };
 </script>
 

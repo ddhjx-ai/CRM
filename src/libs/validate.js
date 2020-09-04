@@ -66,9 +66,9 @@ export const validateIDCard = (rule, value, callback) => {
  * @param callback 回调函数
  */
 export const validateNum = (rule, value, callback) => {
-  value = Number(value)
-  if (typeof value != 'number' || isNaN(value)) {
-    callback(new Error('请输入合法的数字'));
+  const reg = /^(0|[1-9][0-9]*)$/;
+  if (!reg.test(value)) {
+    callback(new Error('总数必须大于等于0，并且不能是小数'))
   } else {
     callback();
   }

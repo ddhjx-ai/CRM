@@ -7,18 +7,6 @@
     <Card>
       <Row type="flex" justify="space-between">
         <Col v-if="expand" span="3">
-          <!-- <Alert show-icon>
-            当前选择：
-            <span class="select-title">{{editTitle}}</span>
-            <a class="select-clear" v-if="editTitle" @click="cancelEdit">取消选择</a>
-          </Alert>
-          <Input
-            v-model="searchKey"
-            suffix="ios-search"
-            @on-change="search"
-            placeholder="输入节点名搜索"
-            clearable
-          />-->
           <h3>
             <Icon type="ios-list-box-outline" />商品分类
           </h3>
@@ -32,48 +20,43 @@
         </div>
         <Col :span="span">
           <Row>
-            <Form ref="searchForm" :model="searchForm" inline :label-width="100">
-              <Form-item label="日期范围：">
-                <DatePicker
-                  v-model="selectDate"
-                  type="daterange"
-                  format="yyyy-MM-dd"
-                  clearable
-                  @on-change="selectDateRange"
-                  placeholder="选择起始时间"
-                  style="width: 200px"
-                ></DatePicker>
+            <Form ref="searchForm" :model="searchForm" inline :label-width="90" label-position='left'>
+              <Form-item label="日期范围：" prop='start'>
+                <DatePicker type="date" placeholder="起始时间" format="yyyy-MM-dd" @on-change="startChange" v-model="searchForm.start" style="width: 200px"></DatePicker>
               </Form-item>
-              <Form-item class="hideLabel">
+              <Form-item class="formSpan">
+                <span>-</span>
+              </Form-item>
+              <Form-item class="hideLabel" prop="end">
+                <DatePicker type="date" placeholder="结束时间" format="yyyy-MM-dd" @on-change="endChange" v-model="searchForm.end" style="width: 200px"></DatePicker>
+              </Form-item>
+              <Form-item class="searchLabel" prop="search">
                 <Input
                   type="text"
-                  v-model="searchForm.searchKey"
+                  v-model="searchForm.search"
                   placeholder="商品名称、商品描述、价格"
                   clearable
                   style="width: 200px;"
                 />
               </Form-item>
-              <!-- <Form-item label="状态" prop="status">
-                <Select
-                  v-model="searchForm.status"
-                  placeholder="请选择"
-                  clearable
-                  style="width: 200px"
-                >
-                  <Option value="0">正常</Option>
-                  <Option value="-1">禁用</Option>
-                </Select>
-              </Form-item>-->
               <Form-item style="margin-left:-35px;" class="br">
                 <Button @click="handleSearch" type="primary" icon="ios-search">搜索</Button>
                 <Button @click="handleReset">重置</Button>
               </Form-item>
             </Form>
           </Row>
-          <Row class="operation">
-            <Button @click="add" type="primary" icon="md-add">添加</Button>
-            <Button @click="delAll" icon="md-trash">批量删除</Button>
-            <Button @click="getDataList" icon="md-refresh">刷新</Button>
+          <Row class="operation" type="flex" justify="space-between">
+            <Col>
+              <Button @click="add" type="primary" icon="md-add">添加</Button>
+              <Button @click="delAll" icon="md-trash">批量删除</Button>
+              <Button @click="getDataList" icon="md-refresh">刷新</Button>
+            </Col>
+            <Col>
+              <div>
+                共有数据：
+                <span style="font-weight:bold;">{{totalCount}}</span> 条
+              </div>
+            </Col>
           </Row>
           <Row>
             <Table
@@ -89,11 +72,11 @@
           </Row>
           <Row type="flex" justify="end" class="page">
             <Page
-              :current="searchForm.pageNumber"
+              :current="pageForm.page"
               :total="total"
-              :page-size="searchForm.pageSize"
+              :page-size="pageForm.size"
               @on-change="changePage"
-              @on-page-size-change="changePageSize"
+              @on-page-size-change="changesize"
               :page-size-opts="[10,20,50]"
               size="small"
               show-total
@@ -105,18 +88,24 @@
       </Row>
     </Card>
 
-    <Modal :title="modalTitle" v-model="modalVisible" :mask-closable="false" :width="1000">
-      <Form ref="form" :model="form" :label-width="140" :rules="formValidate">
+    <Modal
+      :title="modalTitle"
+      v-model="modalVisible"
+      :mask-closable="false"
+      :width="1000"
+      @on-cancel="cancelSub"
+    >
+      <Form ref="form" :model="form" :label-width="150" :rules="formValidate">
         <FormItem label="产品标题：" prop="title">
           <Input v-model="form.title" />
         </FormItem>
-        <FormItem label="简介描述：" prop="describe">
-          <Input v-model="form.describe" />
+        <FormItem label="简介描述：" prop="sellPoint">
+          <Input v-model="form.sellPoint" />
         </FormItem>
-        <FormItem label="商品分类：" prop="classify">
+        <FormItem label="商品分类：" prop="cname">
           <div style="display:flex;">
             <Input
-              v-model="form.classify"
+              v-model="form.cname"
               placeholder="请点击选择按钮选择商品分类"
               readonly
               style="margin-right:10px;"
@@ -130,27 +119,32 @@
             </Poptip>
           </div>
         </FormItem>
-        <FormItem label="产品展示价格：" prop="price" >
-          <Input v-model="form.price" placeholder="请输入正确金额"/>
+        <FormItem label="产品展示价格：" prop="price">
+          <Input v-model="form.price" placeholder="请输入正确金额" />
         </FormItem>
-        <FormItem label="库存数量：" prop="amount">
-          <Input v-model="form.amount" placeholder="0~99999"/>
+        <FormItem label="有效期：" prop="validity">
+          <Input v-model="form.validity" placeholder="请输入数量，单位为月" />
         </FormItem>
-        <FormItem label="购买限制数量：" prop="limit">
-          <Input v-model="form.limit" placeholder="0~9999"/>
+        <FormItem label="库存数量：" prop="num">
+          <Input v-model="form.num" placeholder="请输入数量，单位为件" />
         </FormItem>
-        <FormItem label="示缩略图片上传：" prop="imgIdList">
+        <FormItem label="购买限制数量：" prop="limitNum">
+          <Input v-model="form.limitNum" placeholder="请输入数量，单位为件" />
+        </FormItem>
+        <FormItem label="展示缩略图片上传：" prop="image">
           <Upload
             multiple
             :before-upload="handleBeforeUpload"
             type="drag"
+            :data="uploadData"
             :action="uploadFileUrl"
+            :max-size="2048"
+            :on-exceeded-size="handleMaxSize"
             :headers="accessToken"
             :on-success="handleSuccess"
             :on-error="handleError"
             :format="['jpg','jpeg','png']"
             :on-format-error="handleFormatError"
-            :show-upload-list="false"
             :on-remove="handleRmove"
           >
             <div style="padding: 20px 0">
@@ -159,8 +153,8 @@
             </div>
           </Upload>
         </FormItem>
-        <FormItem label="商品详情：">
-          <quill id="quill" v-model="form.quillData"></quill>
+        <FormItem label="商品详情：" prop="detail">
+          <quill id="quill" v-model="form.detail" ref="quill"></quill>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -172,21 +166,42 @@
 </template>
 
 <script>
-import { uploadFile } from "@/api/index";
 import quill from "@/views/my-components/xboot/quill";
-import { validatePrice, validateAmount, validateLimit } from "@/libs/validate";
+import {
+  validatePrice,
+  validateAmount,
+  validateLimit,
+  validateNum,
+} from "@/libs/validate";
+import {
+  getCateList,
+  getProductList,
+  getCount,
+  changeStatus,
+  getItemById,
+  uploadImgUrl,
+  updateProduct,
+  addProduct,
+  removeProduct,
+  searchProduct
+} from "@/libs/businessRoom";
+import qs from "qs";
+import { th } from 'date-fns/locale';
 export default {
   name: "productList",
   components: {
     quill,
   },
-  computed: {
-    
-  },
+  computed: {},
   data() {
     return {
-      accessToken: {},
-      uploadFileUrl: uploadFile,
+      accessToken: {
+        "Content-Type": "multipart/form-data",
+      },
+      uploadData: {
+        id: "",
+      },
+      uploadFileUrl: uploadImgUrl,
       uploadList: [], // 图片列表
       treeLoading: false, // 树加载状态
       maxHeight: "500px",
@@ -202,13 +217,14 @@ export default {
       selectList: [], // 多选数据
       searchForm: {
         // 搜索框对应data对象
-        searchKey: "",
-        pageNumber: 1, // 当前页数
-        pageSize: 10, // 页面大小
-        sort: "createTime", // 默认排序字段
-        order: "desc", // 默认排序方式
-        startDate: "", // 起始时间
-        endDate: "", // 终止时间
+        search: "",
+        start: "", // 起始时间
+        end: "", // 终止时间
+      },
+      pageForm: {
+        page: 1, // 当前页数
+        size: 10, // 页面大小
+        cid: -1,
       },
       modalType: 0, // 添加或编辑标识
       modalVisible: false, // 添加或编辑显示
@@ -216,36 +232,43 @@ export default {
       form: {
         // 添加或编辑表单对象初始化数据
         title: "",
-        quillData: '',
-        describe:'',
-        classify: '',
-        price: '',
-        amount: '',
-        limit: '',
+        detail: "",
+        sellPoint: "",
+        cname: "",
+        price: "",
+        num: "",
+        limitNum: "",
         imgIdList: [],
-        sex: 1,
-        type: 0,
+        validity: "",
+        cid: "",
+        id: "",
       },
       formValidate: {
         // 表单验证规则
         title: [{ required: true, message: "标题不能为空", trigger: "blur" }],
-        describe: [{ required: true, message: "描述不能为空", trigger: "blur" }],
-        classify: [{ required: true, message: "分类不能为空", trigger: "change" }],
+        sellPoint: [
+          { required: true, message: "描述不能为空", trigger: "blur" },
+        ],
+        cname: [{ required: true, message: "分类不能为空", trigger: "change" }],
         price: [
-          { required: true, message: "价格不能为空", trigger: "blur" },
+          {
+            required: true,
+            message: "价格不能为空",
+            trigger: "blur",
+          },
           { validator: validatePrice, trigger: "blur" },
         ],
-        amount: [
-          { required: true, message: "数量不能为空", trigger: "blur" },
-          { validator: validateAmount, trigger: "blur" },
+        imgIdList: [{ required: true, message: "请上传图片", trigger: "blur" }],
+        validity: [
+          {
+            required: true,
+            message: "数量不能为空",
+            trigger: "blur",
+          },
+          { validator: validateNum, trigger: "blur" },
         ],
-        limit: [
-          { required: true, message: "数量不能为空", trigger: "blur" },
-          { validator: validateLimit, trigger: "blur" },
-        ],
-        imgIdList: [
-          { required: true, message: "请上传图片", trigger: "blur" }
-        ]
+        num: [{ validator: validateNum, trigger: "blur" }],
+        limitNum: [{ validator: validateNum, trigger: "blur" }],
       },
       columns: [
         // 表头
@@ -260,7 +283,7 @@ export default {
           key: "id",
           align: "center",
           fixed: "left",
-          width:120
+          width: 120,
         },
         {
           title: "缩略图",
@@ -277,6 +300,7 @@ export default {
               style: {
                 width: "70px",
                 height: "70px",
+                marginTop: "5px",
                 "object-fit": "contain",
               },
               /* on: {
@@ -291,31 +315,37 @@ export default {
           title: "商品名称",
           key: "title",
           align: "center",
-          minWidth: 150
+          minWidth: 150,
         },
         {
           title: "描述",
           key: "sellPoint",
           align: "center",
-          minWidth: 200
+          minWidth: 200,
         },
         {
           title: "单价",
           key: "price",
           align: "center",
-          width: 120
+          width: 120,
         },
         {
           title: "创建日期",
           key: "created",
           align: "center",
-          width: 120
+          minWidth: 120,
+          render: (h, params) => {
+            return h("div", {}, this.formdate(params.row.created));
+          },
         },
         {
           title: "更新日期",
           key: "updated",
           align: "center",
-          width: 120
+          minWidth: 120,
+          render: (h, params) => {
+            return h("div", {}, this.formdate(params.row.updated));
+          },
         },
         {
           title: "状态",
@@ -416,6 +446,9 @@ export default {
       submitLoading: false, // 添加或编辑提交状态
       data: [], //表单数据
       total: 0, // 表单数据总数
+      totalCount: 0, // 总数据
+      dataEdit: [], // 编辑时的分类数据
+      updateId: "", // 当前编辑的id
     };
   },
   methods: {
@@ -424,66 +457,63 @@ export default {
       this.getParentList();
       // 获取表单数据
       this.getDataList();
-
+      // 获取总数居
+      this.getAllCount();
       this.accessToken = {
-        accessToken: this.getStore("accessToken")
+        accessToken: this.getStore("accessToken"),
       };
     },
-    getParentList() {
-      // this.treeLoading = true;
-      // this.getRequest("一级数据请求路径，如/tree/getByParentId/0").then(res => {
-      //   this.treeLoading = false;
-      //   if (res.success) {
-      //     res.result.forEach(function(e) {
-      //       if (e.isParent) {
-      //         e.loading = false;
-      //         e.children = [];
-      //       }
-      //     });
-      //     this.treeData = res.result;
-      //   }
-      // });
-      // 模拟请求成功
-      this.treeData = [
-        {
-          title: "一级1",
-          id: "1",
-          parentId: "0",
-          parentTitle: "一级节点",
-          status: 0,
-          loading: false,
-          children: [
-            {
-              title: "二级1",
-              id: "2",
-              parentId: "1",
-              status: 0,
-              parentTitle: "一级1",
-            },
-          ],
-        },
-        {
-          title: "一级2",
-          id: "3",
-          parentId: "0",
-          parentTitle: "一级节点",
-          status: 0,
-        },
-      ];
+    // 时间处理函数
+    formdate(date) {
+      let time = new Date(date);
+      let year = time.getFullYear();
+      let month = (time.getMonth() + 1).toString().padStart(2, "0");
+      let day = time.getDate().toString().padStart(2, "0");
+      let hour = time.getHours().toString().padStart(2, "0");
+      let minute = time.getMinutes().toString().padStart(2, "0");
+      let second = time.getSeconds().toString().padStart(2, "0");
+      return `${year}-${month}-${day} ${hour}:${minute}`;
     },
+    // 获取总数据
+    getAllCount() {
+      getCount().then((res) => {
+        if (res.success) {
+          this.totalCount = res.result;
+        }
+      });
+    },
+    // 获取树形结构的数据
+    getParentList() {
+      this.treeLoading = true;
+      getCateList({ id: 0 }).then((res) => {
+        this.treeLoading = false;
+        res.forEach((e) => {
+          e.title = e.name;
+          if (e.isParent) {
+            e.loading = false;
+            e.children = [];
+          }
+        });
+        this.treeData = res;
+      });
+    },
+    // 树形结构打开分支时获取数据
     loadData(item, callback) {
-      // 异步加载树子节点数据
-      // this.getRequest("请求路径，如/tree/getByParentId/" + item.id).then(res => {
-      //   if (res.success) {
-      //     res.result.forEach(function(e) {
-      //       if (e.isParent) {
-      //         e.loading = false;
-      //         e.children = [];
-      //       }
-      //     });
-      //     callback(res.result);
-      //   }
-      // });
+      getCateList({ id: item.id }).then((res) => {
+        if (res.length > 0) {
+          res.forEach((e) => {
+            e.title = e.name;
+            if (e.isParent) {
+              e.loading = false;
+              e.children = [];
+            }
+          });
+          callback(res);
+        } else {
+          callback([]);
+          this.$Message.warning("该分类暂未添加子级分类");
+        }
+      });
     },
     /* search() {
       // 搜索树
@@ -526,6 +556,7 @@ export default {
       }
     }, */
     selectTree(v) {
+      console.log(v);
       if (v.length > 0) {
         // 转换null为""
         for (let attr in v[0]) {
@@ -535,12 +566,13 @@ export default {
         }
         let str = JSON.stringify(v[0]);
         let data = JSON.parse(str);
-        this.selectNode = data;
-        this.editTitle = data.title;
+        this.pageForm.cid = data.id;
+        this.pageForm.size = 10;
+        this.pageForm.page = 1;
         // 重新加载表
         this.getDataList();
       } else {
-        this.cancelEdit();
+        // this.cancelEdit();
       }
     },
     cancelEdit() {
@@ -568,125 +600,68 @@ export default {
       }
     },
     changePage(v) {
-      this.searchForm.pageNumber = v;
+      this.pageForm.page = v;
       this.getDataList();
       // this.clearSelectAll();
     },
-    changePageSize(v) {
-      this.searchForm.pageSize = v;
+    changesize(v) {
+      this.pageForm.size = v;
       this.getDataList();
     },
+    // 获取列表数据
     getDataList() {
       this.loading = true;
       // 根据用户选择树加载表数据
-      this.searchForm.selectId = this.selectNode.id;
+      // this.searchForm.selectId = this.selectNode.id;
       // 带多条件搜索参数获取表单数据 请自行修改接口
-      // this.getRequest("请求路径", this.searchForm).then(res => {
-      //   this.loading = false;
-      //   if (res.success) {
-      //     this.data = res.result.content;
-      //     this.total = res.result.totalElements;
-      //   }
-      // });
-      // 模拟表格变化 模拟数据
-      if (!this.selectNode.id) {
-        // id为null获取全部数据
-        this.data = [
-          {
-            cid: 1184,
-            created: 1598514543000,
-            id: 159851454285740,
-            image:
-              "http://qfliorh85.hb-bkt.clouddn.com/FhNNr6peAGOFNsRPES78ftbPqsUx",
-            images: [
-              "http://qfliorh85.hb-bkt.clouddn.com/FhNNr6peAGOFNsRPES78ftbPqsUx",
-            ],
-            limitNum: 999,
-            num: 999,
-            price: 199,
-            sellPoint: "新建医院、医院改扩建、医疗设备、医疗物资",
-            status: 1,
-            title: "铁路频道",
-            updated: 1598514620000,
-          },
-          {
-            cid: 1184,
-            created: 1598316458000,
-            id: 159831645819316,
-            image:
-              "http://qfliorh85.hb-bkt.clouddn.com/FhNNr6peAGOFNsRPES78ftbPqsUx",
-            images: [
-              "http://qfliorh85.hb-bkt.clouddn.com/FhNNr6peAGOFNsRPES78ftbPqsUx",
-            ],
-            limitNum: 999,
-            num: 999,
-            price: 1000,
-            sellPoint: "新建医院、医院改扩建、医疗设备、医疗物资",
-            status: 1,
-            title: "医疗频道",
-            updated: 1598335328000,
-          },
-          {
-            cid: 560,
-            created: 1527939792000,
-            id: 150642571432852,
-            image:
-              "https://resource.smartisan.com/resource/367d93db1d58f9f3505bc0ec18efaa44.jpg,https://resource.smartisan.com/resource/8ecc94c0f0c4ebc861f06c86789a66e6.jpg,https://resource.smartisan.com/resource/58a2cdb44f722202b05dd09d6fd959de.jpg,https://resource.smartisan.com/resource/2b811a93a2915310f72291e46bd944ad.jpg,https://resource.smartisan.com/resource/8cd011adef99f9734ed974ea9732e6e7.jpg",
-            images: [
-              "https://resource.smartisan.com/resource/367d93db1d58f9f3505bc0ec18efaa44.jpg",
-            ],
-            limitNum: 100,
-            num: 999,
-            price: 499,
-            sellPoint: "全天佩戴 抬手就听 HEAC稳连技术",
-            status: 0,
-            title: "FIIL Driifter 脖挂蓝牙耳机",
-            updated: 1597882738000,
-          },
-        ];
-      } else if (this.selectNode.id == "1") {
-        this.data = [
-          {
-            id: "1",
-            name: "XBoot",
-            description: "我是一级1的数据",
-            status: 0,
-            createTime: "2018-08-08 00:08:00",
-          },
-        ];
-      } else if (this.selectNode.id == "2") {
-        this.data = [
-          {
-            id: "2",
-            name: "Exrick",
-            description: "我是二级1的数据",
-            status: 0,
-            createTime: "2018-08-08 00:08:00",
-          },
-        ];
-      } else if (this.selectNode.id == "3") {
-        this.data = [
-          {
-            id: "3",
-            name: "Present By Exrick",
-            description: "我是一级2的数据",
-            status: -1,
-            createTime: "2018-08-08 00:08:00",
-          },
-        ];
-      }
-      this.total = this.data.length;
-      this.loading = false;
+      getProductList(this.pageForm).then((res) => {
+        this.loading = false;
+        console.log(res);
+        if (res.success) {
+          this.data = res.result.itemList;
+          this.total = res.result.count;
+        }
+      });
     },
     handleSearch() {
-      this.searchForm.pageNumber = 1;
-      this.searchForm.pageSize = 10;
-      this.getDataList();
+      let data = {
+        page: 1,
+        size: 10,
+        ...this.searchForm
+      }
+      this.loading = true
+      searchProduct(data).then(res => {
+        this.loading = false;
+        if (res.success) {
+          this.data = res.result.itemList;
+          this.total = res.result.count;
+        }
+      });
+    },
+    startChange(v) {
+      console.log(v)
+      if(new Date(v) > new Date(this.searchForm.end)){
+        this.$Message.warning("起始时间不能大于结束时间");
+        this.searchForm.start = ''
+        return
+      }
+      this.searchForm.start = v
+    },
+    endChange(v) {
+      if(new Date(v) < new Date(this.searchForm.start)){
+        this.$Message.warning("结束时间不能小于起始时间");
+        this.searchForm.end = ''
+        return
+      }
+      this.searchForm.end = v
     },
     handleReset() {
       this.$refs.searchForm.resetFields();
-      this.searchForm.pageNumber = 1;
-      this.searchForm.pageSize = 10;
+      /* this.searchForm.start = '';
+      this.searchForm.end = ''; */
+      this.pageForm.page = 1;
+      this.pageForm.size = 10;
+      this.pageForm.cid = -1;
       // 重新加载数据
       this.getDataList();
     },
@@ -705,65 +680,125 @@ export default {
     /* clearSelectAll() {
       this.$refs.table.selectAll(false);
     }, */
+    // 添加
     add() {
       this.modalType = 0;
       this.modalTitle = "添加";
+      this.form.detail = " ";
+      this.$refs.quill.clearFromFa();
       this.$refs.form.resetFields();
+      this.getParentListEdit();
       this.modalVisible = true;
+      this.form.id = new Date().getTime();
     },
+    // 获取商品详情
     edit(v) {
       this.modalType = 1;
       this.modalTitle = "编辑";
       this.$refs.form.resetFields();
+      this.getParentListEdit();
+      this.uploadData.id = v.id;
+      this.updateId = v.id;
       // 转换null为""
-      for (let attr in v) {
-        if (v[attr] == null) {
-          v[attr] = "";
+      getItemById(v.id).then((res) => {
+        console.log(res);
+        if (res.success) {
+          for (let attr in res.result) {
+            if (res.result[attr] == null) {
+              res.result[attr] = "";
+            }
+            if (typeof res.result[attr] == "number") {
+              res.result[attr] = "" + res.result[attr];
+            }
+          }
+          let str = JSON.stringify(res.result);
+          let data = JSON.parse(str);
+          this.form = data;
+          this.modalVisible = true;
         }
+      });
+    },
+    // 编辑时选择类别
+    selectTreeEdit(v) {
+      console.log(v[0]);
+      if (v.length > 0) {
+        // 转换null为""
+        for (let attr in v[0]) {
+          if (v[0][attr] == null) {
+            v[0][attr] = "";
+          }
+        }
+        let str = JSON.stringify(v[0]);
+        let data = JSON.parse(str);
+        this.form.cname = data.name;
+        this.form.cid = data.id;
       }
-      let str = JSON.stringify(v);
-      let data = JSON.parse(str);
-      this.form = data;
-      this.modalVisible = true;
+    },
+    // 分类列表
+    getParentListEdit() {
+      this.loadingEdit = true;
+      getCateList({ id: 0 }).then((res) => {
+        this.loadingEdit = false;
+        res.forEach((e) => {
+          e.title = e.name;
+          if (e.isParent) {
+            e.loading = false;
+            e.children = [];
+          }
+        });
+        this.dataEdit = res;
+      });
     },
     handelSubmit() {
+      let data = {
+        title: this.form.title,
+        sellPoint: this.form.sellPoint,
+        cid: this.form.cid,
+        cname: this.form.cname,
+        num: this.form.num,
+        price: this.form.price,
+        limitNum: this.form.limitNum,
+        image: "",
+        detail: this.form.detail,
+        validity: this.form.validity,
+      };
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.submitLoading = true;
           if (this.modalType == 0) {
-            // 添加 避免编辑后传入id等数据 记得删除
-            delete this.form.id;
-            delete this.form.status;
-            // this.postRequest("请求路径", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.modalVisible = false;
+            data.id = this.form.id;
+            console.log(data)
+            addProduct(qs.stringify(data)).then((res) => {
+              // 添加 避免编辑后传入id等数据 记得删除
+              delete this.form.id;
+              this.submitLoading = false;
+              if (res.success) {
+                this.$Message.success("操作成功");
+                this.getDataList();
+                this.getAllCount();
+                this.modalVisible = false;
+              }
+            });
           } else if (this.modalType == 1) {
             // 编辑
-            // this.postRequest("请求路径", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.modalVisible = false;
+            updateProduct(this.updateId, qs.stringify(data)).then((res) => {
+              this.submitLoading = false;
+              if (res.success) {
+                this.$Message.success("操作成功");
+                this.getDataList();
+                this.modalVisible = false;
+              }
+            });
           }
         }
       });
     },
+    cancelSub() {
+      this.form.detail = " ";
+      this.$refs.quill.clearFromFa();
+      this.$refs.form.resetFields();
+    },
+    // 删除单个
     remove(v) {
       this.$Modal.confirm({
         title: "确认删除",
@@ -772,17 +807,14 @@ export default {
         loading: true,
         onOk: () => {
           // 删除
-          // this.deleteRequest("请求地址，如/deleteByIds/" + v.id).then(res => {
-          //   this.$Modal.remove();
-          //   if (res.success) {
-          //     this.$Message.success("操作成功");
-          //     this.getDataList();
-          //   }
-          // });
-          // 模拟请求成功
-          this.$Message.success("操作成功");
-          this.$Modal.remove();
-          this.getDataList();
+          removeProduct([v.id]).then(res => {
+            this.$Modal.remove();
+            if (res.success) {
+              this.$Message.success("操作成功");
+              this.getDataList();
+              this.getAllCount();
+            }
+          });
         },
       });
     },
@@ -790,36 +822,35 @@ export default {
     // 发布
     publish(v) {
       let title = v.status ? "下架" : "发布";
+      let data = {
+        id: v.id,
+        status: v.status ? 0 : 1,
+      };
       this.$Modal.confirm({
         title: title,
         // 记得确认修改此处
         content: "您确认要" + title + " " + v.title + " 的商品吗?",
         loading: true,
         onOk: () => {
-          // 删除
-          // this.deleteRequest("请求地址，如/deleteByIds/" + v.id).then(res => {
-          //   this.$Modal.remove();
-          //   if (res.success) {
-          //     this.$Message.success("操作成功");
-          //     this.getDataList();
-          //   }
-          // });
-          // 模拟请求成功
-          this.$Message.success("操作成功");
-          this.$Modal.remove();
-          this.getDataList();
+          changeStatus(qs.stringify(data)).then((res) => {
+            this.$Modal.remove();
+            if (res.success) {
+              this.$Message.success("操作成功");
+              this.getDataList();
+            }
+          });
         },
       });
     },
     // ##wu
-    selectDateRange(v) {
+    /* selectDateRange(v) {
       if (v) {
-        this.searchForm.startDate = v[0];
-        this.searchForm.endDate = v[1];
+        this.searchForm.minDate = v[0];
+        this.searchForm.maxDate = v[1];
       }
-    },
+    }, */
     // ##wu 文件上传
-    handleBeforeUpload() {
+    handleBeforeUpload(file) {
       const check = this.uploadList.length < 5;
       if (!check) {
         this.$Notice.warning({
@@ -834,12 +865,20 @@ export default {
         desc:
           "所选文件‘ " +
           file.name +
-          " ’格式不正确, 请选择 'jpg','jpeg','png' 格式文件"
+          " ’格式不正确, 请选择 'jpg','jpeg','png' 格式文件",
+      });
+    },
+    // 上传文件大小判断
+    handleMaxSize(file) {
+      this.$Notice.warning({
+        title: "文件过大",
+        desc: "上传文件大小不能大于2M",
       });
     },
     handleSuccess(res, file) {
+      console.log(res);
       if (res.success) {
-        this.uploadList.push(res.result)
+        this.uploadList.push(res.result);
       } else {
         this.$Message.error(res.message);
       }
@@ -848,9 +887,8 @@ export default {
       this.loading = false;
       this.$Message.error(error.toString());
     },
-    handleRmove(file, fileList) {
-
-    },
+    handleRmove(file, fileList) {},
+    // 批量删除
     delAll() {
       if (this.selectCount <= 0) {
         this.$Message.warning("您还未选择要删除的数据");
@@ -861,31 +899,28 @@ export default {
         content: "您确认要删除所选的 " + this.selectCount + " 条数据?",
         loading: true,
         onOk: () => {
-          let ids = "";
-          this.selectList.forEach(function (e) {
-            ids += e.id + ",";
-          });
-          ids = ids.substring(0, ids.length - 1);
+          let ids = [];
+          console.log(this.selectList)
+          ids = this.selectList.map(item => {
+            return item.id
+          })
           // 批量删除
-          // this.deleteRequest("请求地址，如/deleteByIds/" + ids).then(res => {
-          //   this.$Modal.remove();
-          //   if (res.success) {
-          //     this.$Message.success("操作成功");
-          //     this.clearSelectAll();
-          //     this.getDataList();
-          //   }
-          // });
-          // 模拟请求成功
-          this.$Message.success("操作成功");
-          this.$Modal.remove();
-          // this.clearSelectAll();
-          this.getDataList();
+          removeProduct(ids).then(res => {
+            this.$Modal.remove();
+            if (res.success) {
+              this.$Message.success("操作成功");
+              // this.clearSelectAll();
+              this.getDataList();
+              this.getAllCount();
+            }
+          });
         },
       });
     },
   },
   mounted() {
     // 计算高度
+
     let height = document.documentElement.clientHeight;
     this.maxHeight = Number(height - 287) + "px";
     this.init();
