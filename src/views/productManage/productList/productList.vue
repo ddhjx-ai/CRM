@@ -20,15 +20,35 @@
         </div>
         <Col :span="span">
           <Row>
-            <Form ref="searchForm" :model="searchForm" inline :label-width="90" label-position='left'>
-              <Form-item label="日期范围：" prop='start'>
-                <DatePicker type="date" placeholder="起始时间" format="yyyy-MM-dd" @on-change="startChange" v-model="searchForm.start" style="width: 200px"></DatePicker>
+            <Form
+              ref="searchForm"
+              :model="searchForm"
+              inline
+              :label-width="90"
+              label-position="left"
+            >
+              <Form-item label="日期范围：" prop="start">
+                <DatePicker
+                  type="date"
+                  placeholder="起始时间"
+                  format="yyyy-MM-dd"
+                  @on-change="startChange"
+                  v-model="searchForm.start"
+                  style="width: 200px"
+                ></DatePicker>
               </Form-item>
               <Form-item class="formSpan">
                 <span>-</span>
               </Form-item>
               <Form-item class="hideLabel" prop="end">
-                <DatePicker type="date" placeholder="结束时间" format="yyyy-MM-dd" @on-change="endChange" v-model="searchForm.end" style="width: 200px"></DatePicker>
+                <DatePicker
+                  type="date"
+                  placeholder="结束时间"
+                  format="yyyy-MM-dd"
+                  @on-change="endChange"
+                  v-model="searchForm.end"
+                  style="width: 200px"
+                ></DatePicker>
               </Form-item>
               <Form-item class="searchLabel" prop="search">
                 <Input
@@ -94,6 +114,7 @@
       :mask-closable="false"
       :width="1000"
       @on-cancel="cancelSub"
+      @on-visible-change="modalOpen"
     >
       <Form ref="form" :model="form" :label-width="150" :rules="formValidate">
         <FormItem label="产品标题：" prop="title">
@@ -131,9 +152,8 @@
         <FormItem label="购买限制数量：" prop="limitNum">
           <Input v-model="form.limitNum" placeholder="请输入数量，单位为件" />
         </FormItem>
-        <FormItem label="展示缩略图片上传：" prop="image">
+        <!-- <FormItem label="展示缩略图片上传：" prop="image">
           <Upload
-            multiple
             :before-upload="handleBeforeUpload"
             type="drag"
             :data="uploadData"
@@ -152,15 +172,54 @@
               <p>或将照片拖到这里，最多可选5张</p>
             </div>
           </Upload>
+        </FormItem>-->
+        <FormItem label="展示缩略图片上传：" >
+          <div class="demo-upload-list" v-for="item in uploadList" :key="item">
+            <template v-if="item.status === 'finished'">
+              <img :src="item.url" />
+              <div class="demo-upload-list-cover">
+                <Icon type="ios-eye-outline" @click.native="handleView(item.name)"></Icon>
+                <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
+              </div>
+            </template>
+            <template v-else>
+              <Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
+            </template>
+          </div>
+          <Upload
+            ref="upload"
+            :show-upload-list="false"
+            :default-file-list="defaultList"
+            :on-success="handleSuccess"
+            :format="['jpg','jpeg','png']"
+            :max-size="2048"
+            :on-format-error="handleFormatError"
+            :on-exceeded-size="handleMaxSize"
+            :before-upload="handleBeforeUpload"
+            type="drag"
+            :data="uploadData"
+            :action="uploadFileUrl"
+            :headers="accessToken"
+            :on-error="handleError"
+            style="display: inline-block;width:58px;"
+          >
+            <div style="width: 58px;height:58px;line-height: 58px;">
+              <Icon type="ios-camera" size="20"></Icon>
+            </div>
+          </Upload>
         </FormItem>
         <FormItem label="商品详情：" prop="detail">
-          <quill id="quill" v-model="form.detail" ref="quill"></quill>
+          <quill id="quill" v-model="form.detail" ref="quill" :uploadData="uploadData"></quill>
         </FormItem>
       </Form>
       <div slot="footer">
         <Button type="Default" @click="modalVisible=false">取消</Button>
         <Button type="primary" :loading="submitLoading" @click="handelSubmit">保存并发布</Button>
       </div>
+    </Modal>
+
+    <Modal title="图片预览" v-model="visible">
+      <img :src="imgName" v-if="visible" style="width: 100%" />
     </Modal>
   </div>
 </template>
@@ -183,10 +242,9 @@ import {
   updateProduct,
   addProduct,
   removeProduct,
-  searchProduct
+  searchProduct,
 } from "@/libs/businessRoom";
 import qs from "qs";
-import { th } from 'date-fns/locale';
 export default {
   name: "productList",
   components: {
@@ -195,6 +253,9 @@ export default {
   computed: {},
   data() {
     return {
+      imgName: "",
+      visible: false,
+      defaultList: [],
       accessToken: {
         "Content-Type": "multipart/form-data",
       },
@@ -238,7 +299,7 @@ export default {
         price: "",
         num: "",
         limitNum: "",
-        imgIdList: [],
+        image: "",
         validity: "",
         cid: "",
         id: "",
@@ -258,7 +319,7 @@ export default {
           },
           { validator: validatePrice, trigger: "blur" },
         ],
-        imgIdList: [{ required: true, message: "请上传图片", trigger: "blur" }],
+        image: [{ required: true, message: "请上传图片", trigger: "blur" }],
         validity: [
           {
             required: true,
@@ -515,46 +576,6 @@ export default {
         }
       });
     },
-    /* search() {
-      // 搜索树
-      if (this.searchKey) {
-        // 模拟请求
-        // this.treeLoading = true;
-        // this.getRequest("搜索请求路径", { title: this.searchKey }).then(res => {
-        //   this.treeLoading = false;
-        //   if (res.success) {
-        //     this.treeData = res.result;
-        //   }
-        // });
-        // 模拟请求成功
-        this.treeData = [
-          {
-            title: "这里需要请求后端接口",
-            id: "1",
-            parentId: "0",
-            parentTitle: "一级节点",
-            status: 0
-          },
-          {
-            title: "所以这里是假数据",
-            id: "4",
-            parentId: "0",
-            parentTitle: "一级节点",
-            status: 0
-          },
-          {
-            title: "我是被禁用的节点",
-            id: "5",
-            parentId: "0",
-            parentTitle: "一级节点",
-            status: -1
-          }
-        ];
-      } else {
-        // 为空重新加载
-        this.getParentList();
-      }
-    }, */
     selectTree(v) {
       console.log(v);
       if (v.length > 0) {
@@ -616,7 +637,6 @@ export default {
       // 带多条件搜索参数获取表单数据 请自行修改接口
       getProductList(this.pageForm).then((res) => {
         this.loading = false;
-        console.log(res);
         if (res.success) {
           this.data = res.result.itemList;
           this.total = res.result.count;
@@ -627,10 +647,10 @@ export default {
       let data = {
         page: 1,
         size: 10,
-        ...this.searchForm
-      }
-      this.loading = true
-      searchProduct(data).then(res => {
+        ...this.searchForm,
+      };
+      this.loading = true;
+      searchProduct(data).then((res) => {
         this.loading = false;
         if (res.success) {
           this.data = res.result.itemList;
@@ -639,21 +659,21 @@ export default {
       });
     },
     startChange(v) {
-      console.log(v)
-      if(new Date(v) > new Date(this.searchForm.end)){
+      console.log(v);
+      if (new Date(v) > new Date(this.searchForm.end)) {
         this.$Message.warning("起始时间不能大于结束时间");
-        this.searchForm.start = ''
-        return
+        this.searchForm.start = "";
+        return;
       }
-      this.searchForm.start = v
+      this.searchForm.start = v;
     },
     endChange(v) {
-      if(new Date(v) < new Date(this.searchForm.start)){
+      if (new Date(v) < new Date(this.searchForm.start)) {
         this.$Message.warning("结束时间不能小于起始时间");
-        this.searchForm.end = ''
-        return
+        this.searchForm.end = "";
+        return;
       }
-      this.searchForm.end = v
+      this.searchForm.end = v;
     },
     handleReset() {
       this.$refs.searchForm.resetFields();
@@ -689,7 +709,9 @@ export default {
       this.$refs.form.resetFields();
       this.getParentListEdit();
       this.modalVisible = true;
-      this.form.id = new Date().getTime();
+      let id = new Date().getTime();
+      this.form.id = id;
+      this.uploadData.id = id;
     },
     // 获取商品详情
     edit(v) {
@@ -701,7 +723,6 @@ export default {
       this.updateId = v.id;
       // 转换null为""
       getItemById(v.id).then((res) => {
-        console.log(res);
         if (res.success) {
           for (let attr in res.result) {
             if (res.result[attr] == null) {
@@ -713,6 +734,14 @@ export default {
           }
           let str = JSON.stringify(res.result);
           let data = JSON.parse(str);
+          this.defaultList.splice(0, 0, {
+            name: data.image,
+            url: data.image,
+          });
+          // this.$refs.upload.fileList = this.defaultList;
+          setTimeout(() => {
+            this.uploadList = this.$refs.upload.fileList;
+          });
           this.form = data;
           this.modalVisible = true;
         }
@@ -758,7 +787,7 @@ export default {
         num: this.form.num,
         price: this.form.price,
         limitNum: this.form.limitNum,
-        image: "",
+        image: this.form.image,
         detail: this.form.detail,
         validity: this.form.validity,
       };
@@ -767,7 +796,7 @@ export default {
           this.submitLoading = true;
           if (this.modalType == 0) {
             data.id = this.form.id;
-            console.log(data)
+            console.log(data);
             addProduct(qs.stringify(data)).then((res) => {
               // 添加 避免编辑后传入id等数据 记得删除
               delete this.form.id;
@@ -793,11 +822,6 @@ export default {
         }
       });
     },
-    cancelSub() {
-      this.form.detail = " ";
-      this.$refs.quill.clearFromFa();
-      this.$refs.form.resetFields();
-    },
     // 删除单个
     remove(v) {
       this.$Modal.confirm({
@@ -807,7 +831,7 @@ export default {
         loading: true,
         onOk: () => {
           // 删除
-          removeProduct([v.id]).then(res => {
+          removeProduct([v.id]).then((res) => {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("操作成功");
@@ -851,13 +875,16 @@ export default {
     }, */
     // ##wu 文件上传
     handleBeforeUpload(file) {
-      const check = this.uploadList.length < 5;
+      /* console.log("beforeUploadfile", file);
+      console.log("beforeUploaduploadList", this.uploadList); */
+
+      /* const check = this.uploadList.length < 22;
       if (!check) {
         this.$Notice.warning({
-          title: "最多只能上传5张图片",
+          title: "只能上传1张图片",
         });
       }
-      return check;
+      return check; */
     },
     handleFormatError(file) {
       this.$Notice.warning({
@@ -876,9 +903,22 @@ export default {
       });
     },
     handleSuccess(res, file) {
-      console.log(res);
+      console.log("successUploadresfile", res, file);
+      console.log("successUploaduploadList", this.uploadList);
       if (res.success) {
-        this.uploadList.push(res.result);
+        file.url = res.result;
+        file.name = res.result;
+        /* console.log('-------------------',this.uploadList)
+        console.log('+++++++++++++++++++',this.$refs.upload.fileList)
+        if(this.uploadList.length > 1) {
+          this.uploadList.splice(0,1)
+          this.$refs.upload.fileList.splice(0,1)
+        }else if(this.uploadList.length === 0){
+          this.uploadList = this.$refs.upload.fileList
+        } */
+        this.$refs.upload.fileList = [file];
+        this.uploadList = this.$refs.upload.fileList;
+        this.form.image = res.result;
       } else {
         this.$Message.error(res.message);
       }
@@ -887,7 +927,6 @@ export default {
       this.loading = false;
       this.$Message.error(error.toString());
     },
-    handleRmove(file, fileList) {},
     // 批量删除
     delAll() {
       if (this.selectCount <= 0) {
@@ -900,12 +939,12 @@ export default {
         loading: true,
         onOk: () => {
           let ids = [];
-          console.log(this.selectList)
-          ids = this.selectList.map(item => {
-            return item.id
-          })
+          console.log(this.selectList);
+          ids = this.selectList.map((item) => {
+            return item.id;
+          });
           // 批量删除
-          removeProduct(ids).then(res => {
+          removeProduct(ids).then((res) => {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("操作成功");
@@ -916,6 +955,25 @@ export default {
           });
         },
       });
+    },
+    handleView(name) {
+      this.imgName = name;
+      this.visible = true;
+    },
+    handleRemove(file) {
+      const fileList = this.$refs.upload.fileList;
+      this.$refs.upload.fileList.splice(0, 1);
+      this.form.image = "";
+    },
+    modalOpen(v) {
+      if (!v) {
+        this.form.detail = " ";
+        this.$refs.quill.clearFromFa();
+        this.$refs.form.resetFields();
+        this.defaultList = [];
+        this.$refs.upload.fileList = [];
+        this.uploadList = [];
+      }
     },
   },
   mounted() {

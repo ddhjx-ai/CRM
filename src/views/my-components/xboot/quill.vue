@@ -38,6 +38,7 @@
       <button class="ql-image" title="插入图片" v-if="base64"></button>
       <div class="q-menu" title="插入图片" v-if="!base64">
         <Upload
+          :data="uploadData"
           :action="uploadFileUrl"
           :headers="accessToken"
           :on-success="handleSuccess"
@@ -98,7 +99,9 @@
 </template>
 
 <script>
-import { uploadFile } from "@/api/index";
+import {
+  uploadImgUrl,
+} from "@/libs/businessRoom";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import xss from "xss";
@@ -110,6 +113,7 @@ export default {
       type: String,
       default: "quill",
     },
+    uploadData: Object,
     value: String,
     base64: {
       type: Boolean,
@@ -139,7 +143,7 @@ export default {
   data() {
     return {
       accessToken: {},
-      uploadFileUrl: uploadFile,
+      uploadFileUrl: uploadImgUrl,
       editor: null,
       options: {
         theme: "snow",

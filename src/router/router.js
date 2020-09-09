@@ -55,14 +55,14 @@ export const authorizeRouter = {
     component: () => import('@/views/authorize.vue')
 };
 
-// export const page404 = {
-//     path: '/*',
-//     name: 'error-404',
-//     meta: {
-//         title: '404-页面不存在'
-//     },
-//     component: () => import('@/views/error-page/404.vue')
-// };
+export const page404 = {
+    path: '/*',
+    name: 'error-404',
+    meta: {
+        title: '404-页面不存在'
+    },
+    component: () => import('@/views/error-page/404.vue')
+};
 
 export const page403 = {
     path: '/403',

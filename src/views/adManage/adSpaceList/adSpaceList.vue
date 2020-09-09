@@ -3,7 +3,7 @@
 <template>
   <div class="search">
     <Card>
-      <Row class="operation">
+      <Row class="operation" style="margin-bottom: 10px">
         <Button @click="add" type="primary" icon="md-add">添加</Button>
         <Button @click="releasePlan" type="primary" icon="md-clipboard">发布计划</Button>
         <Button @click="getDataList" icon="md-refresh">刷新</Button>

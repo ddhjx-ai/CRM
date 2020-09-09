@@ -534,7 +534,7 @@ export default {
         appid: appid,
         agentid: agentid,
         redirect_uri: encodeURI(
-          "http://i9xwmt.natappfree.cc/qywechatlogin?flag=" + query
+          "http://hdj8q2.natappfree.cc/osc/qywechatlogin?flag=" + query
         ),
         connect_redirect: 1,
         state: new Date().getTime(),

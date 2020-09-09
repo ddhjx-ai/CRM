@@ -22,7 +22,7 @@
         </div>
       </shrinkable-menu>
     </div>
-    <div class="main-header-con" :style="{paddingLeft: shrink?'60px':'220px'}">
+    <div class="main-header-con" :style="{paddingLeft: shrink?'60px':'220px'}" >
       <div class="main-header">
         <div class="navicon-con">
           <Button
@@ -39,11 +39,11 @@
           </div>
           <div class="main-nav-menu" v-if="navType==1||navType==2">
             <Menu mode="horizontal" :active-name="currNav" @on-select="selectNav">
-              <MenuItem v-for="(item, i) in navList.slice(0, sliceNum)" :key="i" :name="item.name">
+              <MenuItem v-for="(item, i) in navList.slice(0, 1)" :key="i" :name="item.name">
                 <Icon :type="item.icon" v-if="navType==1" />
                 {{item.title}}
               </MenuItem>
-              <Submenu name="sub" v-if="navList.length>sliceNum">
+              <!-- <Submenu name="sub" v-if="navList.length>sliceNum">
                 <template slot="title">更多</template>
                 <MenuItem
                   v-for="(item, i) in navList.slice(sliceNum, navList.length)"
@@ -53,7 +53,7 @@
                   <Icon :type="item.icon" v-if="navType==1" />
                   {{item.title}}
                 </MenuItem>
-              </Submenu>
+              </Submenu> -->
             </Menu>
           </div>
           <div class="main-nav" v-if="navType==3">

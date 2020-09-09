@@ -1,33 +1,24 @@
 const CompressionPlugin = require('compression-webpack-plugin');
 module.exports = {
+    // publicPath : "./",
     devServer: {
         host: '0.0.0.0',
-        port: 8888,
-        proxy: /* [
-            {
-                context: ['/item', '/order', '/xboot'],
-                target: 'http://192.168.0.56:8888',
-            }
-        ] */
+        port: 7777,
+        proxy:
         {
             '/xboot': {
+                // target: 'http://127.0.0.1:8888',
                 target: 'http://192.168.0.56:8888',
                 ws: true,
             },
             '/admin': {
-                target: 'https://crm.chinabidding.cn',
+                target: 'http://127.0.0.1:8888',
                 ws: true,
                 secure: false,
                 changeOrigin: true,
-                pathRewrite: {
-                    '^/admin': '/admin'
-                }
             },
-            "/item": {
-                target: 'http://192.168.0.56:8888',
-                ws: true,
-            },
-            '/order-manager': {
+            '/xmallend': {
+                // target: 'http://127.0.0.1:8888',
                 target: 'http://192.168.0.56:8888',
                 ws: true,
             },

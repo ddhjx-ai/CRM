@@ -445,7 +445,8 @@ util.initRouterNode = function (routers, data) {
         let meta = {};
         // 给页面添加权限、标题、第三方网页链接
         meta.permTypes = menu.permTypes ? menu.permTypes : null;
-        meta.title = menu.title ? menu.title + " - XBoot一站式前后端分离快速开发平台 By: Exrick" : null;
+        // meta.title = menu.title ? menu.title + " - XBoot一站式前后端分离快速开发平台 By: Exrick" : null;
+        meta.title = menu.title ? menu.title : null;
         meta.url = menu.url ? menu.url : null;
         menu.meta = meta;
 

@@ -7,7 +7,7 @@ import axios from 'axios';
 export const getCateList = (params) => {
   return axios({
     method: 'get',
-    url: `/item/cat/list`,
+    url: `/xmallend/item/cat/list`,
     params: params
   })
 }
@@ -16,7 +16,7 @@ export const getCateList = (params) => {
 export const cateUpdate = (params) => {
   return axios({
     method: 'post',
-    url: '/item/cat/update',
+    url: '/xmallend/item/cat/update',
     data: params
   })
 }
@@ -25,7 +25,7 @@ export const cateUpdate = (params) => {
 export const cateRemove = (id) => {
   return axios({
     method: 'delete',
-    url: '/item/cat/del/' + id
+    url: '/xmallend/item/cat/del/' + id
   })
 }
 
@@ -33,7 +33,7 @@ export const cateRemove = (id) => {
 export const cateAdd = (params) => {
   return axios({
     method: 'post',
-    url: '/item/cat/add',
+    url: '/xmallend/item/cat/add',
     data: params
   })
 }
@@ -45,7 +45,7 @@ export const cateAdd = (params) => {
 export const getProductList = (params) => {
   return axios({
     method: 'get',
-    url: '/item/list',
+    url: '/xmallend/item/list',
     params: params
   })
 }
@@ -54,7 +54,7 @@ export const getProductList = (params) => {
 export const getCount = () => {
   return axios({
     method: 'get',
-    url: '/item/count'
+    url: '/xmallend/item/count'
   })
 }
 
@@ -62,7 +62,7 @@ export const getCount = () => {
 export const changeStatus = (params) => {
   return axios({
     method: 'put',
-    url: '/item/changestatus',
+    url: '/xmallend/item/changestatus',
     data: params
   })
 }
@@ -71,18 +71,18 @@ export const changeStatus = (params) => {
 export const getItemById = (id) => {
   return axios({
     method: 'get',
-    url: '/item/' + id
+    url: '/xmallend/item/' + id
   })
 }
 
 // 上传图片接口
-export const uploadImgUrl = '/item/uploadfile';
+export const uploadImgUrl = '/xmallend/item/uploadfile';
 
 // 编辑
 export const updateProduct = (id, data) => {
   return axios({
     method: 'post',
-    url: '/item/update/' + id,
+    url: '/xmallend/item/update/' + id,
     data: data
   })
 }
@@ -91,7 +91,7 @@ export const updateProduct = (id, data) => {
 export const addProduct = (data) => {
   return axios({
     method: 'post',
-    url: '/item/add',
+    url: '/xmallend/item/add',
     data: data
   })
 }
@@ -100,7 +100,7 @@ export const addProduct = (data) => {
 export const removeProduct = (ids) => {
   return axios({
     method: 'delete',
-    url: '/item/del/' + ids
+    url: '/xmallend/item/del/' + ids
   })
 }
 
@@ -108,7 +108,7 @@ export const removeProduct = (ids) => {
 export const searchProduct = (data) => {
   return axios({
     method: 'get',
-    url: '/item/search',
+    url: '/xmallend/item/search',
     params: data
   })
 }
@@ -120,7 +120,7 @@ export const searchProduct = (data) => {
 export const getOrderList = (data) => {
   return axios({
     method: 'get',
-    url: '/order-manager/list',
+    url: '/xmallend/order-manager/list',
     params: data
   })
 }
@@ -129,7 +129,7 @@ export const getOrderList = (data) => {
 export const getOrderCount = () => {
   return axios({
     method: 'get',
-    url: '/order-manager/count'
+    url: '/xmallend/order-manager/count'
   })
 }
 
@@ -137,7 +137,7 @@ export const getOrderCount = () => {
 export const removeOrder = (ids) => {
   return axios({
     method: 'delete',
-    url: '/order-manager/del/' + ids
+    url: '/xmallend/order-manager/del/' + ids
   })
 }
 
@@ -145,7 +145,7 @@ export const removeOrder = (ids) => {
 export const updateOrder = (id, data) => {
   return axios({
     method: 'put',
-    url: '/order-manager/update/' + id,
+    url: '/xmallend/order-manager/update/' + id,
     data: data
   })
 }
