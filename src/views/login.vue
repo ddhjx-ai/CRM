@@ -170,12 +170,16 @@
         请选择公司所在地区：
         <i-button
           :type="primary ? 'primary' : ''"
-          @click="getWeCode('wwdef3f8f98ff3b878', '1000002',1, true)"
+          @click="getWeCode('ww0c31d7c2891ce172', '1000038',1, true)"
         >北京</i-button>
         <i-button
           :type="primary ? '' : 'primary'"
-          @click="getWeCode('ww446591eeb1c9a3d3', '1000003',2,false)"
+          @click="getWeCode('wwaf72994d2eb35329', '1000004',2,false)"
         >武汉</i-button>
+        <!-- <i-button
+          :type="primary ? '' : 'primary'"
+          @click="getWeCode('ww446591eeb1c9a3d3', '1000003',2,false)"
+        >武汉</i-button> -->
       </div>
     </div>
   </div>
@@ -197,7 +201,6 @@ import {
   getOtherSet,
   getNotice,
 } from "@/api/index";
-import { getTicket } from "@/libs/axios";
 import { validateMobile } from "@/libs/validate";
 import Cookies from "js-cookie";
 import Header from "@/views/main-components/header";
@@ -534,7 +537,8 @@ export default {
         appid: appid,
         agentid: agentid,
         redirect_uri: encodeURI(
-          "http://hdj8q2.natappfree.cc/osc/qywechatlogin?flag=" + query
+          "http://osc.chinabidding.cn/osc/qywechatlogin?flag=" + query
+          // "http://ru3kus.natappfree.cc/osc/qywechatlogin?flag=" + query
         ),
         connect_redirect: 1,
         state: new Date().getTime(),
@@ -543,7 +547,7 @@ export default {
     }
   },
   mounted() {
-    this.getWeCode('wwdef3f8f98ff3b878', '1000002',1, true);
+    this.getWeCode('ww0c31d7c2891ce172', '1000038',1, true);
     this.relatedLogin();
     this.showNotice();
     this.getCaptchaImg();

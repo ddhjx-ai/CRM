@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { postCrmRequest, removeCrm } from "@/libs/axios";
+import { getCrmRequest, removeCrm } from "@/api/crm";
 import { validatePrice } from "@/libs/validate";
 import axios from "axios";
 import qs from "qs";
@@ -145,7 +145,7 @@ export default {
         agency_type: "",
         agency_kind: "",
       });
-      postCrmRequest("/website.Channels/getList", params);
+      getCrmRequest("/website.Channels/getList", params);
       // this.requestData('https://crm.chinabidding.cn/admin/website.Channels/getList', params)
     },
     init() {
@@ -185,7 +185,6 @@ export default {
           /<a[\s\S]*>([\s\S]*)<\/[\s\S]*>/g,
           "$1"
         );
-        console.log(item.cell[2]);
         item = { ...item.cell, id: item.id };
         return item;
       });

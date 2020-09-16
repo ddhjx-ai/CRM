@@ -97,11 +97,11 @@
             </Col>
           </Row>
           <Row :gutter="32">
-            <Col span="12">
+            <!-- <Col span="12">
               <FormItem label="头像">
                 <upload-pic-input v-model="form.avatar"></upload-pic-input>
               </FormItem>
-            </Col>
+            </Col> -->
             <Col span="12">
               <FormItem label="角色分配" prop="roleIds">
                 <Select v-model="form.roleIds" multiple>

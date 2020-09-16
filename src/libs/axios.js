@@ -159,31 +159,6 @@ export const postNoAuthRequest = (url, params) => {
     });
 };
 
-/* crm请求 */
-export const postCrmRequest = (url, params) => {
-    return axios({
-        method: 'post',
-        url: `/admin${url}`,
-        data: params,
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    })
-}
 
-export const removeCrm = (url, params) => {
-    return axios({
-        method: 'post',
-        url: `/admin${url}`,
-        data: params
-    })
-}
 
-// 获取JS-SDK
-export const getTicket = (url) => {
-    return axios({
-        method: 'get',
-        url: `${base}${url}`,
-    })
-}
 

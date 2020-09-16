@@ -10,6 +10,7 @@
       </Row>
       <Row>
         <Table
+          id="mygrid"
           :loading="loading"
           border
           :columns="columns"
@@ -39,7 +40,7 @@
 </template>
 
 <script>
-import { postCrmRequest, removeCrm } from "@/libs/axios";
+import { getCrmRequest, removeCrm } from "@/api/crm";
 import { validatePrice } from "@/libs/validate";
 import axios from "axios";
 import qs from "qs";
@@ -89,9 +90,9 @@ export default {
                 style: {
                   "text-decoration": "none",
                 },
-                attrs:  {
+                attrs: {
                   href: params.row.href,
-                  target: '_blank'
+                  target: "_blank",
                 },
               },
               params.row[4]
@@ -263,7 +264,7 @@ export default {
         agency_type: "",
         agency_kind: "",
       });
-      postCrmRequest("/website.Channels/getList", params);
+      getCrmRequest("/website.Channels/getList", params);
       // this.requestData('https://crm.chinabidding.cn/admin/website.Channels/getList', params)
     },
     init() {
@@ -300,15 +301,14 @@ export default {
       let list = this.dataList.rows;
       this.data = list.map((item) => {
         item.cell["href"] = item.cell[4].replace(
-          /<a href="([\s\S]*)" [\s\S]*>[\s\S]*<\/a[\s\S]*>/g,
+          /<a href=([\s\S]*) [\s\S]*>[\s\S]*<\/a[\s\S]*>/g,
           "$1"
         );
         item.cell[4] = item.cell[4].replace(
           /<a[\s\S]*>([\s\S]*)<\/a[\s\S]*>/g,
           "$1"
         );
-
-        console.log(item.cell["href"]);
+        item.cell["href"] = item.cell["href"].slice(1,item.cell["href"].length - 2)
         item = { ...item.cell, id: item.id };
         return item;
       });
@@ -390,3 +390,8 @@ export default {
   },
 };
 </script>
+<style lang="less" scoped>
+#mygrid .ivu-table th {
+  text-align: center;
+}
+</style>

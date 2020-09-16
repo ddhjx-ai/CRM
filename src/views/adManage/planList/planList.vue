@@ -150,7 +150,7 @@
 </template>
 
 <script>
-import { postCrmRequest, removeCrm } from "@/libs/axios";
+import { getCrmRequest, removeCrm } from "@/api/crm";
 import { validatePrice } from "@/libs/validate";
 import axios from "axios";
 import qs from "qs";
@@ -527,7 +527,7 @@ export default {
         agency_type: "",
         agency_kind: "",
       });
-      postCrmRequest("/ad.FaBuJiHuas/getList", params);
+      getCrmRequest("/ad.FaBuJiHuas/getList", params);
     },
     init() {
       this.getDataList();
@@ -706,7 +706,7 @@ export default {
         return;
       }
       var id = this.selectList[0].id;
-      postCrmRequest(
+      getCrmRequest(
         "/ad.FaBuJiHuas/chuzhang",
         qs.stringify({ yzId: id })
       ).then(() => {
@@ -724,7 +724,7 @@ export default {
         return;
       }
       var id = this.selectList[0].id;
-      postCrmRequest(
+      getCrmRequest(
         "/ad.FaBuJiHuas/toOver",
         qs.stringify({ fbjhId: id })
       ).then(() => {

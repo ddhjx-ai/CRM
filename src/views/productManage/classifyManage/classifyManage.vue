@@ -13,7 +13,6 @@
       </Row>
       <Row type="flex" justify="start">
         <Col :md="8" :lg="8" :xl="6">
-          
           <div class="tree-bar" :style="{maxHeight: maxHeight}">
             <Tree
               ref="tree"
@@ -65,7 +64,7 @@
               </i-switch>
             </FormItem>
             <FormItem label="备注：">
-              <Input v-model="form.remarks" type="textarea" :rows="4" placeholder="说点什么..." />
+              <Input v-model="form.remark" type="textarea" :rows="4" placeholder="说点什么..." />
             </FormItem>
             <Form-item class="br">
               <Button
@@ -99,13 +98,13 @@
             <InputNumber :max="1000" :min="0" v-model="subForm.sortOrder"></InputNumber>
           </Tooltip>
         </FormItem>
-        <FormItem label="是否启用：">
+        <FormItem label="是否启用：" prop="status">
           <i-switch size="large" v-model="subForm.status" :true-value="1" :false-value="0">
             <span slot="open">启用</span>
             <span slot="close">禁用</span>
           </i-switch>
         </FormItem>
-        <FormItem label="是否为父节点：">
+        <FormItem label="是否为父节点：" prop="isParent">
           <i-switch size="large" v-model="subForm.isParent" :true-value="1" :false-value="0">
             <span slot="open">是</span>
             <span slot="close">否</span>
@@ -144,14 +143,14 @@
             <span slot="close">禁用</span>
           </i-switch>
         </FormItem>
-        <FormItem label="是否为父节点：">
+        <FormItem label="是否为父节点：" prop="isParent">
           <i-switch size="large" v-model="rootForm.isParent" :true-value="1" :false-value="0">
-            <span slot="open">启用</span>
-            <span slot="close">禁用</span>
+            <span slot="open">是</span>
+            <span slot="close">否</span>
           </i-switch>
         </FormItem>
         <FormItem label="备注：">
-          <Input v-model="rootForm.remarks" type="textarea" :rows="4" placeholder="说点什么..." />
+          <Input v-model="rootForm.remark" type="textarea" :rows="4" placeholder="说点什么..." />
         </FormItem>
       </Form>
       <div slot="footer">
@@ -172,7 +171,13 @@ import {
   searchDepartment,
   getUserByDepartmentId,
 } from "@/api/index";
-import { getCateList, cateUpdate, cateRemove, cateAdd } from "@/libs/businessRoom";
+import {
+  getCateList,
+  cateUpdate,
+  cateRemove,
+  cateAdd,
+  getProductList,
+} from "@/api/businessRoom";
 import qs from "qs";
 export default {
   name: "department-manage",
@@ -208,7 +213,7 @@ export default {
       rootForm: {
         name: "",
         isParent: 1,
-        remarks: "",
+        remark: "",
         sortOrder: 1,
         status: 1,
       },
@@ -225,6 +230,12 @@ export default {
       // 当前选中的分类的父级
       currentParent: {},
       currentId: "",
+      // 获取当前分类是否存在子类
+      sonListLength: 0,
+      // 当前分类是否存在数据
+      productListLength: 0,
+      // 当前选中的分类是否是父节点
+      isParent: false,
     };
   },
   methods: {
@@ -319,7 +330,20 @@ export default {
       }
     },
     selectTree(v) {
+      console.log(v)
       if (v.length > 0) {
+        this.isParent = v[0].isParent;
+        let id = v[0].id;
+        getCateList({ id: id }).then((res) => {
+          this.sonListLength = res.length;
+        });
+        if (!v[0].children) {
+          getProductList({ page: 1, size: 10, cid: id }).then((res) => {
+            if (res.success) {
+              this.productListLength = res.result.count;
+            }
+          });
+        }
         this.currentId = v[0].id;
         this.currentParent = this.parentIdList.find((item) => {
           return item.id == v[0].pid;
@@ -392,6 +416,7 @@ export default {
         name: this.form.title,
         parentName: this.currentParent ? this.currentParent.title : "",
         sortOrder: this.form.sortOrder,
+        remark: this.form.remark,
       };
       this.$refs.form.validate((valid) => {
         if (valid) {
@@ -418,10 +443,8 @@ export default {
             parentId: this.form.id,
             ...this.subForm,
           };
-          console.log(params);
           this.submitLoading = true;
           cateAdd(qs.stringify(params)).then((res) => {
-            console.log(res);
             this.submitLoading = false;
             if (res.success) {
               this.$Message.success("添加成功");
@@ -453,13 +476,26 @@ export default {
     },
     addRoot() {
       this.rootVisible = true;
+      this.$refs.rootForm.resetFields();
     },
     addSub() {
       if (this.form.id == "" || this.form.id == null) {
         this.$Message.warning("请先点击选择一个分类");
         return;
       }
+      if(!this.isParent) {
+        this.$Modal.confirm({
+          title: "提示",
+          content: "该节点不是一个父节点，无法添加子节点分类，请选择一个父节点",
+          loading: true,
+          onOk: () => {
+            this.$Modal.remove();
+          },
+        });
+        return;
+      }
       this.subVisible = true;
+      this.$refs.subForm.resetFields();
     },
     cancelRoot() {
       this.$refs.rootForm.resetFields();
@@ -468,11 +504,6 @@ export default {
       this.selectCount = v.length;
       this.selectList = v;
     },
-    remove(v) {
-      this.selectCount = 1;
-      this.selectList.push(v);
-      this.delAll();
-    },
     delAll() {
       /* if (this.selectCount <= 0) {
         this.$Message.warning("您还未勾选要删除的数据");
@@ -480,6 +511,28 @@ export default {
       } */
       if (!this.currentId) {
         this.$Message.warning("请选择要删除的数据");
+        return;
+      }
+      if (this.sonListLength !== 0) {
+        this.$Modal.confirm({
+          title: "提示",
+          content: "请先删除该分类下的所有子类别",
+          loading: true,
+          onOk: () => {
+            this.$Modal.remove();
+          },
+        });
+        return;
+      }
+      if (this.productListLength !== 0) {
+        this.$Modal.confirm({
+          title: "提示",
+          content: "该分类下还有商品数据，请先到商品列表中删除对应商品数据",
+          loading: true,
+          onOk: () => {
+            this.$Modal.remove();
+          },
+        });
         return;
       }
       this.$Modal.confirm({

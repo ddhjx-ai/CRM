@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { postCrmRequest, removeCrm } from "@/libs/axios";
+import { getCrmRequest, removeCrm } from "@/api/crm";
 import axios from "axios";
 import qs from "qs";
 export default {
@@ -261,7 +261,7 @@ export default {
         agency_type: "",
         agency_kind: "",
       });
-      postCrmRequest("/website.Channels/getList", params);
+      getCrmRequest("/website.Channels/getList", params);
       // this.requestData('https://crm.chinabidding.cn/admin/website.Channels/getList', params)
     },
     getDataList() {

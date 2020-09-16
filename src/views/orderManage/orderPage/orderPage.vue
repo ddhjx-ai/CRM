@@ -190,15 +190,20 @@
       <div slot="footer" class="footer">
         <Button type="info" v-print="'#printBox'">打印</Button>
       </div>
-    </Modal> -->
+    </Modal>-->
   </div>
 </template>
 
 <script>
 import { validatePrice } from "@/libs/validate";
-import { getOrderList, getOrderCount, removeOrder, updateOrder } from "@/libs/businessRoom";
+import {
+  getOrderList,
+  getOrderCount,
+  removeOrder,
+  updateOrder,
+} from "@/api/businessRoom";
 import Print from "print-js";
-import qs from 'qs';
+import qs from "qs";
 export default {
   name: "orderPage",
   data() {
@@ -303,7 +308,7 @@ export default {
         {
           title: "订单号",
           key: "orderId",
-          width: 120,
+          width: 160,
           align: "center",
           fixed: "left",
         },
@@ -334,7 +339,8 @@ export default {
         {
           title: "创建时间",
           key: "createTime",
-          width: 120,
+          minWidth: 120,
+          align: "center",
           render: (h, params) => {
             return h("div", {}, this.formdate(params.row.createTime));
           },
@@ -342,7 +348,8 @@ export default {
         {
           title: "支付时间",
           key: "paymentTime",
-          width: 120,
+          minWidth: 120,
+          align: "center",
           render: (h, params) => {
             return h("div", {}, this.formdate(params.row.paymentTime));
           },
@@ -397,6 +404,7 @@ export default {
           key: "action",
           align: "center",
           width: 150,
+          fixed: "right",
           render: (h, params) => {
             return h("div", [
               /* h(
@@ -499,6 +507,9 @@ export default {
     },
     // 时间处理函数
     formdate(date) {
+      if(!date) {
+        return '-'
+      }
       let time = new Date(date);
       let year = time.getFullYear();
       let month = (time.getMonth() + 1).toString().padStart(2, "0");
@@ -508,25 +519,6 @@ export default {
       let second = time.getSeconds().toString().padStart(2, "0");
       return `${year}-${month}-${day} ${hour}:${minute}`;
     },
-    /* changeColumns(v) {
-      this.columns.map((item) => {
-        let hide = true;
-        for (let i = 0; i < v.length; i++) {
-          if (!item.key) {
-            hide = false;
-            break;
-          }
-          if (item.key == v[i] || item.key.indexOf(this.whiteColumns) > -1) {
-            hide = false;
-            break;
-          }
-        }
-        item.hide = hide;
-        return item;
-      });
-      // 触发计算方法
-      this.columnChange = !this.columnChange;
-    }, */
     changePage(v) {
       this.searchForm.page = v;
       this.getDataList();
@@ -549,9 +541,29 @@ export default {
       this.loading = true;
       getOrderList(this.searchForm).then((res) => {
         this.loading = false;
-        if (res.success) {
+        /* if (res.success) {
+          if (res.result.list.length !== 0) {
+            this.data = res.result.list;
+            this.total = res.result.count;
+          } else if (
+            res.result.list.length === 0 &&
+            this.searchForm.page !== 1
+          ) {
+            this.searchForm.page -= 1;
+            this.getDataList();
+          }
+        } */
+        if (res.result.list.length !== 0) {
           this.data = res.result.list;
           this.total = res.result.count;
+        } else {
+          if (this.searchForm.page !== 1) {
+            this.searchForm.page -= 1;
+            this.getDataList();
+          } else {
+            this.data = res.result.list;
+            this.total = res.result.count;
+          }
         }
       });
     },
@@ -585,9 +597,9 @@ export default {
     handleSubmit() {
       // 编辑
       let data = {
-        note: this.editForm.buyerMessage
-      }
-      updateOrder(this.updateId, qs.stringify(data)).then(res => {
+        note: this.editForm.buyerMessage,
+      };
+      updateOrder(this.updateId, qs.stringify(data)).then((res) => {
         this.submitLoading = false;
         if (res.success) {
           this.$Message.success("操作成功");
@@ -624,7 +636,7 @@ export default {
       }
       let str = JSON.stringify(v);
       let data = JSON.parse(str);
-      this.editForm.buyerMessage = data.buyerMessage
+      this.editForm.buyerMessage = data.buyerMessage;
     },
     remove(v) {
       this.$Modal.confirm({

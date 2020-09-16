@@ -40,13 +40,13 @@
               <Form-item class="formSpan">
                 <span>-</span>
               </Form-item>
-              <Form-item class="hideLabel" prop="end">
+              <Form-item class="hideLabel" prop="showEnd">
                 <DatePicker
                   type="date"
                   placeholder="结束时间"
                   format="yyyy-MM-dd"
                   @on-change="endChange"
-                  v-model="searchForm.end"
+                  v-model="searchForm.showEnd"
                   style="width: 200px"
                 ></DatePicker>
               </Form-item>
@@ -152,28 +152,7 @@
         <FormItem label="购买限制数量：" prop="limitNum">
           <Input v-model="form.limitNum" placeholder="请输入数量，单位为件" />
         </FormItem>
-        <!-- <FormItem label="展示缩略图片上传：" prop="image">
-          <Upload
-            :before-upload="handleBeforeUpload"
-            type="drag"
-            :data="uploadData"
-            :action="uploadFileUrl"
-            :max-size="2048"
-            :on-exceeded-size="handleMaxSize"
-            :headers="accessToken"
-            :on-success="handleSuccess"
-            :on-error="handleError"
-            :format="['jpg','jpeg','png']"
-            :on-format-error="handleFormatError"
-            :on-remove="handleRmove"
-          >
-            <div style="padding: 20px 0">
-              <Icon type="ios-cloud-upload" size="52" style="color: #3399ff"></Icon>
-              <p>或将照片拖到这里，最多可选5张</p>
-            </div>
-          </Upload>
-        </FormItem>-->
-        <FormItem label="展示缩略图片上传：" >
+        <FormItem label="缩略图片上传：" prop="image">
           <div class="demo-upload-list" v-for="item in uploadList" :key="item">
             <template v-if="item.status === 'finished'">
               <img :src="item.url" />
@@ -243,7 +222,7 @@ import {
   addProduct,
   removeProduct,
   searchProduct,
-} from "@/libs/businessRoom";
+} from "@/api/businessRoom";
 import qs from "qs";
 export default {
   name: "productList",
@@ -281,6 +260,7 @@ export default {
         search: "",
         start: "", // 起始时间
         end: "", // 终止时间
+        showEnd: ''
       },
       pageForm: {
         page: 1, // 当前页数
@@ -306,9 +286,23 @@ export default {
       },
       formValidate: {
         // 表单验证规则
-        title: [{ required: true, message: "标题不能为空", trigger: "blur" }],
+        title: [
+          { required: true, message: "标题不能为空", trigger: "blur" },
+          {
+            type: "string",
+            max: 15,
+            message: "标题长度不能超过15个字符",
+            trigger: "blur",
+          },
+        ],
         sellPoint: [
           { required: true, message: "描述不能为空", trigger: "blur" },
+          {
+            type: "string",
+            max: 50,
+            message: "描述内容不能超过50个字符",
+            trigger: "blur",
+          },
         ],
         cname: [{ required: true, message: "分类不能为空", trigger: "change" }],
         price: [
@@ -323,7 +317,7 @@ export default {
         validity: [
           {
             required: true,
-            message: "数量不能为空",
+            message: "有效期不能为空",
             trigger: "blur",
           },
           { validator: validateNum, trigger: "blur" },
@@ -526,6 +520,9 @@ export default {
     },
     // 时间处理函数
     formdate(date) {
+      if(!date) {
+        return '-'
+      }
       let time = new Date(date);
       let year = time.getFullYear();
       let month = (time.getMonth() + 1).toString().padStart(2, "0");
@@ -577,7 +574,6 @@ export default {
       });
     },
     selectTree(v) {
-      console.log(v);
       if (v.length > 0) {
         // 转换null为""
         for (let attr in v[0]) {
@@ -587,6 +583,10 @@ export default {
         }
         let str = JSON.stringify(v[0]);
         let data = JSON.parse(str);
+        if (data.isParent) {
+          this.$Message.warning("请点击子级分类获取对应分类数据");
+          return;
+        }
         this.pageForm.cid = data.id;
         this.pageForm.size = 10;
         this.pageForm.page = 1;
@@ -638,12 +638,42 @@ export default {
       getProductList(this.pageForm).then((res) => {
         this.loading = false;
         if (res.success) {
-          this.data = res.result.itemList;
-          this.total = res.result.count;
+          /* this.data = res.result.itemList;
+          this.total = res.result.count; */
+          /* if (res.result.itemList.length !== 0) {
+            this.data = res.result.itemList;
+            this.total = res.result.count;
+          } else if ( res.result.itemList.length === 0 &&this.pageForm.page !== 1) {
+            this.pageForm.page -= 1;
+            this.getDataList();
+          } else if (res.result.itemList.length === 0 &&this.pageForm.page === 1 ) {
+            this.data = res.result.itemList;
+            this.total = res.result.count;
+          } */
+          if (res.result.itemList.length !== 0) {
+            this.data = res.result.itemList;
+            this.total = res.result.count;
+          } else {
+            if (this.pageForm.page !== 1) {
+              this.pageForm.page -= 1;
+              this.getDataList();
+            } else {
+              this.data = res.result.itemList;
+              this.total = res.result.count;
+            }
+          }
         }
       });
     },
     handleSearch() {
+      if(this.searchForm.start && !this.searchForm.end){
+        this.$Message.warning("请选择截止时间");
+        return
+      }
+      if(!this.searchForm.start && this.searchForm.end){
+        this.$Message.warning("请选择起始时间");
+        return
+      }
       let data = {
         page: 1,
         size: 10,
@@ -659,9 +689,8 @@ export default {
       });
     },
     startChange(v) {
-      console.log(v);
-      if (new Date(v) > new Date(this.searchForm.end)) {
-        this.$Message.warning("起始时间不能大于结束时间");
+      if (new Date(v) > new Date(this.searchForm.showEnd)) {
+        this.$Message.warning("起始时间不能大于截止时间");
         this.searchForm.start = "";
         return;
       }
@@ -669,11 +698,21 @@ export default {
     },
     endChange(v) {
       if (new Date(v) < new Date(this.searchForm.start)) {
-        this.$Message.warning("结束时间不能小于起始时间");
-        this.searchForm.end = "";
+        this.$Message.warning("截止时间不能小于起始时间");
+        this.searchForm.showEnd = "";
         return;
       }
-      this.searchForm.end = v;
+      this.searchForm.showEnd = v
+      let d = this.formateDate(new Date(v).getTime() + 86400000)
+      this.searchForm.end = d;
+    },
+    formateDate(date) {
+      date = new Date(date)
+      let year = date.getFullYear()
+      let month = (date.getMonth() + 1).toString().padStart(2, '0')
+      let day = date.getDate().toString().padStart(2, '0')
+
+      return `${year}-${month}-${day}`
     },
     handleReset() {
       this.$refs.searchForm.resetFields();
@@ -749,7 +788,6 @@ export default {
     },
     // 编辑时选择类别
     selectTreeEdit(v) {
-      console.log(v[0]);
       if (v.length > 0) {
         // 转换null为""
         for (let attr in v[0]) {
@@ -796,7 +834,6 @@ export default {
           this.submitLoading = true;
           if (this.modalType == 0) {
             data.id = this.form.id;
-            console.log(data);
             addProduct(qs.stringify(data)).then((res) => {
               // 添加 避免编辑后传入id等数据 记得删除
               delete this.form.id;
@@ -866,18 +903,10 @@ export default {
         },
       });
     },
-    // ##wu
-    /* selectDateRange(v) {
-      if (v) {
-        this.searchForm.minDate = v[0];
-        this.searchForm.maxDate = v[1];
-      }
-    }, */
     // ##wu 文件上传
     handleBeforeUpload(file) {
       /* console.log("beforeUploadfile", file);
       console.log("beforeUploaduploadList", this.uploadList); */
-
       /* const check = this.uploadList.length < 22;
       if (!check) {
         this.$Notice.warning({
@@ -903,8 +932,6 @@ export default {
       });
     },
     handleSuccess(res, file) {
-      console.log("successUploadresfile", res, file);
-      console.log("successUploaduploadList", this.uploadList);
       if (res.success) {
         file.url = res.result;
         file.name = res.result;
@@ -939,7 +966,6 @@ export default {
         loading: true,
         onOk: () => {
           let ids = [];
-          console.log(this.selectList);
           ids = this.selectList.map((item) => {
             return item.id;
           });

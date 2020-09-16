@@ -56,7 +56,7 @@ import "viewerjs/dist/viewer.css";
 import Viewer from "viewerjs";
 import { uploadFile } from "@/api/index";
 import vuedraggable from "vuedraggable";
-import { uploadImgUrl, updateProduct } from "@/libs/businessRoom";
+import { uploadImgUrl, updateProduct } from "@/api/businessRoom";
 export default {
   name: "uploadPicThumb",
   components: {

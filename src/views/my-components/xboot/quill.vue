@@ -101,7 +101,7 @@
 <script>
 import {
   uploadImgUrl,
-} from "@/libs/businessRoom";
+} from "@/api/businessRoom";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import xss from "xss";

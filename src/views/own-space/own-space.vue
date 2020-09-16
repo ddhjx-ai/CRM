@@ -21,7 +21,8 @@
               <Form ref="userForm" :model="userForm" :label-width="90" label-position="left">
                 <FormItem label="登录账号：" prop="username">{{userForm.username}}</FormItem>
                 <FormItem label="用户头像：">
-                  <upload-pic-thumb v-model="userForm.avatar" :multiple="false"></upload-pic-thumb>
+                  <!-- <upload-pic-thumb v-model="userForm.avatar" :multiple="false"></upload-pic-thumb> -->
+                  <img :src="userForm.avatar" alt="" style="width:60px; height:60px; border-radius:5px">
                 </FormItem>
                 <FormItem label="用户名：" prop="nickname">
                   <Input v-model="userForm.nickname" style="width: 300px" />
@@ -381,6 +382,20 @@ export default {
       currMenu: "基本信息",
       dictSex: this.$store.state.dict.sex
     };
+  },
+  /* created(){
+    console.log(this.$store.state.dict.sex)
+    console.log(this.userForm.sex)
+  }, */
+  watch: {
+    '$store.state.dict.sex': {
+      deep: true,
+      handler: function (newValue, oldValue) {
+        console.log('newValue', newValue)
+        console.log('oldValue', oldValue)
+        this.dictSex = newValue
+      }
+    }
   },
   methods: {
     init() {

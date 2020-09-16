@@ -67,8 +67,10 @@ export const validateIDCard = (rule, value, callback) => {
  */
 export const validateNum = (rule, value, callback) => {
   const reg = /^(0|[1-9][0-9]*)$/;
-  if (!reg.test(value)) {
-    callback(new Error('总数必须大于等于0，并且不能是小数'))
+  if(value === ''){
+    callback();
+  }else if (!reg.test(value)) {
+    callback(new Error('请输入大于等于0的数字，并且不能是小数'))
   } else {
     callback();
   }
@@ -118,6 +120,22 @@ export const validateLimit = (rule, value, callback) => {
     callback(new Error('最多可以输入 4 个字符'));
   } else if(!reg.test(value)) {
     callback(new Error('总数必须大于等于0，并且不能是小数'))
+  }else {
+    callback();
+  }
+};
+
+
+/**
+ * IP校验
+ * @param rule 
+ * @param value 需要验证的值
+ * @param callback 回调函数
+ */
+export const validateIP = (rule, value, callback) => {
+  const reg = /^(\d{1}|[1-9]{1}\d{1}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1}|[1-9]{1}\d{1}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1}|[1-9]{1}\d{1}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1}|[1-9]{1}\d{1}|1\d\d|2[0-4]\d|25[0-5])$/
+  if(!reg.test(value)) {
+    callback(new Error('请输入合法的IP地址'))
   }else {
     callback();
   }
