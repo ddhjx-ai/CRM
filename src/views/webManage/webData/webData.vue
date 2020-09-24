@@ -43,7 +43,7 @@
         <FormItem label="别名" prop="alias">
           <Input v-model="form.alias" />
         </FormItem>
-        <FormItem label="sphinx_query" prop="sphinx_query" v-if="modalType">
+        <FormItem label="sphinx_query" prop="sphinx_query">
           <Input v-model="form.sphinx_query" />
         </FormItem>
         <FormItem label="sphinx_table_name" prop="sphinx_table_name" v-if="modalType">
@@ -64,9 +64,6 @@
         <FormItem label="query" prop="query">
           <Input v-model="form.query" />
         </FormItem>
-        <FormItem label="sphinx_query" prop="sphinx_query" v-if="!modalType">
-          <Input v-model="form.sphinx_query" />
-        </FormItem>
         <FormItem label="任务地址" prop="url">
           <Input v-model="form.url" />
         </FormItem>
@@ -82,6 +79,8 @@
         <FormItem label="页面" prop="pages">
           <Select v-model="form.pages" multiple>
             <Option v-for="item in optionList" :value="item.id" :key="item.id">{{ item.name }}</Option>
+            <!-- <Option value="1">1</Option>
+            <Option value="12">12</Option> -->
           </Select>
         </FormItem>
       </Form>
@@ -94,21 +93,14 @@
 </template>
 
 <script>
-import { getCrmRequest, removeCrm } from "@/api/crm";
+import { getCrmRequest, removeCrm, postCrmRequest } from "@/api/crm";
 import qs from "qs";
+import {
+  validateNum,
+} from "@/libs/validate";
 export default {
   name: "webData",
   data() {
-    const validateNum = (rule, value, callback) => {
-      // 模拟异步验证效果
-      setTimeout(() => {
-        if (!Number.isInteger(value)) {
-          callback(new Error("请输入数字值"));
-        } else {
-          callback();
-        }
-      }, 1000);
-    };
     return {
       optionList: [],
       openTip: false, // 显示提示
@@ -127,17 +119,27 @@ export default {
         alias: "",
         query: "",
         sphinx_query: "",
+        sphinx_table_name: '',
+        sphinx_table_name2: '',
+        sphinx_area:'',
+        sphinx_cate: '',
+        sphinx_classaid: '',
         url: "",
-        rp: "",
+        rp: 0,
         isShowDescription: false,
         isShowTotal: false,
         pages: [],
       },
       // 表单验证规则
       formValidate: {
-        name: [{ required: true, message: "不能为空", trigger: "blur" }],
+        /* name: [{ required: true, message: "不能为空", trigger: "blur" }],
         alias: [{ required: true, message: "不能为空", trigger: "blur" }],
-        rp: [{ validator: validateNum, trigger: "blur" }],
+        rp: [
+          { validator: validateNum, trigger: "blur" },
+        ], */
+        /* pages: [
+          {type: 'array', required: true, message: "不能为空", trigger: "blur" }
+        ] */
       },
       submitLoading: false, // 添加或编辑提交状态
       selectList: [], // 多选数据
@@ -278,6 +280,7 @@ export default {
       ],
       data: [], // 表单数据
       total: 0, // 表单数据总数
+      updateId: '',
     };
   },
   // 表格动态列 计算属性
@@ -316,41 +319,64 @@ export default {
       this.modalVisible = false;
     },
     handleSubmit() {
-      console.log(this.form);
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.submitLoading = true;
           if (this.modalType == 0) {
+            let data = {
+              name: this.form.name,
+              alias: this.form.alias,
+              query: this.form.query,
+              sphinx_query: this.form.sphinx_query,
+              url: this.form.url,
+              rp: this.form.rp,
+              isShowDescription: this.form.isShowDescription,
+              isShowTotal: this.form.isShowTotal,
+              pages: this.form.pages
+            }
+            data.pages = data.pages.map(item => {
+              return {id: item}
+            })
+            console.log(data)
             // 添加 避免编辑后传入id等数据 记得删除
-            delete this.form.id;
-            // this.postRequest("请求地址", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟请求成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.getDataList();
-            this.modalVisible = false;
+            postCrmRequest("/website/blocks/add", qs.stringify(data)).then(res => {
+              this.submitLoading = false;
+              if (res.success) {
+                this.$Message.success("操作成功");
+                this.getDataList();
+                this.modalVisible = false;
+              }
+            });
           } else {
             // 编辑
-            // this.postRequest("请求地址", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟请求成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.getDataList();
-            this.modalVisible = false;
+            let data = {
+              name: this.form.name,
+              alias: this.form.alias,
+              query: this.form.query,
+              sphinx_query: this.form.sphinx_query,
+              url: this.form.url,
+              rp: this.form.rp,
+              isShowDescription: this.form.isShowDescription,
+              isShowTotal: this.form.isShowTotal,
+              pages: this.form.pages,
+              sphinx_table_name: this.form.sphinx_table_name,
+              sphinx_table_name2: this.form.sphinx_table_name2,
+              sphinx_area: this.form.sphinx_area,
+              sphinx_cate: this.form.sphinx_cate,
+              sphinx_classaid: this.form.sphinx_classaid
+            }
+            data.pages = data.pages.map(item => {
+              return {id: item}
+            })
+            console.log(data)
+            postCrmRequest("/website/blocks/update/" + this.updateId, qs.stringify(data)).then(res => {
+              this.submitLoading = false;
+              if (res.success) {
+                this.$Message.success("操作成功");
+                this.getDataList();
+                this.modalVisible = false;
+              }
+            });
           }
         }
       });
@@ -378,6 +404,7 @@ export default {
       this.form.pages = data.pages.map((item) => {
         return item.id;
       });
+      this.updateId = data.id
       this.modalVisible = true;
     },
     remove(v) {
@@ -389,19 +416,7 @@ export default {
         loading: true,
         onOk: () => {
           // 删除
-          // this.deleteRequest("请求地址，如/deleteByIds/" + v.id).then(res => {
-          //   this.$Modal.remove();
-          //   if (res.success) {
-          //     this.$Message.success("操作成功");
-          //     this.getDataList();
-          //   }
-          // });
-          // 模拟请求成功
-          /* this.$Message.success("操作成功");
-          this.$Modal.remove();
-          this.getDataList(); */
-          var params = qs.stringify({ id: v.id });
-          removeCrm("/website.Blocks/remove", params).then((res) => {
+          removeCrm("/website/blocks/del/" + [v.id]).then((res) => {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("操作成功");
@@ -452,8 +467,8 @@ export default {
     },
   },
   mounted() {
-    /* this.init();
-    this.getOptionsList(); */
+    this.init();
+    this.getOptionsList();
   },
 };
 </script>

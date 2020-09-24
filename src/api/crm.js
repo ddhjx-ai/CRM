@@ -17,10 +17,9 @@ export const postCrmRequest = (url, params={}) => {
   })
 }
 
-export const removeCrm = (url, params={}) => {
+export const removeCrm = (url) => {
   return axios({
-      method: 'post',
+      method: 'delete',
       url: '/osc' + url,
-      data: params
   })
 }

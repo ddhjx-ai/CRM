@@ -16,9 +16,13 @@
         :open-names="openedSubmenuArr"
         :menu-list="menuList"
       >
-        <div slot="top" class="logo-con">
+        <!-- <div slot="top" class="logo-con">
           <img v-show="!shrink" src="../assets/logo.png" key="max-logo" />
           <img v-show="shrink" src="../assets/logo-min.png" key="min-logo" />
+        </div> -->
+        <div slot="top" class="logo-con">
+          <h3 v-show="!shrink" style="color:#fff; font-size: 25px;">运营中心</h3>
+          <h3 v-show="shrink" style="color:#fff; font-size: 20px;">OSC</h3>
         </div>
       </shrinkable-menu>
     </div>
@@ -38,12 +42,12 @@
             <breadcrumb-nav :currentPath="currentPath"></breadcrumb-nav>
           </div>
           <div class="main-nav-menu" v-if="navType==1||navType==2">
-            <Menu mode="horizontal" :active-name="currNav" @on-select="selectNav">
+            <!-- <Menu mode="horizontal" :active-name="currNav" @on-select="selectNav">
               <MenuItem v-for="(item, i) in navList.slice(0, 1)" :key="i" :name="item.name">
                 <Icon :type="item.icon" v-if="navType==1" />
                 {{item.title}}
               </MenuItem>
-              <!-- <Submenu name="sub" v-if="navList.length>sliceNum">
+              <Submenu name="sub" v-if="navList.length>sliceNum">
                 <template slot="title">更多</template>
                 <MenuItem
                   v-for="(item, i) in navList.slice(sliceNum, navList.length)"
@@ -53,8 +57,8 @@
                   <Icon :type="item.icon" v-if="navType==1" />
                   {{item.title}}
                 </MenuItem>
-              </Submenu> -->
-            </Menu>
+              </Submenu>
+            </Menu> -->
           </div>
           <div class="main-nav" v-if="navType==3">
             <Dropdown transfer @on-click="selectNav">

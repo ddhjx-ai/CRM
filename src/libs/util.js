@@ -9,7 +9,8 @@ let util = {
 };
 
 util.title = function (title) {
-    title = title || 'XBoot一站式前后端分离快速开发平台';
+    title = '采购与招标网-运营中心';
+    // title = "OSC-" + title;
     window.document.title = title;
 };
 
@@ -446,7 +447,7 @@ util.initRouterNode = function (routers, data) {
         // 给页面添加权限、标题、第三方网页链接
         meta.permTypes = menu.permTypes ? menu.permTypes : null;
         // meta.title = menu.title ? menu.title + " - XBoot一站式前后端分离快速开发平台 By: Exrick" : null;
-        meta.title = menu.title ? menu.title : null;
+        meta.title = menu.title ? 'OSC-' + menu.title : null;
         meta.url = menu.url ? menu.url : null;
         menu.meta = meta;
 

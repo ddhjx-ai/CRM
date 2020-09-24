@@ -9,7 +9,7 @@
       </Row>
       <Row>
         <Table
-         class="mygrid"
+          class="mygrid"
           :loading="loading"
           border
           :columns="columns"
@@ -42,10 +42,10 @@
         <FormItem label="别名" prop="alias">
           <Input v-model="form.alias" />
         </FormItem>
-        <FormItem label="site" prop="site">
-          <i-select v-model="form.site" style="width:200px">
-            <i-option v-for="item in optionList" :key="item" :value="item.id">{{ item.name }}</i-option>
-          </i-select>
+        <FormItem label="site" prop="siteId">
+          <Select v-model="form.siteId" >
+            <Option v-for="item in optionList" :key="item" :value="item.id">{{ item.name }}</Option>
+          </Select>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -57,8 +57,7 @@
 </template>
 
 <script>
-import { getCrmRequest, removeCrm } from "@/api/crm";
-import axios from "axios";
+import { getCrmRequest, removeCrm, postCrmRequest } from "@/api/crm";
 import qs from "qs";
 export default {
   name: "channel",
@@ -119,12 +118,13 @@ export default {
         // 添加或编辑表单对象初始化数据
         name: "",
         alias: "",
-        site: "",
+        siteId: "",
       },
       // 表单验证规则
       formValidate: {
-        name: [{ required: true, message: "不能为空", trigger: "blur" }],
-        alias: [{ required: true, message: "不能为空", trigger: "blur" }],
+        /* name: [{ required: true, message: "不能为空", trigger: "blur" }],
+        alias: [{ required: true, message: "不能为空", trigger: "blur" }], */
+        // siteId: [{type: 'number', required: true, message: "请选择站点", trigger: "change" }]
       },
       submitLoading: false, // 添加或编辑提交状态
       selectList: [], // 多选数据
@@ -204,22 +204,23 @@ export default {
       ],
       data: [], // 表单数据
       total: 0, // 表单数据总数
+      updateId: "",
     };
   },
   // 表格动态列 计算属性
-  computed: {
-    
-  },
+  computed: {},
   methods: {
     init() {
       this.getDataList();
     },
-    getOptionsList(){
-      getCrmRequest("/website/sites/list", {page: -1, size:-1}).then(res => {
-        if(res.success) {
-          this.optionList = res.result.list
+    getOptionsList() {
+      getCrmRequest("/website/sites/list", { page: -1, size: -1 }).then(
+        (res) => {
+          if (res.success) {
+            this.optionList = res.result.list;
+          }
         }
-      })
+      );
     },
     changePage(v) {
       this.searchForm.page = v;
@@ -244,41 +245,45 @@ export default {
       this.modalVisible = false;
     },
     handleSubmit() {
+       /* postCrmRequest("/website/channels/add", qs.stringify({name: 'a', a: [{id:1}, {id:2}] }, { arrayFormat: 'repeat' }))
+       postCrmRequest("/website/channels/add", qs.stringify({name: 'a', a: [{id:1}, {id:2}] }, { arrayFormat: 'indices' }))
+       postCrmRequest("/website/channels/add", qs.stringify({name: 'a', a: [{id:1}, {id:2}] }, { arrayFormat: 'brackets' }))
+       postCrmRequest("/website/channels/add", qs.stringify({name: 'a', a: [{id:1}, {id:2}] }, {arrayFormat: 'indices', allowDots: true})) */
+      //  postCrmRequest("/website/channels/add", JSON.stringify({name: 'a', a: [{id:1}, {id:2}] }))
       console.log(this.form);
+      let data = {
+        name: this.form.name,
+        alias: this.form.alias,
+        siteId: this.form.siteId,
+      };
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.submitLoading = true;
           if (this.modalType == 0) {
             // 添加 避免编辑后传入id等数据 记得删除
-            delete this.form.id;
-            // this.postRequest("请求地址", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟请求成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.getDataList();
-            this.modalVisible = false;
+            postCrmRequest("/website/channels/add", qs.stringify(data)).then(
+              (res) => {
+                this.submitLoading = false;
+                if (res.success) {
+                  this.$Message.success("操作成功");
+                  this.getDataList();
+                  this.modalVisible = false;
+                }
+              }
+            );
           } else {
             // 编辑
-            // this.postRequest("请求地址", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟请求成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.getDataList();
-            this.modalVisible = false;
+            postCrmRequest(
+              "/website/channels/update/" + this.updateId,
+              qs.stringify(data)
+            ).then((res) => {
+              this.submitLoading = false;
+              if (res.success) {
+                this.$Message.success("操作成功");
+                this.getDataList();
+                this.modalVisible = false;
+              }
+            });
           }
         }
       });
@@ -287,7 +292,6 @@ export default {
       this.modalType = 0;
       this.modalTitle = "添加";
       this.$refs.form.resetFields();
-      delete this.form.id;
       this.getOptionsList();
       this.modalVisible = true;
     },
@@ -305,6 +309,7 @@ export default {
       let str = JSON.stringify(v);
       let data = JSON.parse(str);
       this.form = data;
+      this.updateId = data.id;
       this.modalVisible = true;
     },
     remove(v) {
@@ -315,19 +320,7 @@ export default {
         loading: true,
         onOk: () => {
           // 删除
-          // this.deleteRequest("请求地址，如/deleteByIds/" + v.id).then(res => {
-          //   this.$Modal.remove();
-          //   if (res.success) {
-          //     this.$Message.success("操作成功");
-          //     this.getDataList();
-          //   }
-          // });
-          // 模拟请求成功
-          // this.$Message.success("操作成功");
-          // this.$Modal.remove();
-          // this.getDataList();
-          var params = qs.stringify({ id: v.id });
-          removeCrm("/website.Sites/remove", params).then((res) => {
+          removeCrm("/website/channels/del/" + [v.id]).then((res) => {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("操作成功");

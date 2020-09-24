@@ -104,7 +104,8 @@ export const otherRouter = {
         { path: 'leave', title: '请假申请', name: 'leave', component: () => import('@/views/activiti/business/leave.vue') },
         { path: 'historic-detail', title: '流程进度历史详情', name: 'historic_detail', component: () => import('@/views/activiti/historic-detail/historicDetail.vue') },
 
-        {path: 'adAllList', title: '业主广告列表', name: 'adAllList-index', component: () => import("@/views/adManage/userList/adAllList.vue")}
+        {path: 'adAllList', title: '业主广告列表', name: 'adAllList-index', component: () => import("@/views/adManage/userList/adAllList.vue")},
+        { path: 'subjectManage/blocksManage', title: 'blocks管理', name: 'blocksManage', component: () => import('@/views/subjectManage/blocksManage/blocksManage.vue') },
     ]
 };
 

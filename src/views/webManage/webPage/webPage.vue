@@ -45,8 +45,8 @@
         <FormItem label="标题" prop="title">
           <Input v-model="form.title" />
         </FormItem>
-        <FormItem label="关键字" prop="keyWords">
-          <Input v-model="form.keyWords" />
+        <FormItem label="关键字" prop="keywords">
+          <Input v-model="form.keywords" />
         </FormItem>
         <FormItem label="活动描述" prop="describe">
           <Input v-model="form.describe" />
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { getCrmRequest, removeCrm } from "@/api/crm";
+import { getCrmRequest, removeCrm, postCrmRequest } from "@/api/crm";
 import qs from "qs";
 export default {
   name: "webPage",
@@ -96,7 +96,7 @@ export default {
         name: "",
         alias: "",
         title: "",
-        keyWords: "",
+        keywords: "",
         describe: "",
         css: "",
         channelId: "",
@@ -104,8 +104,10 @@ export default {
       },
       // 表单验证规则
       formValidate: {
-        name: [{ required: true, message: "不能为空", trigger: "blur" }],
-        alias: [{ required: true, message: "不能为空", trigger: "blur" }],
+       /*  name: [{ required: true, message: "不能为空", trigger: "blur" }],
+        alias: [{ required: true, message: "不能为空", trigger: "blur" }], */
+        /* channelId: [{ required: true, message: "请选择channel", trigger: "change" }],
+        blocks: [{ type: 'array', required: true, message: "请选择blocks", trigger: "change" }] */
       },
       submitLoading: false, // 添加或编辑提交状态
       selectList: [], // 多选数据
@@ -206,6 +208,7 @@ export default {
       ],
       data: [], // 表单数据
       total: 0, // 表单数据总数
+      updateId: '',
     };
   },
   // 表格动态列 计算属性
@@ -253,40 +256,43 @@ export default {
       this.modalVisible = false;
     },
     handleSubmit() {
+      let data = {
+        name: this.form.name,
+        alias: this.form.alias,
+        title: this.form.title,
+        keywords: this.form.keywords,
+        describe: this.form.describe,
+        css: this.form.css,
+        channelId: this.form.channelId,
+        blocks: this.form.blocks,
+      }
+      data.blocks = data.blocks.map(item => {
+        return {id: item}
+      })
+      console.log(data)
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.submitLoading = true;
           if (this.modalType == 0) {
             // 添加 避免编辑后传入id等数据 记得删除
-            delete this.form.id;
-            // this.postRequest("请求地址", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟请求成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.getDataList();
-            this.modalVisible = false;
+            postCrmRequest("/website/pages/add", qs.stringify(data)).then(res => {
+              this.submitLoading = false;
+              if (res.success) {
+                this.$Message.success("操作成功");
+                this.getDataList();
+                this.modalVisible = false;
+              }
+            });
           } else {
             // 编辑
-            // this.postRequest("请求地址", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟请求成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.getDataList();
-            this.modalVisible = false;
+            postCrmRequest("/website/pages/update/" + this.updateId, qs.stringify(data, { arrayFormat: 'repeat' })).then(res => {
+              this.submitLoading = false;
+              if (res.success) {
+                this.$Message.success("操作成功");
+                this.getDataList();
+                this.modalVisible = false;
+              }
+            });
           }
         }
       });
@@ -314,6 +320,7 @@ export default {
       this.form.blocks = data.blocks.map(item => {
         return item.id
       })
+      this.updateId = data.id
       this.modalVisible = true;
     },
     remove(v) {
@@ -324,19 +331,7 @@ export default {
         loading: true,
         onOk: () => {
           // 删除
-          // this.deleteRequest("请求地址，如/deleteByIds/" + v.id).then(res => {
-          //   this.$Modal.remove();
-          //   if (res.success) {
-          //     this.$Message.success("操作成功");
-          //     this.getDataList();
-          //   }
-          // });
-          // 模拟请求成功
-          /* this.$Message.success("操作成功");
-          this.$Modal.remove();
-          this.getDataList(); */
-          var params = qs.stringify({ id: v.id });
-          removeCrm("/website.Pages/remove", params).then((res) => {
+          removeCrm("/website.Pages/remove/" + [v.id]).then((res) => {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("操作成功");

@@ -54,7 +54,7 @@
           :page-size="searchForm.size"
           @on-change="changePage"
           @on-page-size-change="changesize"
-          :page-size-opts="[10,20,50]"
+          :page-size-opts="[5,10,20,50]"
           size="small"
           show-total
           show-elevator

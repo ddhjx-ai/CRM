@@ -52,7 +52,7 @@
 </template>
 
 <script>
-import { getCrmRequest, removeCrm } from "@/api/crm";
+import { getCrmRequest, postCrmRequest, removeCrm } from "@/api/crm";
 import qs from "qs";
 export default {
   name: "webPoint",
@@ -74,8 +74,8 @@ export default {
       },
       // 表单验证规则
       formValidate: {
-        name: [{ required: true, message: "不能为空", trigger: "blur" }],
-        alias: [{ required: true, message: "不能为空", trigger: "blur" }],
+        /* name: [{ required: true, message: "不能为空", trigger: "blur" }],
+        alias: [{ required: true, message: "不能为空", trigger: "blur" }], */
       },
       submitLoading: false, // 添加或编辑提交状态
       selectList: [], // 多选数据
@@ -150,6 +150,7 @@ export default {
       ],
       data: [], // 表单数据
       total: 0, // 表单数据总数
+      updateId: '',
     };
   },
   // 表格动态列 计算属性
@@ -193,35 +194,29 @@ export default {
           this.submitLoading = true;
           if (this.modalType == 0) {
             // 添加 避免编辑后传入id等数据 记得删除
-            delete this.form.id;
-            // this.postRequest("请求地址", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟请求成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.getDataList();
-            this.modalVisible = false;
+            postCrmRequest("/website/sites/add", qs.stringify(this.form)).then(res => {
+              this.submitLoading = false;
+              if (res.success) {
+                this.$Message.success("操作成功");
+                this.getDataList();
+                this.modalVisible = false;
+              }
+            });
           } else {
             // 编辑
-            // this.postRequest("请求地址", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟请求成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.getDataList();
-            this.modalVisible = false;
+            let data = {
+              name: this.form.name,
+              alias: this.form.alias
+            }
+            console.log(data)
+            postCrmRequest("/website/sites/update/" + this.updateId, qs.stringify(data)).then(res => {
+              this.submitLoading = false;
+              if (res.success) {
+                this.$Message.success("操作成功");
+                this.getDataList();
+                this.modalVisible = false;
+              }
+            });
           }
         }
       });
@@ -246,6 +241,7 @@ export default {
       let str = JSON.stringify(v);
       let data = JSON.parse(str);
       this.form = data;
+      this.updateId = data.id;
       this.modalVisible = true;
     },
     remove(v) {
@@ -256,26 +252,14 @@ export default {
         content: "您确认要删除 " + v.name + " ?",
         loading: true,
         onOk: () => {
-          // 删除
-          // this.deleteRequest("请求地址，如/deleteByIds/" + v.id).then(res => {
-          //   this.$Modal.remove();
-          //   if (res.success) {
-          //     this.$Message.success("操作成功");
-          //     this.getDataList();
-          //   }
-          // });
           // 模拟请求成功
-          var params = qs.stringify({ id: v.id });
-          removeCrm("/website.Sites/remove", params).then((res) => {
+          removeCrm("/website/sites/del/" + [v.id]).then((res) => {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("操作成功");
               this.getDataList();
             }
           });
-          /* this.$Message.success("操作成功");
-          this.$Modal.remove();
-          this.getDataList(); */
         },
       });
     },

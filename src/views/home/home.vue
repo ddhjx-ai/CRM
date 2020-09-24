@@ -207,7 +207,7 @@
       <dashboard2 />
     </div>
 
-    <Modal
+    <!-- <Modal
       v-model="showVideo"
       title="作者亲自制作XBoot炫酷文字快闪宣传片"
       :styles="{top: '30px'}"
@@ -223,7 +223,7 @@
         allowfullscreen="true"
         style="width:100%;height:550px;"
       ></iframe>
-    </Modal>
+    </Modal> -->
   </div>
 </template>
 
