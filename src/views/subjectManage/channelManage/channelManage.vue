@@ -285,7 +285,7 @@ export default {
                   name: "blocksManage",
                   query: {
                     id: id,
-                    channelId: e.result
+                    themeId: e.result
                   }
                 });
                 this.$Message.success("操作成功");
@@ -315,7 +315,7 @@ export default {
       this.$Modal.confirm({
         title: "确认删除",
         // 记得确认修改此处
-        content: "您确认要删除改频道?",
+        content: "您确认要删除该频道?",
         loading: true,
         onOk: () => {
           // 删除

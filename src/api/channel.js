@@ -105,11 +105,74 @@ export const addModal = (data) => {
   })
 }
 
+// 添加导航栏数据
+export const addManualData = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/add_manual_data`,
+    data: data
+  })
+}
+
 // 导入excel数据
 export const importExcel = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/excel_upload`,
+    data: data
+  })
+}
+
+// 生成关键词
+export const saveshowdataBlock = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/save_showdata_block`,
+    data: data
+  })
+}
+
+// 删除数据展示模块
+export const removeLabelBlock = (data) => {
+  return axios({
+    method: 'get',
+    url: `/osc/block/channel/delete_showdata_block`,
+    params: data
+  })
+}
+
+// 添加新模块
+export const saveNewData = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/save_newdata_block`,
+    data: data
+  })
+}
+
+// 附件下载
+export const saveDownloadData = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/save_download_block`,
+    data: data
+  })
+}
+
+// 添加中间数据模块
+export const saveContentData = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/save_content_block`,
+    data: data
+  })
+}
+
+// 添加彩色数据模块
+export const saveColorData = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/save_color_block`,
     data: data
   })
 }

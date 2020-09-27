@@ -152,7 +152,10 @@
         <FormItem label="购买限制数量：" prop="limitNum">
           <Input v-model="form.limitNum" placeholder="请输入数量，单位为件" />
         </FormItem>
-        <FormItem label="缩略图片上传：" prop="image">
+        <FormItem label="频道链接：" prop="url">
+          <Input v-model="form.url" placeholder="请输入频道链接" />
+        </FormItem>
+        <FormItem label="缩略图片上传：">
           <div class="demo-upload-list" v-for="item in uploadList" :key="item">
             <template v-if="item.status === 'finished'">
               <img :src="item.url" />
@@ -260,7 +263,7 @@ export default {
         search: "",
         start: "", // 起始时间
         end: "", // 终止时间
-        showEnd: ''
+        showEnd: "",
       },
       pageForm: {
         page: 1, // 当前页数
@@ -283,6 +286,7 @@ export default {
         validity: "",
         cid: "",
         id: "",
+        url: "",
       },
       formValidate: {
         // 表单验证规则
@@ -403,6 +407,28 @@ export default {
           },
         },
         {
+          title: "频道链接",
+          key: "url",
+          align: "center",
+          minWidth: 150,
+          render: (h, params) => {
+            return h(
+              "a",
+              {
+                style: {
+                  "text-decoration": "none",
+                },
+                on: {
+                  click: () => {
+                    this.locationTo(params.row.url);
+                  },
+                },
+              },
+              params.row.url
+            );
+          },
+        },
+        {
           title: "状态",
           key: "status",
           align: "center",
@@ -520,8 +546,8 @@ export default {
     },
     // 时间处理函数
     formdate(date) {
-      if(!date) {
-        return '-'
+      if (!date) {
+        return "-";
       }
       let time = new Date(date);
       let year = time.getFullYear();
@@ -531,6 +557,10 @@ export default {
       let minute = time.getMinutes().toString().padStart(2, "0");
       let second = time.getSeconds().toString().padStart(2, "0");
       return `${year}-${month}-${day} ${hour}:${minute}`;
+    },
+    // 链接跳转
+    locationTo(v) {
+      window.open(v);
     },
     // 获取总数据
     getAllCount() {
@@ -622,12 +652,14 @@ export default {
     },
     changePage(v) {
       this.pageForm.page = v;
-      this.getDataList();
-      // this.clearSelectAll();
+      // this.getDataList();
+      this.getTableList();
     },
     changesize(v) {
       this.pageForm.size = v;
-      this.getDataList();
+      this.pageForm.page = 1;
+      // this.getDataList();
+      this.getTableList();
     },
     // 获取列表数据
     getDataList() {
@@ -638,18 +670,6 @@ export default {
       getProductList(this.pageForm).then((res) => {
         this.loading = false;
         if (res.success) {
-          /* this.data = res.result.itemList;
-          this.total = res.result.count; */
-          /* if (res.result.itemList.length !== 0) {
-            this.data = res.result.itemList;
-            this.total = res.result.count;
-          } else if ( res.result.itemList.length === 0 &&this.pageForm.page !== 1) {
-            this.pageForm.page -= 1;
-            this.getDataList();
-          } else if (res.result.itemList.length === 0 &&this.pageForm.page === 1 ) {
-            this.data = res.result.itemList;
-            this.total = res.result.count;
-          } */
           if (res.result.itemList.length !== 0) {
             this.data = res.result.itemList;
             this.total = res.result.count;
@@ -665,18 +685,34 @@ export default {
         }
       });
     },
-    handleSearch() {
-      if(this.searchForm.start && !this.searchForm.end){
-        this.$Message.warning("请选择截止时间");
-        return
-      }
-      if(!this.searchForm.start && this.searchForm.end){
-        this.$Message.warning("请选择起始时间");
-        return
-      }
+    getTableList() {
       let data = {
-        page: 1,
-        size: 10,
+        page: this.pageForm.page,
+        size: this.pageForm.size,
+        ...this.searchForm,
+      };
+      this.loading = true;
+      searchProduct(data).then((res) => {
+        this.loading = false;
+        if (res.success) {
+          this.data = res.result.itemList;
+          this.total = res.result.count;
+        }
+      });
+    },
+    handleSearch() {
+      if (this.searchForm.start && !this.searchForm.end) {
+        this.$Message.warning("请选择截止时间");
+        return;
+      }
+      if (!this.searchForm.start && this.searchForm.end) {
+        this.$Message.warning("请选择起始时间");
+        return;
+      }
+      this.pageForm.page = 1;
+      let data = {
+        page: this.pageForm.page,
+        size: this.pageForm.size,
         ...this.searchForm,
       };
       this.loading = true;
@@ -702,17 +738,17 @@ export default {
         this.searchForm.showEnd = "";
         return;
       }
-      this.searchForm.showEnd = v
-      let d = this.formateDate(new Date(v).getTime() + 86400000)
+      this.searchForm.showEnd = v;
+      let d = this.formateDate(new Date(v).getTime() + 86400000);
       this.searchForm.end = d;
     },
     formateDate(date) {
-      date = new Date(date)
-      let year = date.getFullYear()
-      let month = (date.getMonth() + 1).toString().padStart(2, '0')
-      let day = date.getDate().toString().padStart(2, '0')
+      date = new Date(date);
+      let year = date.getFullYear();
+      let month = (date.getMonth() + 1).toString().padStart(2, "0");
+      let day = date.getDate().toString().padStart(2, "0");
 
-      return `${year}-${month}-${day}`
+      return `${year}-${month}-${day}`;
     },
     handleReset() {
       this.$refs.searchForm.resetFields();
@@ -828,6 +864,7 @@ export default {
         image: this.form.image,
         detail: this.form.detail,
         validity: this.form.validity,
+        url: this.form.url,
       };
       this.$refs.form.validate((valid) => {
         if (valid) {

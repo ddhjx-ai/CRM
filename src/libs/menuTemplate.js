@@ -1,24 +1,24 @@
 // 导入表格模版数据
 export const userColumns = [
   {
-      title: "一级分类显示",
-      key: ""
+      title: "一级分类",
+      key: "一级分类"
   },
   {
-      title: "二级页面显示",
-      key: ""
+      title: "二级",
+      key: "二级"
   },
   {
-      title: "二级更多显示",
-      key: ""
+      title: "显示关键词",
+      key: "显示关键词"
   },
   {
-      title: "搜索规则",
-      key: ""
+      title: "搜索",
+      key: "搜索"
   },
   {
       title: "范围",
-      key: ""
+      key: "范围"
   }
 ]
 
