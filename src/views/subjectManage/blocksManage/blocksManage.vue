@@ -3,7 +3,13 @@
     <Card>
       <!-- 主题模块 -->
       <Row class="rowModal">
-        <Form ref="themeForm" :model="themeForm" inline :label-width="100">
+        <Form
+          ref="themeForm"
+          :model="themeForm"
+          :rules="ruleValidate"
+          inline
+          :label-width="100"
+        >
           <Col :span="12">
             <h3 class="basicDetail">选择主题</h3>
             <Row>
@@ -35,7 +41,7 @@
           :model="mainUrlForm"
           inline
           :label-width="100"
-          :rules="formValidate"
+          :rules="ruleValidate"
         >
           <Col :span="12">
             <h3 class="basicDetail">添加导航栏</h3>
@@ -135,6 +141,7 @@
               <Row>
                 <Col span="7">
                   <FormItem
+                    style="width: 100%"
                     label="name"
                     prop="name"
                     :rules="{
@@ -148,6 +155,7 @@
                 </Col>
                 <Col span="7">
                   <FormItem
+                    style="width: 100%"
                     label="defaultKey"
                     prop="defaultKey"
                     :rules="{
@@ -163,7 +171,11 @@
                   </FormItem>
                 </Col>
                 <Col span="5">
-                  <FormItem label="queryType" prop="queryType">
+                  <FormItem
+                    label="queryType"
+                    prop="queryType"
+                    style="width: 100%"
+                  >
                     <Select v-model="newModalForm.queryType">
                       <Option :value="0">不匹配</Option>
                       <Option :value="1">标题</Option>
@@ -174,7 +186,11 @@
                   </FormItem>
                 </Col>
                 <Col span="5">
-                  <FormItem label="showType" prop="showType">
+                  <FormItem
+                    label="showType"
+                    prop="showType"
+                    style="width: 100%"
+                  >
                     <Select v-model="newModalForm.showType">
                       <Option :value="1">关键词</Option>
                       <Option :value="2">进展</Option>
@@ -187,17 +203,25 @@
               </Row>
               <Row>
                 <Col span="7">
-                  <FormItem label="与值" prop="andKey">
-                    <Input type="text" v-model="newModalForm.andKey"></Input>
+                  <FormItem label="与值" prop="andKey" style="width: 100%">
+                    <Input
+                      type="text"
+                      v-model="newModalForm.andKey"
+                      placeholder="关键词之间用空格隔开"
+                    ></Input>
                   </FormItem>
                 </Col>
                 <Col span="7">
-                  <FormItem label="或值" prop="orKey">
-                    <Input type="text" v-model="newModalForm.orKey"></Input>
+                  <FormItem label="或值" prop="orKey" style="width: 100%">
+                    <Input
+                      type="text"
+                      v-model="newModalForm.orKey"
+                      placeholder="关键词之间用空格隔开"
+                    ></Input>
                   </FormItem>
                 </Col>
                 <Col span="5">
-                  <FormItem label="type" prop="type">
+                  <FormItem label="type" prop="type" style="width: 100%">
                     <Select v-model="newModalForm.type">
                       <Option :value="1">1</Option>
                       <Option :value="2">2</Option>
@@ -209,6 +233,7 @@
                 <Col span="12">
                   <FormItem>
                     <Button type="primary" @click="newModalSubmit">保存</Button>
+                    <Button @click="ModalReset('newModalForm')">重置</Button>
                   </FormItem>
                 </Col>
               </Row>
@@ -230,6 +255,7 @@
               <Row>
                 <Col span="7">
                   <FormItem
+                    style="width: 100%"
                     label="name"
                     prop="name"
                     :rules="{
@@ -243,6 +269,7 @@
                 </Col>
                 <Col span="7">
                   <FormItem
+                    style="width: 100%"
                     label="defaultKey"
                     prop="defaultKey"
                     :rules="{
@@ -258,7 +285,11 @@
                   </FormItem>
                 </Col>
                 <Col span="5">
-                  <FormItem label="queryType" prop="queryType">
+                  <FormItem
+                    label="queryType"
+                    prop="queryType"
+                    style="width: 100%"
+                  >
                     <Select v-model="downloadModalForm.queryType">
                       <Option :value="0">不匹配</Option>
                       <Option :value="1">标题</Option>
@@ -269,7 +300,11 @@
                   </FormItem>
                 </Col>
                 <Col span="5">
-                  <FormItem label="showType" prop="showType">
+                  <FormItem
+                    label="showType"
+                    prop="showType"
+                    style="width: 100%"
+                  >
                     <Select v-model="downloadModalForm.showType">
                       <Option :value="1">关键词</Option>
                       <Option :value="2">进展</Option>
@@ -282,23 +317,25 @@
               </Row>
               <Row>
                 <Col span="7">
-                  <FormItem label="与值" prop="andKey">
+                  <FormItem label="与值" prop="andKey" style="width: 100%">
                     <Input
                       type="text"
                       v-model="downloadModalForm.andKey"
+                      placeholder="关键词之间用空格隔开"
                     ></Input>
                   </FormItem>
                 </Col>
                 <Col span="7">
-                  <FormItem label="或值" prop="orKey">
+                  <FormItem label="或值" prop="orKey" style="width: 100%">
                     <Input
                       type="text"
                       v-model="downloadModalForm.orKey"
+                      placeholder="关键词之间用空格隔开"
                     ></Input>
                   </FormItem>
                 </Col>
                 <Col span="5">
-                  <FormItem label="type" prop="type">
+                  <FormItem label="type" prop="type" style="width: 100%">
                     <Select v-model="downloadModalForm.type">
                       <Option :value="1">1</Option>
                       <Option :value="2">2</Option>
@@ -312,7 +349,9 @@
                     <Button type="primary" @click="downloadModalSubmit"
                       >保存</Button
                     >
-                    <Button @click="downloadModalReset">重置</Button>
+                    <Button @click="ModalReset('downloadModalForm')"
+                      >重置</Button
+                    >
                   </FormItem>
                 </Col>
               </Row>
@@ -340,6 +379,17 @@
               @on-selection-change="changeSelect"
               style="padding-bootom: 10px"
             ></Table>
+          </Row>
+        </Col>
+      </Row>
+      <!-- 右边数据模块 -->
+      <Row class="rowModal">
+        <Col :span="24">
+          <h3 class="basicDetail">添加右边数据模块</h3>
+          <Row class="operation" style="margin-bottom: 10px; margin-top: 10px">
+            <Button type="primary" @click="asideModalSubmit"
+              >编辑右边数据模块</Button
+            >
           </Row>
         </Col>
       </Row>
@@ -376,7 +426,6 @@
         >
       </div>
     </Modal>
-
     <!-- 导入文件 -->
     <Modal
       title="导入菜单栏数据"
@@ -396,7 +445,7 @@
             :loading="reading"
             icon="ios-cloud-upload-outline"
             style="margin-right: 10px"
-            @click="importExcel"
+            @click="importFile"
             >上传Excel文件</Button
           >
           <input
@@ -422,7 +471,6 @@
         >
       </div>
     </Modal>
-
     <!-- banner图 -->
     <Modal
       title="添加banner图"
@@ -434,6 +482,7 @@
         <Row v-for="(item, index) in bannerModalForm.bannerList" :key="index">
           <Col span="10">
             <FormItem
+              style="width: 100%"
               :label="'banner' + (index + 1)"
               :prop="'bannerList.' + index + '.url'"
               :rules="{
@@ -451,6 +500,7 @@
           </Col>
           <Col span="7" style="margin-left: 10px">
             <FormItem
+              style="width: 100%"
               class="leftBtnForm"
               :prop="'bannerList.' + index + '.name'"
               :rules="{
@@ -463,11 +513,13 @@
                 type="text"
                 v-model="item.name"
                 placeholder="请输入图片链接"
+                style="margin-left: 0px"
               ></Input>
             </FormItem>
           </Col>
           <Col span="4" style="margin-left: 10px">
             <FormItem
+              style="width: 100%"
               class="leftBtnForm"
               :prop="'bannerList.' + index + '.color'"
               :rules="{
@@ -503,7 +555,6 @@
         >
       </div>
     </Modal>
-
     <!-- 数据展示模块 -->
     <Modal
       :title="modalLabelText"
@@ -520,6 +571,7 @@
         <Row>
           <Col span="7">
             <FormItem
+              style="width: 100%"
               label="name"
               prop="name"
               :rules="{
@@ -533,6 +585,7 @@
           </Col>
           <Col span="7">
             <FormItem
+              style="width: 100%"
               label="defaultKey"
               prop="defaultKey"
               :rules="{
@@ -545,7 +598,7 @@
             </FormItem>
           </Col>
           <Col span="5">
-            <FormItem label="queryType" prop="queryType">
+            <FormItem label="queryType" prop="queryType" style="width: 100%">
               <Select v-model="labelModalForm.queryType">
                 <Option :value="0">不匹配</Option>
                 <Option :value="1">标题</Option>
@@ -556,7 +609,7 @@
             </FormItem>
           </Col>
           <Col span="5">
-            <FormItem label="showType" prop="showType">
+            <FormItem label="showType" prop="showType" style="width: 100%">
               <Select v-model="labelModalForm.showType">
                 <Option :value="1">关键词</Option>
                 <Option :value="2">进展</Option>
@@ -569,17 +622,25 @@
         </Row>
         <Row>
           <Col span="7">
-            <FormItem label="与值" prop="andKey">
-              <Input type="text" v-model="labelModalForm.andKey"></Input>
+            <FormItem label="与值" prop="andKey" style="width: 100%">
+              <Input
+                type="text"
+                v-model="labelModalForm.andKey"
+                placeholder="关键词之间用空格隔开"
+              ></Input>
             </FormItem>
           </Col>
           <Col span="7">
-            <FormItem label="或值" prop="orKey">
-              <Input type="text" v-model="labelModalForm.orKey"></Input>
+            <FormItem label="或值" prop="orKey" style="width: 100%">
+              <Input
+                type="text"
+                v-model="labelModalForm.orKey"
+                placeholder="关键词之间用空格隔开"
+              ></Input>
             </FormItem>
           </Col>
           <Col span="5">
-            <FormItem label="type" prop="type">
+            <FormItem label="type" prop="type" style="width: 100%">
               <Select v-model="labelModalForm.type">
                 <Option :value="1">1</Option>
                 <Option :value="2">2</Option>
@@ -598,7 +659,6 @@
         >
       </div>
     </Modal>
-
     <!-- 中间数据模块 -->
     <Modal
       :title="modalContentText"
@@ -615,6 +675,7 @@
         <Row>
           <Col span="7">
             <FormItem
+              style="width: 100%"
               label="name"
               prop="name"
               :rules="{
@@ -628,6 +689,7 @@
           </Col>
           <Col span="7">
             <FormItem
+              style="width: 100%"
               label="defaultKey"
               prop="defaultKey"
               :rules="{
@@ -640,7 +702,7 @@
             </FormItem>
           </Col>
           <Col span="5">
-            <FormItem label="queryType" prop="queryType">
+            <FormItem label="queryType" prop="queryType" style="width: 100%">
               <Select v-model="contentModalForm.queryType">
                 <Option :value="0">不匹配</Option>
                 <Option :value="1">标题</Option>
@@ -651,7 +713,7 @@
             </FormItem>
           </Col>
           <Col span="5">
-            <FormItem label="showType" prop="showType">
+            <FormItem label="showType" prop="showType" style="width: 100%">
               <Select v-model="contentModalForm.showType">
                 <Option :value="1">关键词</Option>
                 <Option :value="2">进展</Option>
@@ -664,17 +726,25 @@
         </Row>
         <Row>
           <Col span="7">
-            <FormItem label="与值" prop="andKey">
-              <Input type="text" v-model="contentModalForm.andKey"></Input>
+            <FormItem label="与值" prop="andKey" style="width: 100%">
+              <Input
+                type="text"
+                v-model="contentModalForm.andKey"
+                placeholder="关键词之间用空格隔开"
+              ></Input>
             </FormItem>
           </Col>
           <Col span="7">
-            <FormItem label="或值" prop="orKey">
-              <Input type="text" v-model="contentModalForm.orKey"></Input>
+            <FormItem label="或值" prop="orKey" style="width: 100%">
+              <Input
+                type="text"
+                v-model="contentModalForm.orKey"
+                placeholder="关键词之间用空格隔开"
+              ></Input>
             </FormItem>
           </Col>
           <Col span="5">
-            <FormItem label="type" prop="type">
+            <FormItem label="type" prop="type" style="width: 100%">
               <Select v-model="contentModalForm.type">
                 <Option :value="1">1</Option>
                 <Option :value="2">2</Option>
@@ -693,7 +763,6 @@
         >
       </div>
     </Modal>
-
     <!-- 彩色数据模块 -->
     <Modal
       title="编辑彩色数据模块"
@@ -758,6 +827,71 @@
         >
       </div>
     </Modal>
+    <!-- 右边数据模块 -->
+    <Modal
+      title="编辑右边数据模块"
+      v-model="asideVisible"
+      :mask-closable="false"
+      :width="600"
+    >
+      <Form ref="asideModalForm" :model="asideModalForm" :label-width="80">
+        <Row>
+          <FormItem
+            label="title"
+            prop="name"
+            :rules="{
+              required: true,
+              message: '标题不能为空',
+              trigger: 'blur',
+            }"
+          >
+            <Input
+              type="text"
+              v-model="asideModalForm.name"
+              placeholder="请输入右边模块标题"
+            ></Input>
+          </FormItem>
+        </Row>
+        <Row v-for="(item, index) in asideModalForm.asideList" :key="index">
+          <Col span="20">
+            <FormItem
+              style="width: 100%"
+              :label="'aside' + (index + 1)"
+              :prop="'asideList.' + index + '.name'"
+              :rules="{
+                required: true,
+                message: '内容不能为空',
+                trigger: 'blur',
+              }"
+            >
+              <Input type="text" v-model="item.name"></Input>
+            </FormItem>
+          </Col>
+
+          <Col span="3" style="margin-left: 10px">
+            <Button @click="handleasideRemove(index)">删除</Button>
+          </Col>
+        </Row>
+        <FormItem>
+          <Row>
+            <Col span="8">
+              <Button type="dashed" long @click="handleAsideAdd" icon="md-add"
+                >添加</Button
+              >
+            </Col>
+          </Row>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="text" @click="handleAsideCancel">取消</Button>
+        <Button
+          type="primary"
+          :loading="submitLoading"
+          @click="handleAsideSubmit"
+          >提交</Button
+        >
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -775,6 +909,8 @@ import {
   saveDownloadData,
   saveContentData,
   saveColorData,
+  delContentData,
+  saveRightData
 } from "@/api/channel";
 // 模版导入文件表数据
 import { userColumns } from "@/libs/menuTemplate";
@@ -785,11 +921,19 @@ export default {
   name: "blocksManage",
   data() {
     return {
+      ruleValidate: {
+        themeId: {
+          type: "number",
+          required: true,
+          message: "请选择主题名",
+          trigger: "change",
+        },
+        name: { required: true, message: "请输入导航栏名称", trigger: "blur" },
+      },
       menuListAbled: true,
       menuListForm: {
         name: "",
       },
-      formValidate: {},
       submitLoading: false,
       channelId: "",
       // 主题模块
@@ -814,8 +958,9 @@ export default {
       menuListId: "",
       menuVisible: false,
       reading: false,
-      uploadfile: {},
-      importTableData: [],
+      uploadfile: {
+        name: "",
+      },
       // banner
       bannerVisible: false,
       bannerModalForm: {
@@ -945,6 +1090,22 @@ export default {
           align: "center",
         },
         {
+          title: "彩色模块",
+          key: "status",
+          align: "center",
+          render: (h, params) => {
+            return h(
+              "Tag",
+              {
+                props: {
+                  color: params.row.status ? "success" : "default",
+                },
+              },
+              params.row.status ? "已添加" : "未添加"
+            );
+          },
+        },
+        {
           title: "操作",
           key: "action",
           align: "center",
@@ -1014,6 +1175,16 @@ export default {
         imgurl: "",
         color: "",
       },
+      // 右边数据模块
+      asideVisible: false,
+      asideModalForm: {
+        name: "",
+        asideList: [
+          {
+            name: "",
+          },
+        ],
+      },
     };
   },
   created() {
@@ -1056,11 +1227,15 @@ export default {
         themeId: this.themeForm.themeId,
       };
       let blcokSession = this.getSession();
-      themeAddModal(data).then((res) => {
-        if (res.success) {
-          this.$Message.success("操作成功");
-          blcokSession.themeId = this.themeForm.themeId;
-          this.setSession(blcokSession);
+      this.$refs.themeForm.validate((valid) => {
+        if (valid) {
+          themeAddModal(data).then((res) => {
+            if (res.success) {
+              this.$Message.success("操作成功");
+              blcokSession.themeId = this.themeForm.themeId;
+              this.setSession(blcokSession);
+            }
+          });
         }
       });
     },
@@ -1076,12 +1251,16 @@ export default {
       if (blcokSession.mainUrlId) {
         data.blockId = blcokSession.mainUrlId;
       }
-      addModal(qs.stringify(data)).then((res) => {
-        this.$Message.success("操作成功");
-        blcokSession.mainUrlName = this.mainUrlForm.name;
-        blcokSession.mainUrlId = res.result;
-        this.setSession(blcokSession);
-        this.mainUrlAbled = false;
+      this.$refs.mainUrlForm.validate((valid) => {
+        if (valid) {
+          addModal(qs.stringify(data)).then((res) => {
+            this.$Message.success("操作成功");
+            blcokSession.mainUrlName = this.mainUrlForm.name;
+            blcokSession.mainUrlId = res.result;
+            this.setSession(blcokSession);
+            this.mainUrlAbled = false;
+          });
+        }
       });
     },
     mainDataSubmit() {
@@ -1112,12 +1291,13 @@ export default {
       this.mainUrlVisible = false;
     },
     // 添加菜单栏，导入excel
-    importExcel() {
+    importFile() {
       this.$refs.excelFile.click();
     },
     menuModalSubmit() {
       this.menuVisible = true;
       this.uploadfile = {};
+      this.$refs.excelFile.value = null;
       let blcokSession = this.getSession();
       if (blcokSession.menuListId) {
         this.menuListId = blcokSession.menuListId;
@@ -1135,10 +1315,12 @@ export default {
     },
     getExcelFile() {
       let file = this.$refs.excelFile.files[0];
+      console.log(file);
       this.uploadfile = file;
     },
     clearImportData() {
       this.uploadfile = {};
+      this.$refs.excelFile.value = null;
     },
     handleMenuCancel() {
       this.uploadfile = {};
@@ -1164,9 +1346,10 @@ export default {
       let formData = new FormData();
       formData.append("file", this.uploadfile);
       formData.append("blockId", this.menuListId);
+      formData.append("channelId", this.channelId);
       importExcel(formData).then((res) => {
         if (res.success) {
-          this.submitLoading = true;
+          this.submitLoading = false;
           this.$Message.success("导入成功");
           this.menuVisible = false;
         }
@@ -1278,18 +1461,22 @@ export default {
       this.$refs.labelModalForm.validate((valid) => {
         if (valid) {
           if (this.modalType === 1) {
+            let labelIndex = blcokSession.labelIndex || 1;
             let data = {
               ...this.labelModalForm,
               channelId: this.channelId,
+              sortNo: labelIndex,
             };
             saveshowdataBlock(qs.stringify(data)).then((res) => {
               if (res.result) {
                 this.$Message.success("添加数据展示模块成功");
                 this.labelVisible = false;
+                labelIndex++;
                 blcokSession.labelList.push({
                   labelBlockId: res.result,
                   name: this.labelModalForm.name,
                 });
+                blcokSession.labelIndex = labelIndex;
                 this.setSession(blcokSession);
                 this.getTableList();
               }
@@ -1394,6 +1581,34 @@ export default {
       this.modalcontentText = "编辑中间数据模块";
       this.contentBlockId = v.contentBlockId;
     },
+    contentRemove(v) {
+      let data = {
+        content_blockId: v.contentBlockId,
+        color_blockId: v.colorfulId,
+      };
+      let blcokSession = this.getSession();
+      this.$Modal.confirm({
+        title: "确认删除",
+        // 记得确认修改此处
+        content: "您确认要删除该数据?",
+        loading: true,
+        onOk: () => {
+          // 删除
+          delContentData(data).then((res) => {
+            this.$Modal.remove();
+            if (res.success) {
+              this.$Message.success("删除成功");
+              let index = blcokSession.contentList.findIndex((item) => {
+                return v.contentBlockId == item.contentBlockId;
+              });
+              blcokSession.contentList.splice(index, 1);
+              this.setSession(blcokSession);
+              this.getContentTableList();
+            }
+          });
+        },
+      });
+    },
     handleContentSubmit() {
       let blcokSession = this.getSession();
       blcokSession.contentList = blcokSession.contentList || [];
@@ -1415,6 +1630,7 @@ export default {
                   contentBlockId: res.result.content_blockId,
                   colorfulId: res.result.color_blockId,
                   name: this.contentModalForm.name,
+                  status: 0,
                 });
                 blcokSession.contentIndex = contentIndex;
                 this.setSession(blcokSession);
@@ -1455,6 +1671,7 @@ export default {
       this.$refs.colorfulModalForm.resetFields();
     },
     handleColorfulSubmit() {
+      let blcokSession = this.getSession();
       this.$refs.colorfulModalForm.validate((valid) => {
         if (valid) {
           let data = {
@@ -1464,12 +1681,83 @@ export default {
           saveColorData(qs.stringify(data)).then((res) => {
             this.$Message.success("编辑彩色模块成功");
             this.colorfulVisible = false;
+            blcokSession.contentList.forEach((item) => {
+              if (this.colorfulBlockId === item.colorfulId) {
+                item.status = 1;
+              }
+            });
+            this.setSession(blcokSession);
+            this.getContentTableList();
           });
         }
       });
     },
     handleColorfulCancel() {
       this.colorfulVisible = false;
+    },
+    // 右边数据模块
+    asideModalSubmit() {
+      this.asideVisible = true;
+      this.$refs.asideModalForm.resetFields();
+      this.asideModalForm = {
+        name: "",
+        asideList: [
+          {
+            name: "",
+          },
+        ],
+      };
+    },
+    handleasideRemove(index) {
+      this.asideModalForm.asideList.splice(index, 1);
+    },
+    handleAsideAdd() {
+      this.asideModalForm.asideList.push({
+        name: "",
+      });
+    },
+    handleAsideSubmit() {
+      let blcokSession = this.getSession();
+      let data
+      let nameStr = ''
+      this.asideModalForm.asideList.forEach(item => {
+        nameStr += item.name + ' '
+      })
+      this.$refs.asideModalForm.validate((valid) => {
+        if (valid) {
+          if(blcokSession.asideBlockId) {
+            data = {
+              name: this.asideModalForm.name,
+              contentList: nameStr,
+              blockId: blcokSession.asideBlockId,
+              channelId: this.channelId
+            }
+          }else {
+            data = {
+              name: this.asideModalForm.name,
+              contentList: nameStr,
+              channelId: this.channelId
+            }
+          }
+          this.submitLoading = true;
+          saveRightData(qs.stringify(data)).then((res) => {
+            if (res.success) {
+              this.submitLoading = false;
+              blcokSession.asideBlockId = res.result;
+              this.setSession(blcokSession);
+              this.$Message.success("编辑右侧模块数据成功");
+              this.asideVisible = false;
+            }
+          });
+        }
+      });
+    },
+    handleAsideCancel() {
+      this.asideVisible = false;
+    },
+    // 重置
+    ModalReset(name) {
+      this.$refs[name].resetFields();
     },
   },
 };

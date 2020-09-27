@@ -168,11 +168,29 @@ export const saveContentData = (data) => {
   })
 }
 
+// 删除中间数据模块
+export const delContentData = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/delete_content_block`,
+    data: data
+  })
+}
+
 // 添加彩色数据模块
 export const saveColorData = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/save_color_block`,
+    data: data
+  })
+}
+
+// 添加右边模块数据
+export const saveRightData = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/save_right_block`,
     data: data
   })
 }

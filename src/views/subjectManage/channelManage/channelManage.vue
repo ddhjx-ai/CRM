@@ -2,23 +2,31 @@
   <div>
     <Card>
       <Row>
-        <Form ref="searchForm" :model="searchForm" inline :label-width="80" label-position="left">
+        <Form
+          ref="searchForm"
+          :model="searchForm"
+          inline
+          :label-width="80"
+          label-position="left"
+        >
           <Form-item label="关键词" prop="search">
             <Input
               type="text"
               placeholder="请输入频道名、描述、主题"
               v-model="searchForm.search"
               clearable
-              style="width: 200px;"
+              style="width: 200px"
             />
           </Form-item>
-          <Form-item style="margin-left:-35px;" class="br">
-            <Button @click="handleSearch" type="primary" icon="ios-search">搜索</Button>
+          <Form-item style="margin-left: -35px" class="br">
+            <Button @click="handleSearch" type="primary" icon="ios-search"
+              >搜索</Button
+            >
             <Button @click="handleReset">重置</Button>
           </Form-item>
         </Form>
       </Row>
-      <Row class="operation" style="margin-bottom:10px">
+      <Row class="operation" style="margin-bottom: 10px">
         <Button @click="add" type="primary" icon="md-add">添加</Button>
         <Button @click="getDataList" icon="md-refresh">刷新</Button>
       </Row>
@@ -40,7 +48,7 @@
           :page-size="searchForm.size"
           @on-change="changePage"
           @on-page-size-change="changesize"
-          :page-size-opts="[10,20,50]"
+          :page-size-opts="[10, 20, 50]"
           size="small"
           show-total
           show-elevator
@@ -49,16 +57,29 @@
       </Row>
     </Card>
 
-    <Modal :title="modalTitle" v-model="modalVisible" :mask-closable="false" :width="500">
+    <Modal
+      :title="modalTitle"
+      v-model="modalVisible"
+      :mask-closable="false"
+      :width="500"
+    >
       <Form ref="form" :model="form" :label-width="80" :rules="formValidate">
         <FormItem label="频道名" prop="channelName">
-          <Input v-model="form.channelName" placeholder="请输入频道名，如 xx频道" />
+          <Input
+            v-model="form.channelName"
+            placeholder="请输入频道名，如 xx频道"
+          />
         </FormItem>
         <FormItem label="描述" prop="description">
           <Input v-model="form.description" />
         </FormItem>
         <FormItem label="是否禁用" prop="isDeleted">
-          <i-switch size="large" v-model="form.isDeleted" :true-value="0" :false-value="1">
+          <i-switch
+            size="large"
+            v-model="form.isDeleted"
+            :true-value="0"
+            :false-value="1"
+          >
             <span slot="open">启用</span>
             <span slot="close">禁用</span>
           </i-switch>
@@ -66,14 +87,21 @@
       </Form>
       <div slot="footer">
         <Button type="text" @click="handleCancel">取消</Button>
-        <Button type="primary" :loading="submitLoading" @click="handleSubmit">下一步</Button>
+        <Button type="primary" :loading="submitLoading" @click="handleSubmit"
+          >提交</Button
+        >
       </div>
     </Modal>
   </div>
 </template>
 
 <script>
-import { getChanelList, channelNameAdd, channelUpdate, themeBlockId } from "@/api/channel.js";
+import {
+  getChanelList,
+  channelNameAdd,
+  channelUpdate,
+  themeBlockId,
+} from "@/api/channel.js";
 import qs from "qs";
 export default {
   name: "channelManage",
@@ -92,6 +120,22 @@ export default {
           title: "频道名",
           key: "channelName",
           align: "center",
+          render: (h, params) => {
+            return h(
+              "a",
+              {
+                style: {
+                  "text-decoration": "none",
+                },
+                on: {
+                  click: () => {
+                    this.locationTo(params.row);
+                  },
+                },
+              },
+              params.row.channelName
+            );
+          },
         },
         {
           title: "描述",
@@ -255,44 +299,51 @@ export default {
     handleCancel() {
       this.modalVisible = false;
     },
-    /* // 获取主题blockId
-    getThemeBlockId(id) {
-      themeBlockId().then(res => {
-        console.log(res)
+    // 跳转到block页面
+    locationTo(v){
+      this.$router.push({
+        name: 'blocksManage',
+        query: {
+          id: v.id
+        }
       })
-    }, */
+    },
     // 提交
     handleSubmit() {
-      /* this.$router.push({
-        name: "blocksManage",
-      }); */
       let id;
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.submitLoading = true;
           if (this.modalType == 0) {
             // 添加 避免编辑后传入id等数据 记得删除
-            channelNameAdd(qs.stringify(this.form)).then((res) => {
-              this.submitLoading = false;
-              if (res.success) {
-                id = res.result.id
-                return themeBlockId(qs.stringify({channelId: res.result.id, blockType: 1}))
-              }
-            }).then(e => {
-              if(e.success) {
-                sessionStorage.clear();
-                this.$router.push({
-                  name: "blocksManage",
-                  query: {
-                    id: id,
-                    themeId: e.result
-                  }
-                });
-                this.$Message.success("操作成功");
-                this.getDataList();
-                this.modalVisible = false;
-              }
-            })
+            channelNameAdd(qs.stringify(this.form))
+              .then((res) => {
+                this.submitLoading = false;
+                if (res.success) {
+                  this.$Message.success("添加成功");
+                  this.getDataList();
+                  this.modalVisible = false;
+                  /* id = res.result.id;
+                  return themeBlockId(
+                    qs.stringify({ channelId: res.result.id, blockType: 1 })
+                  ); */
+                }
+              })
+              /* .then((e) => {
+                if (e.success) {
+                  sessionStorage.clear();
+                  this.$router.push({
+                    name: "blocksManage",
+                    query: {
+                      id: id,
+                      themeId: e.result,
+                    },
+                  });
+                  this.$Message.success("操作成功");
+                  this.getDataList();
+                  this.modalVisible = false;
+                }
+              }); */
           } else {
             // 编辑
             postCrmRequest(
@@ -301,7 +352,7 @@ export default {
             ).then((res) => {
               this.submitLoading = false;
               if (res.success) {
-                this.$Message.success("操作成功");
+                this.$Message.success("编辑成功");
                 this.getDataList();
                 this.modalVisible = false;
               }
