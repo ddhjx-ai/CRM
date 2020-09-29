@@ -101,6 +101,7 @@ import {
   channelNameAdd,
   channelUpdate,
   themeBlockId,
+  delChannel 
 } from "@/api/channel.js";
 import qs from "qs";
 export default {
@@ -300,56 +301,37 @@ export default {
       this.modalVisible = false;
     },
     // 跳转到block页面
-    locationTo(v){
+    locationTo(v) {
       this.$router.push({
-        name: 'blocksManage',
+        name: "blocksManage",
         query: {
-          id: v.id
-        }
-      })
+          id: v.id,
+        },
+      });
     },
     // 提交
     handleSubmit() {
-      let id;
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.submitLoading = true;
           if (this.modalType == 0) {
             // 添加 避免编辑后传入id等数据 记得删除
-            channelNameAdd(qs.stringify(this.form))
-              .then((res) => {
-                this.submitLoading = false;
-                if (res.success) {
-                  this.$Message.success("添加成功");
-                  this.getDataList();
-                  this.modalVisible = false;
-                  /* id = res.result.id;
-                  return themeBlockId(
-                    qs.stringify({ channelId: res.result.id, blockType: 1 })
-                  ); */
-                }
-              })
-              /* .then((e) => {
-                if (e.success) {
-                  sessionStorage.clear();
-                  this.$router.push({
-                    name: "blocksManage",
-                    query: {
-                      id: id,
-                      themeId: e.result,
-                    },
-                  });
-                  this.$Message.success("操作成功");
-                  this.getDataList();
-                  this.modalVisible = false;
-                }
-              }); */
+            channelNameAdd(qs.stringify(this.form)).then((res) => {
+              this.submitLoading = false;
+              if (res.success) {
+                this.$Message.success("添加成功");
+                this.getDataList();
+                this.modalVisible = false;
+              }
+            });
           } else {
             // 编辑
-            postCrmRequest(
-              "/website/pages/update/" + this.updateId,
-              qs.stringify(data)
-            ).then((res) => {
+            let data = {
+              channelName: this.form.channelName,
+              description: this.form.description,
+              isDeleted: this.form.isDeleted,
+            };
+            channelUpdate(this.updateId, qs.stringify(data)).then((res) => {
               this.submitLoading = false;
               if (res.success) {
                 this.$Message.success("编辑成功");
@@ -366,11 +348,11 @@ export default {
       this.$Modal.confirm({
         title: "确认删除",
         // 记得确认修改此处
-        content: "您确认要删除该频道?",
+        content: "该频道删除后不可恢复,您确认要删除?",
         loading: true,
         onOk: () => {
           // 删除
-          removeCrm("/website.Pages/remove/" + [v.id]).then((res) => {
+          delChannel(v.id).then((res) => {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("操作成功");

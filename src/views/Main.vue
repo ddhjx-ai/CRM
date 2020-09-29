@@ -133,9 +133,9 @@
     </div>
     <div class="single-page-con" :style="{left: shrink?'60px':'220px'}">
       <div class="single-page">
-        <keep-alive :include="cachePage">
+        <!-- <keep-alive :include="cachePage"> -->
           <router-view></router-view>
-        </keep-alive>
+        <!-- </keep-alive> -->
       </div>
     </div>
     <!-- 全局加载动画 -->
@@ -296,7 +296,7 @@ export default {
       this.$i18n.locale = name;
       this.$store.commit("switchLang", name);
     },
-    handleClickUserDropdown(name) {
+    handleClickUserDropdown(name) {   
       if (name == "ownSpace") {
         util.openNewPage(this, "ownspace_index");
         this.$router.push({

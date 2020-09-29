@@ -77,6 +77,23 @@ export const validateNum = (rule, value, callback) => {
 };
 
 /**
+ * 排序校验
+ * @param rule 验证规则
+ * @param value 需要验证的值
+ * @param callback 回调函数
+ */
+export const validateSort = (rule, value, callback) => {
+  const reg = /^(0|[1-9][0-9]*)$/;
+  if(value === ''){
+    callback();
+  }else if (!reg.test(value)) {
+    callback(new Error('该值不能是小数'))
+  } else {
+    callback();
+  }
+};
+
+/**
  * 价格验证
  * @param rule 验证规则(保留两位小数)
  * @param value 需要验证的值

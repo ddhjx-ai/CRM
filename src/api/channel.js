@@ -60,10 +60,11 @@ export const channelNameAdd = (params) => {
 }
 
 // 编辑频道
-export const channelUpdate = (id) => {
+export const channelUpdate = (id, data) => {
   return axios({
     method: 'post',
-    url: `/osc/block/channel/update` + id,
+    url: `/osc/block/channel/update/` + id,
+    data: data
   })
 }
 
@@ -136,7 +137,7 @@ export const saveshowdataBlock = (data) => {
 export const removeLabelBlock = (data) => {
   return axios({
     method: 'get',
-    url: `/osc/block/channel/delete_showdata_block`,
+    url: `/osc/block/channel/delete_showdata`,
     params: data
   })
 }
@@ -192,5 +193,83 @@ export const saveRightData = (data) => {
     method: 'post',
     url: `/osc/block/channel/save_right_block`,
     data: data
+  })
+}
+
+/* 新接口 */
+// 添加导航栏
+export const addNav = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/add_navi`,
+    data: data
+  })
+}
+
+// 上传文件
+export const addMenu = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/add_menu`,
+    data: data
+  })
+}
+
+// 添加banner图
+export const addBanner = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/add_banner`,
+    data: data
+  })
+}
+
+// 添加右边模块数据
+export const addRight = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/add_right`,
+    data: data
+  })
+}
+
+// 添加数据展示模块/新模块/附件下载
+export const addData = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/add_data`,
+    data: data
+  })
+}
+
+// 模块内容回显接口
+export const channelDetail = (id) => {
+  return axios({
+    method: 'get',
+    url: `/osc/block/channel/detail/` + id,
+  })
+}
+
+// 编辑回显数据展示模块
+export const labelDetail = (id) => {
+  return axios({
+    method: 'get',
+    url: `/osc/block/channel/showdata/detail/` + id,
+  })
+}
+
+// 编辑回显彩色模块数据
+export const colorfulDetail = (id) => {
+  return axios({
+    method: 'get',
+    url: `/osc/block/channel/colorblock/detail/` + id,
+  })
+}
+
+// 删除频道接口
+export const delChannel = (id) => {
+  return axios({
+    method: 'get',
+    url: `/osc/block/channel/delete_channel/` + id,
   })
 }

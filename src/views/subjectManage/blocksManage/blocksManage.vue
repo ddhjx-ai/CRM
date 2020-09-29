@@ -3,6 +3,9 @@
     <Card>
       <!-- 主题模块 -->
       <Row class="rowModal">
+        <h1 :style="{color: themeColor}" class="basicDetail">{{channelName}}</h1>
+      </Row>
+      <Row class="rowModal">
         <Form
           ref="themeForm"
           :model="themeForm"
@@ -13,23 +16,26 @@
           <Col :span="12">
             <h3 class="basicDetail">选择主题</h3>
             <Row>
-              <Col :span="16">
-                <FormItem prop="themeId" label="主题名" style="width: 100%">
-                  <Select v-model="themeForm.themeId">
-                    <Option
-                      v-for="item in themeList"
-                      :value="item.id"
-                      :key="item.id"
-                      >{{ item.name }}</Option
-                    >
-                  </Select>
-                </FormItem>
-              </Col>
-              <Col :span="8">
-                <FormItem class="btnForm">
-                  <Button type="primary" @click="themeAddSubmit">保存</Button>
-                </FormItem>
-              </Col>
+              <FormItem prop="themeId" label="主题名" style="width: 100%">
+                <Select v-model="themeForm.themeId">
+                  <Option
+                    v-for="item in themeList"
+                    :value="item.id"
+                    :key="item.id"
+                    >{{ item.name }}</Option
+                  >
+                </Select>
+              </FormItem>
+            </Row>
+            <Row>
+              <FormItem>
+                <Button
+                  type="primary"
+                  @click="themeAddSubmit"
+                  :loading="themeLoading"
+                  >保存</Button
+                >
+              </FormItem>
             </Row>
           </Col>
         </Form>
@@ -37,8 +43,8 @@
       <!-- 导航栏模块 -->
       <Row class="rowModal">
         <Form
-          ref="mainUrlForm"
-          :model="mainUrlForm"
+          ref="mainUrlModalForm"
+          :model="mainUrlModalForm"
           inline
           :label-width="100"
           :rules="ruleValidate"
@@ -46,44 +52,91 @@
           <Col :span="12">
             <h3 class="basicDetail">添加导航栏</h3>
             <Row>
-              <Col :span="16">
-                <FormItem label="导航名" prop="name" style="width: 100%">
-                  <Input
-                    v-model="mainUrlForm.name"
-                    placeholder="请输入导航名，如 xx频道分类"
-                  />
-                </FormItem>
-              </Col>
-              <Col :span="8">
-                <FormItem class="btnForm">
-                  <Button type="primary" @click="mainModalSubmit">保存</Button>
-                </FormItem>
-              </Col>
+              <FormItem label="导航名" prop="title" style="width: 100%">
+                <Input
+                  v-model="mainUrlModalForm.title"
+                  placeholder="请输入导航名，如 xx频道分类"
+                />
+              </FormItem>
             </Row>
-          </Col>
-          <Col :span="12">
-            <h3 class="basicDetail">添加导航栏内容</h3>
-            <FormItem>
-              <Button
-                type="primary"
-                :disabled="mainUrlAbled"
-                @click="mainDataSubmit"
-                >添加数据</Button
-              >
-            </FormItem>
+            <Row>
+              <FormItem label="导航内容" prop="name" style="width: 100%">
+                <Input
+                  v-model="mainUrlModalForm.name"
+                  placeholder="请输入导航内容，用空格隔开，如:医疗器械 拟在建项目 建筑工程"
+                />
+              </FormItem>
+            </Row>
+            <Row class="operation">
+              <FormItem>
+                <Button
+                  type="primary"
+                  @click="mainModalSubmit"
+                  :loading="mainLoading"
+                  >保存</Button
+                >
+                <Button @click="ModalReset('mainUrlModalForm')">重置</Button>
+              </FormItem>
+            </Row>
           </Col>
         </Form>
       </Row>
       <!-- 菜单栏模块 -->
       <Row class="rowModal">
-        <Form ref="menuListForm" :model="menuListForm" inline>
+        <Form ref="menuListForm" inline :label-width="100">
           <Col :span="12">
             <h3 class="basicDetail">添加菜单栏</h3>
             <Row>
-              <FormItem>
-                <Button type="primary" @click="menuModalSubmit"
-                  >导入数据</Button
+              <FormItem style="width: 100%">
+                <Button type="primary" @click="downloadTemplate"
+                  >下载Excel模板</Button
                 >
+                <a
+                  href="./template.xlsx"
+                  download="模板"
+                  ref="excelDownload"
+                  v-show="false"
+                  >下载</a
+                >
+              </FormItem>
+              <FormItem style="width: 100%">
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                  "
+                >
+                  <div>
+                    <Button
+                      icon="ios-cloud-upload-outline"
+                      style="margin-right: 10px"
+                      @click="importFile"
+                      >上传Excel文件</Button
+                    >
+                    <input
+                      v-show="false"
+                      type="file"
+                      @change="getExcelFile"
+                      accept=".xls, .xlsx"
+                      ref="excelFile"
+                    />
+                    <span v-if="uploadfile.name"
+                      >当前文件：{{ uploadfile.name }}</span
+                    >
+                  </div>
+                </div>
+              </FormItem>
+            </Row>
+            <Row class="operation">
+              <FormItem>
+                <Button
+                  type="primary"
+                  @click="menuModalSubmit"
+                  :loading="menuLoading"
+                  >导入</Button
+                >
+                <Button @click="clearImportData">重置</Button>
               </FormItem>
             </Row>
           </Col>
@@ -91,26 +144,109 @@
       </Row>
       <!-- banner图模块 -->
       <Row class="rowModal">
-        <Form ref="menuListForm" :model="menuListForm" inline>
-          <Col :span="12">
-            <h3 class="basicDetail">添加banner图</h3>
+        <h3 class="basicDetail">添加banner图</h3>
+        <Col :span="12">
+          <Form
+            ref="bannerModalForm"
+            :model="bannerModalForm"
+            :label-width="100"
+          >
+            <Row
+              v-for="(item, index) in bannerModalForm.bannerList"
+              :key="index"
+              :gutter="10"
+            >
+              <Col span="10">
+                <FormItem
+                  style="width: 100%"
+                  :label="'banner' + (index + 1)"
+                  :prop="'bannerList.' + index + '.url'"
+                  :rules="{
+                    required: true,
+                    message: '图片路径不能为空',
+                    trigger: 'blur',
+                  }"
+                >
+                  <Input
+                    type="text"
+                    v-model="item.url"
+                    placeholder="请输入图片路径"
+                  ></Input>
+                </FormItem>
+              </Col>
+              <Col span="7">
+                <FormItem
+                  style="width: 100%"
+                  class="leftBtnForm"
+                  :prop="'bannerList.' + index + '.name'"
+                  :rules="{
+                    required: true,
+                    message: '图片链接不能为空',
+                    trigger: 'blur',
+                  }"
+                >
+                  <Input
+                    type="text"
+                    v-model="item.name"
+                    placeholder="请输入图片链接"
+                    style="margin-left: 0px"
+                  ></Input>
+                </FormItem>
+              </Col>
+              <Col span="4">
+                <FormItem
+                  style="width: 100%"
+                  class="leftBtnForm"
+                  :prop="'bannerList.' + index + '.color'"
+                  :rules="{
+                    required: true,
+                    message: '颜色不能为空',
+                    trigger: 'change',
+                  }"
+                >
+                  <ColorPicker v-model="item.color" />
+                </FormItem>
+              </Col>
+              <Col span="2" v-if="index !== 0">
+                <Button @click="handleBannerRemove(index)">删除</Button>
+              </Col>
+            </Row>
             <Row>
               <FormItem>
-                <Button type="primary" @click="bannerModalSubmit"
-                  >添加banner图</Button
-                >
+                <Col span="8">
+                  <Button
+                    type="dashed"
+                    long
+                    @click="handleBannerAdd"
+                    icon="md-add"
+                    >添加图片</Button
+                  >
+                </Col>
               </FormItem>
             </Row>
-          </Col>
-        </Form>
+            <Row class="operation">
+              <FormItem style="width: 100%">
+                <Col span="24">
+                  <Button
+                    type="primary"
+                    :loading="bannerLoading"
+                    @click="handleBannerSubmit"
+                    >保存</Button
+                  >
+                  <Button @click="ModalBannerReset('bannerModalForm')">重置</Button>
+                </Col>
+              </FormItem>
+            </Row>
+          </Form>
+        </Col>
       </Row>
       <!-- 数据展示模块 -->
       <Row class="rowModal">
         <Col :span="24">
           <h3 class="basicDetail">添加数据展示模块</h3>
           <Row class="operation" style="margin-bottom: 10px; margin-top: 10px">
-            <Button type="primary" @click="labelModalSubmit"
-              >添加数据展示模块</Button
+            <Button type="primary" icon="md-add" @click="labelModalSubmit"
+              >添加</Button
             >
           </Row>
           <Row>
@@ -142,7 +278,7 @@
                 <Col span="7">
                   <FormItem
                     style="width: 100%"
-                    label="name"
+                    label="title"
                     prop="name"
                     :rules="{
                       required: true,
@@ -150,7 +286,11 @@
                       trigger: 'blur',
                     }"
                   >
-                    <Input type="text" v-model="newModalForm.name"></Input>
+                    <Input
+                      type="text"
+                      v-model="newModalForm.name"
+                      placeholder="请输入新模块标题"
+                    ></Input>
                   </FormItem>
                 </Col>
                 <Col span="7">
@@ -167,6 +307,7 @@
                     <Input
                       type="text"
                       v-model="newModalForm.defaultKey"
+                      placeholder="默认关键词"
                     ></Input>
                   </FormItem>
                 </Col>
@@ -230,12 +371,21 @@
                 </Col>
               </Row>
               <Row>
-                <Col span="12">
-                  <FormItem>
-                    <Button type="primary" @click="newModalSubmit">保存</Button>
-                    <Button @click="ModalReset('newModalForm')">重置</Button>
-                  </FormItem>
+                <Col span="19">
+                <FormItem label="关键词" prop="keywords" style="width: 100%">
+                   <Input
+                      type="text"
+                      v-model="newModalForm.keywords"
+                      readonly
+                    ></Input>
+                </FormItem>
                 </Col>
+              </Row>
+              <Row>
+                <FormItem>
+                  <Button type="primary" @click="newModalSubmit">保存</Button>
+                  <Button @click="ModalReset('newModalForm')">重置</Button>
+                </FormItem>
               </Row>
             </Form>
           </Row>
@@ -256,7 +406,7 @@
                 <Col span="7">
                   <FormItem
                     style="width: 100%"
-                    label="name"
+                    label="title"
                     prop="name"
                     :rules="{
                       required: true,
@@ -264,7 +414,11 @@
                       trigger: 'blur',
                     }"
                   >
-                    <Input type="text" v-model="downloadModalForm.name"></Input>
+                    <Input
+                      type="text"
+                      v-model="downloadModalForm.name"
+                      placeholder="请输入附件下载模块标题"
+                    ></Input>
                   </FormItem>
                 </Col>
                 <Col span="7">
@@ -281,6 +435,7 @@
                     <Input
                       type="text"
                       v-model="downloadModalForm.defaultKey"
+                      placeholder="默认关键词"
                     ></Input>
                   </FormItem>
                 </Col>
@@ -344,6 +499,17 @@
                 </Col>
               </Row>
               <Row>
+                <Col span="19">
+                <FormItem label="关键词" prop="keywords" style="width: 100%">
+                   <Input
+                      type="text"
+                      v-model="downloadModalForm.keywords"
+                      readonly
+                    ></Input>
+                </FormItem>
+                </Col>
+              </Row>
+              <Row>
                 <Col span="12">
                   <FormItem>
                     <Button type="primary" @click="downloadModalSubmit"
@@ -364,8 +530,8 @@
         <Col :span="24">
           <h3 class="basicDetail">添加中间数据模块</h3>
           <Row class="operation" style="margin-bottom: 10px; margin-top: 10px">
-            <Button type="primary" @click="contentModalSubmit"
-              >添加中间数据模块</Button
+            <Button type="primary" icon="md-add" @click="contentModalSubmit"
+              >添加</Button
             >
           </Row>
           <Row>
@@ -387,174 +553,89 @@
         <Col :span="24">
           <h3 class="basicDetail">添加右边数据模块</h3>
           <Row class="operation" style="margin-bottom: 10px; margin-top: 10px">
-            <Button type="primary" @click="asideModalSubmit"
-              >编辑右边数据模块</Button
+            <Form
+              ref="asideModalForm"
+              :model="asideModalForm"
+              :label-width="80"
             >
+              <Col :span="12">
+                <Row>
+                  <Col span="20">
+                    <FormItem
+                      label="title"
+                      prop="name"
+                      :rules="{
+                        required: true,
+                        message: '标题不能为空',
+                        trigger: 'blur',
+                      }"
+                    >
+                      <Input
+                        type="text"
+                        v-model="asideModalForm.name"
+                        placeholder="请输入右边模块标题"
+                      ></Input>
+                    </FormItem>
+                  </Col>
+                </Row>
+                <Row
+                  v-for="(item, index) in asideModalForm.asideList"
+                  :key="index"
+                >
+                  <Col span="20">
+                    <FormItem
+                      style="width: 100%"
+                      :label="'aside' + (index + 1)"
+                      :prop="'asideList.' + index + '.name'"
+                      :rules="{
+                        required: true,
+                        message: '内容不能为空',
+                        trigger: 'blur',
+                      }"
+                    >
+                      <Input
+                        type="text"
+                        v-model="item.name"
+                        placeholder="请输入内容"
+                      ></Input>
+                    </FormItem>
+                  </Col>
+
+                  <Col span="3" style="margin-left: 10px">
+                    <Button @click="handleasideRemove(index)">删除</Button>
+                  </Col>
+                </Row>
+                <Row>
+                  <FormItem>
+                    <Col span="8">
+                      <Button
+                        type="dashed"
+                        long
+                        @click="handleAsideAdd"
+                        icon="md-add"
+                        >添加</Button
+                      >
+                    </Col>
+                  </FormItem>
+                </Row>
+                <Row>
+                  <FormItem>
+                    <Button
+                      type="primary"
+                      :loading="asideLoading"
+                      @click="handleAsideSubmit"
+                      >保存</Button
+                    >
+                    <Button @click="ModalAsideReset('asideModalForm')">重置</Button>
+                  </FormItem>
+                </Row>
+              </Col>
+            </Form>
           </Row>
         </Col>
       </Row>
     </Card>
 
-    <!-- 导入导航栏数据 -->
-    <Modal
-      title="添加导航栏内容"
-      v-model="mainUrlVisible"
-      :mask-closable="false"
-      :width="600"
-    >
-      <Form
-        ref="mainUrlModalForm"
-        :model="mainUrlModalForm"
-        :rules="mainUrlValidate"
-        :label-width="80"
-      >
-        <FormItem label="导航名" prop="name">
-          <Input
-            type="text"
-            v-model="mainUrlModalForm.name"
-            placeholder="请输入导航名，用空格隔开，如:医疗器械 拟在建项目 建筑工程"
-          ></Input>
-        </FormItem>
-      </Form>
-      <div slot="footer">
-        <Button type="text" @click="handleMainCancel">取消</Button>
-        <Button
-          type="primary"
-          :loading="submitLoading"
-          @click="handleMainSubmit"
-          >提交</Button
-        >
-      </div>
-    </Modal>
-    <!-- 导入文件 -->
-    <Modal
-      title="导入菜单栏数据"
-      v-model="menuVisible"
-      :mask-closable="false"
-      :width="600"
-    >
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        "
-      >
-        <div>
-          <Button
-            :loading="reading"
-            icon="ios-cloud-upload-outline"
-            style="margin-right: 10px"
-            @click="importFile"
-            >上传Excel文件</Button
-          >
-          <input
-            v-show="false"
-            type="file"
-            @change="getExcelFile"
-            accept=".xls, .xlsx"
-            ref="excelFile"
-          />
-          <span v-if="uploadfile.name"
-            >当前选择文件：{{ uploadfile.name }}</span
-          >
-        </div>
-        <Button @click="clearImportData" icon="md-trash">清空数据</Button>
-      </div>
-      <div slot="footer">
-        <Button type="text" @click="handleMenuCancel">取消</Button>
-        <Button
-          type="primary"
-          :loading="submitLoading"
-          @click="handleMenuSubmit"
-          >提交</Button
-        >
-      </div>
-    </Modal>
-    <!-- banner图 -->
-    <Modal
-      title="添加banner图"
-      v-model="bannerVisible"
-      :mask-closable="false"
-      :width="800"
-    >
-      <Form ref="bannerModalForm" :model="bannerModalForm" :label-width="80">
-        <Row v-for="(item, index) in bannerModalForm.bannerList" :key="index">
-          <Col span="10">
-            <FormItem
-              style="width: 100%"
-              :label="'banner' + (index + 1)"
-              :prop="'bannerList.' + index + '.url'"
-              :rules="{
-                required: true,
-                message: '图片路径不能为空',
-                trigger: 'blur',
-              }"
-            >
-              <Input
-                type="text"
-                v-model="item.url"
-                placeholder="请输入图片路径"
-              ></Input>
-            </FormItem>
-          </Col>
-          <Col span="7" style="margin-left: 10px">
-            <FormItem
-              style="width: 100%"
-              class="leftBtnForm"
-              :prop="'bannerList.' + index + '.name'"
-              :rules="{
-                required: true,
-                message: '图片链接不能为空',
-                trigger: 'blur',
-              }"
-            >
-              <Input
-                type="text"
-                v-model="item.name"
-                placeholder="请输入图片链接"
-                style="margin-left: 0px"
-              ></Input>
-            </FormItem>
-          </Col>
-          <Col span="4" style="margin-left: 10px">
-            <FormItem
-              style="width: 100%"
-              class="leftBtnForm"
-              :prop="'bannerList.' + index + '.color'"
-              :rules="{
-                required: true,
-                message: '图片背景色不能为空',
-                trigger: 'change',
-              }"
-            >
-              <ColorPicker v-model="item.color" />
-            </FormItem>
-          </Col>
-          <Col span="2" v-if="index !== 0">
-            <Button @click="handleBannerRemove(index)">删除</Button>
-          </Col>
-        </Row>
-        <FormItem>
-          <Row>
-            <Col span="8">
-              <Button type="dashed" long @click="handleBannerAdd" icon="md-add"
-                >添加图片</Button
-              >
-            </Col>
-          </Row>
-        </FormItem>
-      </Form>
-      <div slot="footer">
-        <Button type="text" @click="handleBannerCancel">取消</Button>
-        <Button
-          type="primary"
-          :loading="submitLoading"
-          @click="handleBannerSubmit"
-          >提交</Button
-        >
-      </div>
-    </Modal>
     <!-- 数据展示模块 -->
     <Modal
       :title="modalLabelText"
@@ -567,12 +648,13 @@
         :model="labelModalForm"
         inline
         :label-width="90"
+        :rules="ruleValidate"
       >
         <Row>
           <Col span="7">
             <FormItem
               style="width: 100%"
-              label="name"
+              label="title"
               prop="name"
               :rules="{
                 required: true,
@@ -580,7 +662,11 @@
                 trigger: 'blur',
               }"
             >
-              <Input type="text" v-model="labelModalForm.name"></Input>
+              <Input
+                type="text"
+                v-model="labelModalForm.name"
+                placeholder="请输入数据展示模块标题"
+              ></Input>
             </FormItem>
           </Col>
           <Col span="7">
@@ -594,7 +680,11 @@
                 trigger: 'blur',
               }"
             >
-              <Input type="text" v-model="labelModalForm.defaultKey"></Input>
+              <Input
+                type="text"
+                v-model="labelModalForm.defaultKey"
+                placeholder="默认关键词"
+              ></Input>
             </FormItem>
           </Col>
           <Col span="5">
@@ -647,6 +737,32 @@
               </Select>
             </FormItem>
           </Col>
+          <!-- <Col span="5">
+            <FormItem label="排序值" prop="sortNo" style="width: 100%">
+              <Tooltip
+                trigger="hover"
+                placement="right"
+                content="值越小越靠前，不支持小数"
+                style="width: 100%"
+              >
+                <InputNumber
+                  :max="1000"
+                  :step="1"
+                  :min="1"
+                  v-model="labelModalForm.sortNo"
+                ></InputNumber>
+              </Tooltip>
+            </FormItem>
+          </Col> -->
+        </Row>
+        <Row>
+          <FormItem label="关键词" prop="keywords" style="width: 100%">
+              <Input
+                type="text"
+                v-model="labelModalForm.keywords"
+                readonly
+              ></Input>
+            </FormItem>
         </Row>
       </Form>
       <div slot="footer">
@@ -671,12 +787,13 @@
         :model="contentModalForm"
         inline
         :label-width="90"
+        :rules="ruleValidate"
       >
         <Row>
           <Col span="7">
             <FormItem
               style="width: 100%"
-              label="name"
+              label="title"
               prop="name"
               :rules="{
                 required: true,
@@ -684,7 +801,11 @@
                 trigger: 'blur',
               }"
             >
-              <Input type="text" v-model="contentModalForm.name"></Input>
+              <Input
+                type="text"
+                v-model="contentModalForm.name"
+                placeholder="请输入中间模块标题"
+              ></Input>
             </FormItem>
           </Col>
           <Col span="7">
@@ -698,7 +819,11 @@
                 trigger: 'blur',
               }"
             >
-              <Input type="text" v-model="contentModalForm.defaultKey"></Input>
+              <Input
+                type="text"
+                v-model="contentModalForm.defaultKey"
+                placeholder="默认关键词"
+              ></Input>
             </FormItem>
           </Col>
           <Col span="5">
@@ -751,6 +876,32 @@
               </Select>
             </FormItem>
           </Col>
+          <!-- <Col span="5">
+            <FormItem label="排序值" prop="sortNo" style="width: 100%">
+              <Tooltip
+                trigger="hover"
+                placement="right"
+                content="值越小越靠前，不支持小数"
+                style="width: 100%"
+              >
+                <InputNumber
+                  :max="1000"
+                  :step="1"
+                  :min="1"
+                  v-model="contentModalForm.sortNo"
+                ></InputNumber>
+              </Tooltip>
+            </FormItem>
+          </Col> -->
+        </Row>
+        <Row>
+          <FormItem label="关键词" prop="keywords" style="width: 100%">
+              <Input
+                type="text"
+                v-model="contentModalForm.keywords"
+                readonly
+              ></Input>
+            </FormItem>
         </Row>
       </Form>
       <div slot="footer">
@@ -768,7 +919,7 @@
       title="编辑彩色数据模块"
       v-model="colorfulVisible"
       :mask-closable="false"
-      :width="600"
+      :width="650"
     >
       <Form
         ref="colorfulModalForm"
@@ -827,78 +978,13 @@
         >
       </div>
     </Modal>
-    <!-- 右边数据模块 -->
-    <Modal
-      title="编辑右边数据模块"
-      v-model="asideVisible"
-      :mask-closable="false"
-      :width="600"
-    >
-      <Form ref="asideModalForm" :model="asideModalForm" :label-width="80">
-        <Row>
-          <FormItem
-            label="title"
-            prop="name"
-            :rules="{
-              required: true,
-              message: '标题不能为空',
-              trigger: 'blur',
-            }"
-          >
-            <Input
-              type="text"
-              v-model="asideModalForm.name"
-              placeholder="请输入右边模块标题"
-            ></Input>
-          </FormItem>
-        </Row>
-        <Row v-for="(item, index) in asideModalForm.asideList" :key="index">
-          <Col span="20">
-            <FormItem
-              style="width: 100%"
-              :label="'aside' + (index + 1)"
-              :prop="'asideList.' + index + '.name'"
-              :rules="{
-                required: true,
-                message: '内容不能为空',
-                trigger: 'blur',
-              }"
-            >
-              <Input type="text" v-model="item.name"></Input>
-            </FormItem>
-          </Col>
-
-          <Col span="3" style="margin-left: 10px">
-            <Button @click="handleasideRemove(index)">删除</Button>
-          </Col>
-        </Row>
-        <FormItem>
-          <Row>
-            <Col span="8">
-              <Button type="dashed" long @click="handleAsideAdd" icon="md-add"
-                >添加</Button
-              >
-            </Col>
-          </Row>
-        </FormItem>
-      </Form>
-      <div slot="footer">
-        <Button type="text" @click="handleAsideCancel">取消</Button>
-        <Button
-          type="primary"
-          :loading="submitLoading"
-          @click="handleAsideSubmit"
-          >提交</Button
-        >
-      </div>
-    </Modal>
   </div>
 </template>
 
 <script>
 import {
-  getAllThemeList,
-  themeAddModal,
+  getAllThemeList, // 获取主题列表接口
+  themeAddModal, // 添加主题模块接口
   addModal,
   themeBlockId,
   importExcel,
@@ -910,17 +996,27 @@ import {
   saveContentData,
   saveColorData,
   delContentData,
-  saveRightData
+  saveRightData,
+  // -------------
+  addNav, // 添加导航栏模块接口
+  addMenu,
+  addBanner,
+  addRight,
+  addData,
+  channelDetail,
+  labelDetail,    // 数据展示模块回显
+  colorfulDetail,  // 彩色模块数据回显
 } from "@/api/channel";
-// 模版导入文件表数据
-import { userColumns } from "@/libs/menuTemplate";
 import qs from "qs";
 // excel转换工具类
 import excel from "@/libs/excel";
+import { validateSort } from "@/libs/validate";
 export default {
   name: "blocksManage",
   data() {
     return {
+      themeColor: '#000000',
+      channelName: '',
       ruleValidate: {
         themeId: {
           type: "number",
@@ -928,41 +1024,47 @@ export default {
           message: "请选择主题名",
           trigger: "change",
         },
-        name: { required: true, message: "请输入导航栏名称", trigger: "blur" },
-      },
-      menuListAbled: true,
-      menuListForm: {
-        name: "",
+        title: {
+          required: true,
+          message: "导航栏名称不能为空",
+          trigger: "blur",
+        },
+        name: { required: true, message: "导航内容不能为空", trigger: "blur" },
+        sortNo: [
+          {
+            required: true,
+            message: "排序值不能为空",
+            trigger: "blur",
+            type: "number",
+          },
+          { validator: validateSort, trigger: "blur" },
+        ],
       },
       submitLoading: false,
       channelId: "",
       // 主题模块
-      themeList: [],
+      themeBlockId: "",
+      themeList: [], // 主题列表
       themeForm: {
         themeId: "",
       },
-      themeBlockId: "",
+      themeLoading: false,
       // 导航栏模块
-      mainUrlVisible: false,
-      mainUrlForm: {
-        name: "",
-      },
+      mainBlockId: "",
       mainUrlModalForm: {
         name: "",
+        title: "",
       },
-      mainUrlValidate: {
-        name: { required: true, message: "内容不能为空", trigger: "blur" },
-      },
-      mainUrlAbled: true,
+      mainLoading: false,
       // 菜单栏
-      menuListId: "",
-      menuVisible: false,
-      reading: false,
+      menuBlockId: '',
+      menuLoading: false,
       uploadfile: {
         name: "",
       },
-      // banner
-      bannerVisible: false,
+      // banner图
+      bannerBlockId: '',
+      bannerLoading: false,
       bannerModalForm: {
         bannerList: [
           {
@@ -973,12 +1075,11 @@ export default {
         ],
       },
       // 数据展示模块
-      labelIndex: 1,
+      labelBlockId: "",
+      labelSortNo: 0,
       labelVisible: false,
-      keywords: "",
       modalType: 1,
       modalLabelText: "添加数据展示模块",
-      labelBlockId: "",
       labelModalForm: {
         andKey: "",
         orKey: "",
@@ -987,6 +1088,8 @@ export default {
         queryType: 0,
         showType: 1,
         defaultKey: "",
+        // sortNo: 1,
+        keywords: '',
       },
       labelData: [],
       labelColumns: [
@@ -1044,6 +1147,7 @@ export default {
         },
       ],
       // 新模块
+      newBlockId: '',
       newModalForm: {
         andKey: "",
         orKey: "",
@@ -1052,8 +1156,10 @@ export default {
         queryType: 0,
         showType: 1,
         defaultKey: "",
+        keywords: '',
       },
       // 下载模块
+      downloadBlockId: '',
       downloadModalForm: {
         andKey: "",
         orKey: "",
@@ -1062,11 +1168,12 @@ export default {
         queryType: 0,
         showType: 1,
         defaultKey: "",
+        keywords: '',
       },
       // 中间模块
-      contentIndex: 1,
-      contentVisible: false,
       contentBlockId: "",
+      contentSortNo: 0,
+      contentVisible: false,
       contentModalForm: {
         andKey: "",
         orKey: "",
@@ -1075,6 +1182,8 @@ export default {
         queryType: 0,
         showType: 1,
         defaultKey: "",
+        // sortNo: 1,
+        keywords: ''
       },
       modalContentText: "添加中间模块数据",
       contentData: [],
@@ -1128,7 +1237,7 @@ export default {
                     },
                   },
                 },
-                "编辑中间模块数据"
+                "编辑中间模块"
               ),
               h(
                 "Button",
@@ -1146,7 +1255,7 @@ export default {
                     },
                   },
                 },
-                "编辑彩色模块数据"
+                "编辑彩色模块"
               ),
               h(
                 "Button",
@@ -1176,7 +1285,8 @@ export default {
         color: "",
       },
       // 右边数据模块
-      asideVisible: false,
+      asideBlockId: '',
+      asideLoading: false,
       asideModalForm: {
         name: "",
         asideList: [
@@ -1187,30 +1297,88 @@ export default {
       },
     };
   },
-  created() {
-    this.channelId = this.$route.query.id;
-    this.themeBlockId = this.$route.query.themeId;
-    let blcokSession = this.getSession();
-    if (blcokSession.themeId) {
-      this.themeForm.themeId = blcokSession.themeId;
-    }
-    if (blcokSession.mainUrlName) {
-      this.mainUrlForm.name = blcokSession.mainUrlName;
-      this.mainUrlAbled = false;
-    }
-    this.getTableList();
-    this.getContentTableList();
-  },
   mounted() {
+    this.channelId = this.$route.query.id;
     this.getThemeList();
+    this.getDetail();
   },
   methods: {
-    // 获取/设置session
-    getSession() {
-      return JSON.parse(sessionStorage.getItem("blcokSession") || "{}");
-    },
-    setSession(session) {
-      sessionStorage.setItem("blcokSession", JSON.stringify(session));
+    // 获取详情
+    getDetail() {
+      channelDetail(this.channelId).then((res) => {
+        if(!res){
+          this.$router.push({name: 'error-402'})
+        }
+        let data;
+        if(res[0]) {
+          data = res[0]
+        }else {
+          return
+        }
+        if(data.AchannelName) {
+          this.channelName = data.AchannelName;
+        }
+        if (data.theme_block) {
+          this.themeColor = data.theme_block.theme_color;
+          this.themeForm.themeId = data.theme_block.theme_id;
+          this.themeBlockId = data.theme_block.theme_block_id;
+        }
+        if(data.navi_block.length > 0) {
+          this.mainBlockId = data.navi_block[0].navi_block_id;
+          this.mainUrlModalForm.title = data.navi_block[0].title;
+          let str = ''
+          data.navi_block.forEach(item => {
+            str += item.name + ' ';
+          })
+          this.mainUrlModalForm.name = str;
+        }
+        if(data.menu_block) {
+          this.menuBlockId = data.menu_block.menu_block_id;
+        }
+        if(data.banner_block.length>0) {
+          this.bannerBlockId = data.banner_block[0].banner_block_id;
+          this.bannerModalForm.bannerList = data.banner_block.map(item => {
+            return {
+              name: item.name,
+              url: item.url,
+              color: item.color
+            }
+          })
+        }
+        if(data.show_data_block.length > 0) {
+          this.labelSortNo = data.show_data_block[data.show_data_block.length - 1].sort_no;
+          this.labelData = [...data.show_data_block]
+        }
+        if(data.new_data_block){
+          this.newBlockId = data.new_data_block.new_data_block_id;
+          this.newModalForm.name = data.new_data_block.name;
+          this.newModalForm.defaultKey = data.new_data_block.default_key;
+          this.newModalForm.queryType = data.new_data_block.query_type;
+          this.newModalForm.showType = data.new_data_block.show_type * 1;
+          this.newModalForm.keywords = data.new_data_block.sphinx_query;
+        }
+        if(data.download_block) {
+          this.downloadBlockId = data.download_block.download_block_id;
+          this.downloadModalForm.name = data.download_block.name;
+          this.downloadModalForm.defaultKey = data.download_block.default_key;
+          this.downloadModalForm.queryType = data.download_block.query_type;
+          this.downloadModalForm.showType = data.download_block.show_type * 1;
+          this.downloadModalForm.keywords = data.download_block.sphinx_query;
+        }
+        if(data.content_block.length > 0) {
+          this.contentSortNo = data.content_block[data.content_block.length -1].sort_no;
+          this.contentData = [...data.content_block];
+        }
+        if(data.right_block.length > 0) {
+          this.asideBlockId = data.right_block[0].right_block_id;
+          this.asideModalForm.name = data.right_block[0].title;
+          this.asideModalForm.asideList = data.right_block.map(item => {
+            return {
+              name: item.name
+            }
+          })
+        }
+      });
     },
     // 获取主题列表
     getThemeList() {
@@ -1222,18 +1390,27 @@ export default {
     },
     // 添加主题模块
     themeAddSubmit() {
-      let data = {
-        blockId: this.themeBlockId,
-        themeId: this.themeForm.themeId,
-      };
-      let blcokSession = this.getSession();
+      let data;
       this.$refs.themeForm.validate((valid) => {
         if (valid) {
+          if (this.themeBlockId) {
+            data = {
+              themeId: this.themeForm.themeId,
+              channelId: this.channelId,
+              blockId: this.themeBlockId,
+            };
+          } else {
+            data = {
+              themeId: this.themeForm.themeId,
+              channelId: this.channelId,
+            };
+          }
+          this.themeLoading = true;
           themeAddModal(data).then((res) => {
             if (res.success) {
+              this.themeLoading = false;
               this.$Message.success("操作成功");
-              blcokSession.themeId = this.themeForm.themeId;
-              this.setSession(blcokSession);
+              this.getDetail();
             }
           });
         }
@@ -1241,94 +1418,50 @@ export default {
     },
     // 添加导航模块
     mainModalSubmit() {
-      let data = {
-        channelId: this.channelId,
-        componentId: 3,
-        DISC: 60,
-        name: this.mainUrlForm.name,
-      };
-      let blcokSession = this.getSession();
-      if (blcokSession.mainUrlId) {
-        data.blockId = blcokSession.mainUrlId;
-      }
-      this.$refs.mainUrlForm.validate((valid) => {
-        if (valid) {
-          addModal(qs.stringify(data)).then((res) => {
-            this.$Message.success("操作成功");
-            blcokSession.mainUrlName = this.mainUrlForm.name;
-            blcokSession.mainUrlId = res.result;
-            this.setSession(blcokSession);
-            this.mainUrlAbled = false;
-          });
-        }
-      });
-    },
-    mainDataSubmit() {
-      this.mainUrlVisible = true;
-      this.$refs.mainUrlModalForm.resetFields();
-    },
-    handleMainSubmit() {
-      let blcokSession = this.getSession();
-      let data = {
-        list: [{ name: this.mainUrlModalForm.name }],
-        blockId: blcokSession.mainUrlId,
-        dataType: 1,
-      };
+      let data;
       this.$refs.mainUrlModalForm.validate((valid) => {
         if (valid) {
-          this.submitLoading = true;
-          addManualData(data).then((res) => {
+          if (this.mainBlockId) {
+            data = {
+              blockId: this.mainBlockId,
+              channelId: this.channelId,
+              name: this.mainUrlModalForm.title,
+              contentList: this.mainUrlModalForm.name,
+            };
+          } else {
+            data = {
+              channelId: this.channelId,
+              name: this.mainUrlModalForm.title,
+              contentList: this.mainUrlModalForm.name,
+            };
+          }
+          this.mainLoading = true;
+          addNav(qs.stringify(data)).then((res) => {
             if (res.success) {
-              this.submitLoading = false;
-              this.mainUrlVisible = false;
-              this.$Message.success("添加导航栏内容成功");
+              this.mainLoading = false;
+              // this.mainBlockId = res.result.navi_block_id;
+              this.getDetail();
+              this.$Message.success("操作成功");
             }
           });
         }
       });
     },
-    handleMainCancel() {
-      this.mainUrlVisible = false;
-    },
     // 添加菜单栏，导入excel
     importFile() {
       this.$refs.excelFile.click();
     },
-    menuModalSubmit() {
-      this.menuVisible = true;
-      this.uploadfile = {};
-      this.$refs.excelFile.value = null;
-      let blcokSession = this.getSession();
-      if (blcokSession.menuListId) {
-        this.menuListId = blcokSession.menuListId;
-      } else {
-        themeBlockId(
-          qs.stringify({ channelId: this.channelId, blockType: 2 })
-        ).then((res) => {
-          if (res.success) {
-            this.menuListId = res.result;
-            blcokSession.menuListId = res.result;
-            this.setSession(blcokSession);
-          }
-        });
-      }
-    },
     getExcelFile() {
       let file = this.$refs.excelFile.files[0];
-      console.log(file);
       this.uploadfile = file;
     },
     clearImportData() {
       this.uploadfile = {};
       this.$refs.excelFile.value = null;
     },
-    handleMenuCancel() {
-      this.uploadfile = {};
-      this.menuVisible = false;
-    },
-    handleMenuSubmit() {
+    menuModalSubmit() {
       if (!this.uploadfile.name) {
-        return this.$Message.error("请先导入excel文件");
+        return this.$Message.error("请先选择excel文件");
       }
       const fileExt = this.uploadfile.name.split(".").pop().toLocaleLowerCase();
       let ext = ["xlsx", "xls"];
@@ -1342,44 +1475,27 @@ export default {
         });
         return;
       }
-      this.submitLoading = true;
+      this.menuLoading = true;
       let formData = new FormData();
       formData.append("file", this.uploadfile);
-      formData.append("blockId", this.menuListId);
       formData.append("channelId", this.channelId);
-      importExcel(formData).then((res) => {
+      if (this.menuBlockId) {
+        formData.append("blockId", this.menuBlockId);
+      }
+      addMenu(formData).then((res) => {
         if (res.success) {
-          this.submitLoading = false;
+          this.menuLoading = false;
+          this.menuBlockId = res.result.menu_block_id;
           this.$Message.success("导入成功");
-          this.menuVisible = false;
+        }else {
+          this.menuLoading = false;
         }
       });
     },
-    // 添加banner图
-    bannerModalSubmit() {
-      this.bannerVisible = true;
-      this.$refs.bannerModalForm.resetFields();
-      this.bannerModalForm = {
-        bannerList: [
-          {
-            url: "",
-            name: "javascript:void(0);",
-            color: "",
-          },
-        ],
-      };
-      let blcokSession = this.getSession();
-      if (!blcokSession.bannerBlockId) {
-        themeBlockId(
-          qs.stringify({ channelId: this.channelId, blockType: 3 })
-        ).then((res) => {
-          if (res.success) {
-            blcokSession.bannerBlockId = res.result;
-            this.setSession(blcokSession);
-          }
-        });
-      }
+    downloadTemplate() {
+      this.$refs.excelDownload.click();
     },
+    // 添加banner图
     handleBannerAdd() {
       this.bannerModalForm.bannerList.push({
         name: "javascript:void(0);",
@@ -1391,27 +1507,32 @@ export default {
       this.bannerModalForm.bannerList.splice(index, 1);
     },
     handleBannerSubmit() {
-      let blcokSession = this.getSession();
-      let data = {
-        list: this.bannerModalForm.bannerList,
-        blockId: blcokSession.bannerBlockId,
-        dataType: 2,
-      };
+      let data;
       this.$refs.bannerModalForm.validate((valid) => {
         if (valid) {
-          this.submitLoading = true;
-          addManualData(data).then((res) => {
+          this.bannerLoading = true;
+          if (this.bannerBlockId) {
+            data = {
+              channelId: this.channelId,
+              blockId: this.bannerBlockId,
+              list: this.bannerModalForm.bannerList,
+            };
+          } else {
+            data = {
+              channelId: this.channelId,
+              list: this.bannerModalForm.bannerList,
+              blockId: 0,
+            };
+          }
+          addBanner(data).then((res) => {
             if (res.success) {
-              this.submitLoading = false;
-              this.$Message.success("添加banner图成功");
-              this.bannerVisible = false;
+              this.bannerLoading = false;
+              this.getDetail();
+              this.$Message.success("操作成功");
             }
           });
         }
       });
-    },
-    handleBannerCancel() {
-      this.bannerVisible = false;
     },
     // 添加lable_list数据
     labelModalSubmit() {
@@ -1423,19 +1544,26 @@ export default {
     labelEdit(v) {
       this.labelVisible = true;
       this.$refs.labelModalForm.resetFields();
-      this.labelModalForm.name = v.name;
+      labelDetail(v.blocks_id).then(res => {
+        if(res) {
+          this.labelModalForm.name = res.name;
+          this.labelModalForm.queryType = res.query_type;
+          this.labelModalForm.showType = res.show_type * 1;
+          this.labelModalForm.sortNo = res.sort_no;
+          this.labelModalForm.defaultKey = res.default_key;
+          this.labelModalForm.keywords = res.sphinx_query;
+        }
+      })
       this.modalType = 2;
       this.modalLabelText = "编辑数据展示模块";
-      this.labelBlockId = v.labelBlockId;
+      this.labelBlockId = v.blocks_id;
     },
     labelRemove(v) {
       let data = {
-        blockId: v.labelBlockId,
+        blockId: v.blocks_id,
       };
-      let blcokSession = this.getSession();
       this.$Modal.confirm({
         title: "确认删除",
-        // 记得确认修改此处
         content: "您确认要删除该数据?",
         loading: true,
         onOk: () => {
@@ -1444,94 +1572,71 @@ export default {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("删除成功");
-              let index = blcokSession.labelList.findIndex((item) => {
-                return v.labelBlockId == item.labelBlockId;
-              });
-              blcokSession.labelList.splice(index, 1);
-              this.setSession(blcokSession);
-              this.getTableList();
+              this.getDetail();
             }
           });
         },
       });
     },
     handleLabelSubmit() {
-      let blcokSession = this.getSession();
-      blcokSession.labelList = blcokSession.labelList || [];
       this.$refs.labelModalForm.validate((valid) => {
         if (valid) {
           if (this.modalType === 1) {
-            let labelIndex = blcokSession.labelIndex || 1;
             let data = {
               ...this.labelModalForm,
               channelId: this.channelId,
-              sortNo: labelIndex,
+              componentId: 4,
+              sortNo: this.labelSortNo + 1
             };
-            saveshowdataBlock(qs.stringify(data)).then((res) => {
+            console.log(data)
+            addData(qs.stringify(data)).then((res) => {
               if (res.result) {
+                this.getDetail();
                 this.$Message.success("添加数据展示模块成功");
                 this.labelVisible = false;
-                labelIndex++;
-                blcokSession.labelList.push({
-                  labelBlockId: res.result,
-                  name: this.labelModalForm.name,
-                });
-                blcokSession.labelIndex = labelIndex;
-                this.setSession(blcokSession);
-                this.getTableList();
               }
             });
-          } else if (this.modalType === 2) {
+          } else{
             let data = {
               ...this.labelModalForm,
               channelId: this.channelId,
               blockId: this.labelBlockId,
+              componentId: 4,
             };
-            saveshowdataBlock(qs.stringify(data)).then((res) => {
+            addData(qs.stringify(data)).then((res) => {
               if (res.success) {
+                this.getDetail();
                 this.$Message.success("编辑数据展示模块成功");
                 this.labelVisible = false;
-                blcokSession.labelList.forEach((item) => {
-                  if (this.labelBlockId === item.labelBlockId) {
-                    item.name = this.labelModalForm.name;
-                  }
-                });
-                this.setSession(blcokSession);
-                this.getTableList();
               }
             });
           }
         }
       });
     },
-    getTableList() {
-      let blcokSession = this.getSession();
-      this.labelData = blcokSession.labelList || [];
-    },
     // 新模块
     newModalSubmit() {
-      let blcokSession = this.getSession();
       this.$refs.newModalForm.validate((valid) => {
         if (valid) {
           let data;
-          if (blcokSession.newBlockId) {
+          if (this.newBlockId) {
             data = {
               ...this.newModalForm,
               channelId: this.channelId,
-              blockId: blcokSession.newBlockId,
+              blockId: this.newBlockId,
+              componentId: 5,
             };
           } else {
             data = {
               ...this.newModalForm,
               channelId: this.channelId,
+              componentId: 5,
             };
           }
-          saveNewData(qs.stringify(data)).then((res) => {
+          addData(qs.stringify(data)).then((res) => {
             if (res.success) {
-              this.$Message.success("新模块添加成功");
-              blcokSession.newBlockId = res.result;
-              this.setSession(blcokSession);
-              this.getTableList();
+              this.$Message.success("操作成功");
+              this.getDetail();
             }
           });
         }
@@ -1539,15 +1644,14 @@ export default {
     },
     // 附件下载
     downloadModalSubmit() {
-      let blcokSession = this.getSession();
       this.$refs.downloadModalForm.validate((valid) => {
         if (valid) {
           let data;
-          if (blcokSession.downloadBlockId) {
+          if (this.downloadBlockId) {
             data = {
               ...this.downloadModalForm,
               channelId: this.channelId,
-              blockId: blcokSession.downloadBlockId,
+              blockId: this.downloadBlockId,
             };
           } else {
             data = {
@@ -1555,12 +1659,16 @@ export default {
               channelId: this.channelId,
             };
           }
-          saveDownloadData(qs.stringify(data)).then((res) => {
+          if (this.downloadModalForm.name.indexOf("附件") != -1) {
+            data.componentId = 6;
+          } else {
+            data.componentId = 15;
+          }
+          console.log(data);
+          addData(qs.stringify(data)).then((res) => {
             if (res.success) {
-              this.$Message.success("新模块添加成功");
-              blcokSession.downloadBlockId = res.result;
-              this.setSession(blcokSession);
-              this.getTableList();
+              this.$Message.success("操作成功");
+              this.getDetail();
             }
           });
         }
@@ -1574,19 +1682,28 @@ export default {
       this.$refs.contentModalForm.resetFields();
     },
     contentEdit(v) {
+      console.log(v);
       this.contentVisible = true;
       this.$refs.contentModalForm.resetFields();
-      this.contentModalForm.name = v.name;
+      labelDetail(v.content_block_id).then(res => {
+        if(res) {
+          this.contentModalForm.name = res.name
+          this.contentModalForm.defaultKey = res.default_key
+          this.contentModalForm.queryType = res.query_type
+          this.contentModalForm.showType = res.show_type * 1
+          this.contentModalForm.sortNo = res.sort_no
+          this.contentModalForm.keywords = res.sphinx_query
+        }
+      })
       this.modalType = 2;
       this.modalcontentText = "编辑中间数据模块";
-      this.contentBlockId = v.contentBlockId;
+      this.contentBlockId = v.content_block_id;
     },
     contentRemove(v) {
       let data = {
-        content_blockId: v.contentBlockId,
-        color_blockId: v.colorfulId,
+        content_blockId: v.content_block_id,
+        color_blockId: v.color_block_id,
       };
-      let blcokSession = this.getSession();
       this.$Modal.confirm({
         title: "确认删除",
         // 记得确认修改此处
@@ -1598,43 +1715,27 @@ export default {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("删除成功");
-              let index = blcokSession.contentList.findIndex((item) => {
-                return v.contentBlockId == item.contentBlockId;
-              });
-              blcokSession.contentList.splice(index, 1);
-              this.setSession(blcokSession);
-              this.getContentTableList();
+              this.getDetail();
             }
           });
         },
       });
     },
     handleContentSubmit() {
-      let blcokSession = this.getSession();
-      blcokSession.contentList = blcokSession.contentList || [];
       this.$refs.contentModalForm.validate((valid) => {
         if (valid) {
           if (this.modalType === 1) {
-            let contentIndex = blcokSession.contentIndex || 1;
             let data = {
               ...this.contentModalForm,
               channelId: this.channelId,
-              sortNo: contentIndex,
+              componentId: 8,
+              sortNo: this.contentSortNo + 1
             };
-            saveContentData(qs.stringify(data)).then((res) => {
+            addData(qs.stringify(data)).then((res) => {
               if (res.result) {
-                this.$Message.success("添加中间数据模块成功");
+                this.$Message.success("添加成功");
                 this.contentVisible = false;
-                contentIndex++;
-                blcokSession.contentList.push({
-                  contentBlockId: res.result.content_blockId,
-                  colorfulId: res.result.color_blockId,
-                  name: this.contentModalForm.name,
-                  status: 0,
-                });
-                blcokSession.contentIndex = contentIndex;
-                this.setSession(blcokSession);
-                this.getContentTableList();
+                this.getDetail();
               }
             });
           } else if (this.modalType === 2) {
@@ -1642,36 +1743,34 @@ export default {
               ...this.contentModalForm,
               channelId: this.channelId,
               blockId: this.contentBlockId,
+              componentId: 8,
             };
-            saveContentData(qs.stringify(data)).then((res) => {
+            addData(qs.stringify(data)).then((res) => {
               if (res.success) {
-                this.$Message.success("编辑中间数据模块成功");
+                this.$Message.success("编辑成功");
                 this.contentVisible = false;
-                blcokSession.contentList.forEach((item) => {
-                  if (this.contentBlockId === item.contentBlockId) {
-                    item.name = this.contentModalForm.name;
-                  }
-                });
-                this.setSession(blcokSession);
-                this.getContentTableList();
+                this.getDetail();
               }
             });
           }
         }
       });
     },
-    getContentTableList() {
-      let blcokSession = this.getSession();
-      this.contentData = blcokSession.contentList || [];
-    },
+    
     // 编辑彩色模块
     colorfulEdit(v) {
       this.colorfulVisible = true;
-      this.colorfulBlockId = v.colorfulId;
+      this.colorfulBlockId = v.color_block_id;
       this.$refs.colorfulModalForm.resetFields();
+      colorfulDetail(v.color_block_id).then(res => {
+        if(res) {
+          this.colorfulModalForm.nameStr = res.name;
+        this.colorfulModalForm.imgurl = res.img_url;
+        this.colorfulModalForm.color = res.color;
+        }
+      })
     },
     handleColorfulSubmit() {
-      let blcokSession = this.getSession();
       this.$refs.colorfulModalForm.validate((valid) => {
         if (valid) {
           let data = {
@@ -1681,13 +1780,7 @@ export default {
           saveColorData(qs.stringify(data)).then((res) => {
             this.$Message.success("编辑彩色模块成功");
             this.colorfulVisible = false;
-            blcokSession.contentList.forEach((item) => {
-              if (this.colorfulBlockId === item.colorfulId) {
-                item.status = 1;
-              }
-            });
-            this.setSession(blcokSession);
-            this.getContentTableList();
+            this.getDetail();
           });
         }
       });
@@ -1696,18 +1789,6 @@ export default {
       this.colorfulVisible = false;
     },
     // 右边数据模块
-    asideModalSubmit() {
-      this.asideVisible = true;
-      this.$refs.asideModalForm.resetFields();
-      this.asideModalForm = {
-        name: "",
-        asideList: [
-          {
-            name: "",
-          },
-        ],
-      };
-    },
     handleasideRemove(index) {
       this.asideModalForm.asideList.splice(index, 1);
     },
@@ -1717,48 +1798,65 @@ export default {
       });
     },
     handleAsideSubmit() {
-      let blcokSession = this.getSession();
-      let data
-      let nameStr = ''
-      this.asideModalForm.asideList.forEach(item => {
-        nameStr += item.name + ' '
-      })
+      let data;
+      let nameStr = "";
+      this.asideModalForm.asideList.forEach((item) => {
+        nameStr += item.name + " ";
+      });
       this.$refs.asideModalForm.validate((valid) => {
         if (valid) {
-          if(blcokSession.asideBlockId) {
+          if (this.asideBlockId) {
             data = {
               name: this.asideModalForm.name,
               contentList: nameStr,
-              blockId: blcokSession.asideBlockId,
-              channelId: this.channelId
-            }
-          }else {
+              blockId: this.asideBlockId,
+              channelId: this.channelId,
+            };
+          } else {
             data = {
               name: this.asideModalForm.name,
               contentList: nameStr,
-              channelId: this.channelId
-            }
+              channelId: this.channelId,
+            };
           }
-          this.submitLoading = true;
-          saveRightData(qs.stringify(data)).then((res) => {
+          this.asideLoading = true;
+          addRight(qs.stringify(data)).then((res) => {
             if (res.success) {
-              this.submitLoading = false;
-              blcokSession.asideBlockId = res.result;
-              this.setSession(blcokSession);
-              this.$Message.success("编辑右侧模块数据成功");
-              this.asideVisible = false;
+              this.asideLoading = false;
+              this.$Message.success("操作成功");
+              this.asideBlockId = res.result.right_block_id;
             }
           });
         }
       });
     },
-    handleAsideCancel() {
-      this.asideVisible = false;
-    },
     // 重置
     ModalReset(name) {
       this.$refs[name].resetFields();
     },
+    ModalAsideReset(name) {
+      this.asideModalForm = {
+        name: '',
+        asideList: [
+          {
+            name: ''
+          }
+        ]
+      }
+      this.$refs[name].resetFields();
+    },
+    ModalBannerReset(name) {
+      this.bannerModalForm = {
+        bannerList: [
+          {
+            url: "",
+            name: "javascript:void(0);",
+            color: "",
+          },
+        ],
+      }
+      this.$refs[name].resetFields();
+    }
   },
 };
 </script>

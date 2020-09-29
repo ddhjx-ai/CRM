@@ -64,6 +64,15 @@ export const page404 = {
     component: () => import('@/views/error-page/404.vue')
 };
 
+export const page402 = {
+    path: '/402',
+    name: 'error-402',
+    meta: {
+        title: '402-页面不存在'
+    },
+    component: () => import('@/views/error-page/402.vue')
+};
+
 export const page403 = {
     path: '/403',
     meta: {
@@ -104,8 +113,9 @@ export const otherRouter = {
         { path: 'leave', title: '请假申请', name: 'leave', component: () => import('@/views/activiti/business/leave.vue') },
         { path: 'historic-detail', title: '流程进度历史详情', name: 'historic_detail', component: () => import('@/views/activiti/historic-detail/historicDetail.vue') },
 
-        {path: 'adAllList', title: '业主广告列表', name: 'adAllList-index', component: () => import("@/views/adManage/userList/adAllList.vue")},
-        { path: 'subjectManage/blocksManage', title: 'blocks管理', name: 'blocksManage', component: () => import('@/views/subjectManage/blocksManage/blocksManage.vue') },
+        { path: 'subjectManage/blocksManage', title: '模块管理', name: 'blocksManage', component: () => import('@/views/subjectManage/blocksManage/blocksManage.vue') },
+        // {path: 'adAllList', title: '业主广告列表', name: 'adAllList-index', component: () => import("@/views/adManage/userList/adAllList.vue")},
+        // { path: 'subjectManage/channelManage', title: '频道管理', name: 'channelManage', component: () => import('@/views/subjectManage/channelManage/channelManage.vue') },
     ]
 };
 
@@ -123,5 +133,6 @@ export const routers = [
     locking,
     ...appRouter,
     page500,
-    page403
+    page403,
+    page402
 ];
