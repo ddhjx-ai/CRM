@@ -3,7 +3,9 @@
     <Card>
       <!-- 主题模块 -->
       <Row class="rowModal">
-        <h1 :style="{color: themeColor}" class="basicDetail">{{channelName}}</h1>
+        <h1 :style="{ color: themeColor }">
+          {{ channelName }}
+        </h1>
       </Row>
       <Row class="rowModal">
         <Form
@@ -14,7 +16,7 @@
           :label-width="100"
         >
           <Col :span="12">
-            <h3 class="basicDetail">选择主题</h3>
+            <h3 style="margin-bottom: 10px">选择主题</h3>
             <Row>
               <FormItem prop="themeId" label="主题名" style="width: 100%">
                 <Select v-model="themeForm.themeId">
@@ -50,7 +52,7 @@
           :rules="ruleValidate"
         >
           <Col :span="12">
-            <h3 class="basicDetail">添加导航栏</h3>
+            <h3 style="margin-bottom: 10px">添加导航栏</h3>
             <Row>
               <FormItem label="导航名" prop="title" style="width: 100%">
                 <Input
@@ -85,10 +87,13 @@
       <Row class="rowModal">
         <Form ref="menuListForm" inline :label-width="100">
           <Col :span="12">
-            <h3 class="basicDetail">添加菜单栏</h3>
+            <h3 style="margin-bottom: 10px">添加菜单栏</h3>
             <Row>
               <FormItem style="width: 100%">
-                <Button type="primary" @click="downloadTemplate"
+                <Button
+                  type="primary"
+                  @click="downloadTemplate"
+                  icon="ios-cloud-download-outline"
                   >下载Excel模板</Button
                 >
                 <a
@@ -144,8 +149,8 @@
       </Row>
       <!-- banner图模块 -->
       <Row class="rowModal">
-        <h3 class="basicDetail">添加banner图</h3>
-        <Col :span="12">
+        <h3 style="margin-bottom: 10px">添加banner图</h3>
+        <Col :span="20">
           <Form
             ref="bannerModalForm"
             :model="bannerModalForm"
@@ -193,7 +198,7 @@
                   ></Input>
                 </FormItem>
               </Col>
-              <Col span="4">
+              <Col span="2">
                 <FormItem
                   style="width: 100%"
                   class="leftBtnForm"
@@ -213,7 +218,7 @@
             </Row>
             <Row>
               <FormItem>
-                <Col span="8">
+                <Col span="6">
                   <Button
                     type="dashed"
                     long
@@ -233,7 +238,9 @@
                     @click="handleBannerSubmit"
                     >保存</Button
                   >
-                  <Button @click="ModalBannerReset('bannerModalForm')">重置</Button>
+                  <Button @click="ModalBannerReset('bannerModalForm')"
+                    >重置</Button
+                  >
                 </Col>
               </FormItem>
             </Row>
@@ -243,8 +250,8 @@
       <!-- 数据展示模块 -->
       <Row class="rowModal">
         <Col :span="24">
-          <h3 class="basicDetail">添加数据展示模块</h3>
-          <Row class="operation" style="margin-bottom: 10px; margin-top: 10px">
+          <h3 style="margin-bottom: 10px">添加数据展示模块</h3>
+          <Row class="operation" style="margin-bottom: 10px">
             <Button type="primary" icon="md-add" @click="labelModalSubmit"
               >添加</Button
             >
@@ -266,13 +273,13 @@
       <!-- 新模块 -->
       <Row class="rowModal">
         <Col :span="24">
-          <h3 class="basicDetail">添加新模块</h3>
+          <h3 style="margin-bottom: 10px">添加新模块</h3>
           <Row class="operation" style="margin-bottom: 10px; margin-top: 10px">
             <Form
               ref="newModalForm"
               :model="newModalForm"
               inline
-              :label-width="90"
+              :label-width="95"
             >
               <Row>
                 <Col span="7">
@@ -369,16 +376,22 @@
                     </Select>
                   </FormItem>
                 </Col>
+                <Col span="5">
+                  <FormItem>
+                    <Button type="primary" @click="getNewKeywords('newModalForm')">生成关键词</Button>
+                  </FormItem>
+                </Col>
               </Row>
               <Row>
                 <Col span="19">
-                <FormItem label="关键词" prop="keywords" style="width: 100%">
-                   <Input
+                  <FormItem label="关键词" prop="keywords" style="width: 100%">
+                    <!-- <Input
                       type="text"
                       v-model="newModalForm.keywords"
                       readonly
-                    ></Input>
-                </FormItem>
+                    ></Input> -->
+                    <span>{{newModalForm.keywords}}</span>
+                  </FormItem>
                 </Col>
               </Row>
               <Row>
@@ -394,13 +407,13 @@
       <!-- 附件下载模块 -->
       <Row class="rowModal">
         <Col :span="24">
-          <h3 class="basicDetail">添加附件下载模块</h3>
-          <Row class="operation" style="margin-bottom: 10px; margin-top: 10px">
+          <h3 style="margin-bottom: 10px">添加附件下载模块</h3>
+          <Row class="operation" style="margin-bottom: 10px">
             <Form
               ref="downloadModalForm"
               :model="downloadModalForm"
               inline
-              :label-width="90"
+              :label-width="95"
             >
               <Row>
                 <Col span="7">
@@ -497,16 +510,22 @@
                     </Select>
                   </FormItem>
                 </Col>
+                <Col span="5">
+                  <FormItem>
+                    <Button type="primary" @click="getNewKeywords('downloadModalForm')">生成关键词</Button>
+                  </FormItem>
+                </Col>
               </Row>
               <Row>
                 <Col span="19">
-                <FormItem label="关键词" prop="keywords" style="width: 100%">
-                   <Input
+                  <FormItem label="关键词" prop="keywords" style="width: 100%">
+                    <!-- <Input
                       type="text"
                       v-model="downloadModalForm.keywords"
                       readonly
-                    ></Input>
-                </FormItem>
+                    ></Input> -->
+                    <span>{{downloadModalForm.keywords}}</span>
+                  </FormItem>
                 </Col>
               </Row>
               <Row>
@@ -528,7 +547,7 @@
       <!-- 彩色模块 -->
       <Row class="rowModal">
         <Col :span="24">
-          <h3 class="basicDetail">添加中间数据模块</h3>
+          <h3 style="margin-bottom: 10px">添加中间数据模块</h3>
           <Row class="operation" style="margin-bottom: 10px; margin-top: 10px">
             <Button type="primary" icon="md-add" @click="contentModalSubmit"
               >添加</Button
@@ -551,16 +570,16 @@
       <!-- 右边数据模块 -->
       <Row class="rowModal">
         <Col :span="24">
-          <h3 class="basicDetail">添加右边数据模块</h3>
-          <Row class="operation" style="margin-bottom: 10px; margin-top: 10px">
+          <h3 style="margin-bottom: 10px">添加右边数据模块</h3>
+          <Row class="operation" style="margin-bottom: 10px">
             <Form
               ref="asideModalForm"
               :model="asideModalForm"
               :label-width="80"
             >
-              <Col :span="12">
+              <Col :span="18">
                 <Row>
-                  <Col span="20">
+                  <Col span="18">
                     <FormItem
                       label="title"
                       prop="name"
@@ -581,8 +600,9 @@
                 <Row
                   v-for="(item, index) in asideModalForm.asideList"
                   :key="index"
+                  :gutter="10"
                 >
-                  <Col span="20">
+                  <Col span="12">
                     <FormItem
                       style="width: 100%"
                       :label="'aside' + (index + 1)"
@@ -596,11 +616,32 @@
                       <Input
                         type="text"
                         v-model="item.name"
-                        placeholder="请输入内容"
+                        placeholder="必填，请输入内容"
                       ></Input>
                     </FormItem>
                   </Col>
-
+                  <!-- <Col span="3">
+                    <FormItem
+                      style="width: 100%"
+                      class="leftBtnForm"
+                    >
+                      <Button type="primary" @click="showInput(item)">添加URL</Button
+                    >
+                    </FormItem>
+                  </Col> -->
+                  <Col span="8">
+                    <FormItem
+                      style="width: 100%"
+                      :prop="'asideList.' + index + '.url'"
+                      class="leftBtnForm"
+                    >
+                      <Input
+                        type="text"
+                        v-model="item.url"
+                        placeholder="选填，需要手动输入URL时，请输入URL"
+                      ></Input>
+                    </FormItem>
+                  </Col>
                   <Col span="3" style="margin-left: 10px">
                     <Button @click="handleasideRemove(index)">删除</Button>
                   </Col>
@@ -626,7 +667,9 @@
                       @click="handleAsideSubmit"
                       >保存</Button
                     >
-                    <Button @click="ModalAsideReset('asideModalForm')">重置</Button>
+                    <Button @click="ModalAsideReset('asideModalForm')"
+                      >重置</Button
+                    >
                   </FormItem>
                 </Row>
               </Col>
@@ -647,7 +690,7 @@
         ref="labelModalForm"
         :model="labelModalForm"
         inline
-        :label-width="90"
+        :label-width="95"
         :rules="ruleValidate"
       >
         <Row>
@@ -737,32 +780,35 @@
               </Select>
             </FormItem>
           </Col>
+          <Col span="5">
+            <FormItem>
+              <Button type="primary" @click="getNewKeywords('labelModalForm')">生成关键词</Button>
+            </FormItem>
+          </Col>
           <!-- <Col span="5">
-            <FormItem label="排序值" prop="sortNo" style="width: 100%">
-              <Tooltip
-                trigger="hover"
-                placement="right"
-                content="值越小越靠前，不支持小数"
-                style="width: 100%"
-              >
-                <InputNumber
-                  :max="1000"
-                  :step="1"
-                  :min="1"
-                  v-model="labelModalForm.sortNo"
-                ></InputNumber>
-              </Tooltip>
+            <FormItem
+              label="排序值"
+              prop="sortNo"
+              style="width: 100%"
+            >
+              <InputNumber
+                :max="1000"
+                :step="1"
+                :min="1"
+                v-model="labelModalForm.sortNo"
+              ></InputNumber>
             </FormItem>
           </Col> -->
         </Row>
         <Row>
           <FormItem label="关键词" prop="keywords" style="width: 100%">
-              <Input
-                type="text"
-                v-model="labelModalForm.keywords"
-                readonly
-              ></Input>
-            </FormItem>
+            <!-- <Input
+              type="text"
+              v-model="labelModalForm.keywords"
+              readonly
+            ></Input> -->
+            <span>{{labelModalForm.keywords}}</span>
+          </FormItem>
         </Row>
       </Form>
       <div slot="footer">
@@ -786,8 +832,7 @@
         ref="contentModalForm"
         :model="contentModalForm"
         inline
-        :label-width="90"
-        :rules="ruleValidate"
+        :label-width="95"
       >
         <Row>
           <Col span="7">
@@ -813,11 +858,13 @@
               style="width: 100%"
               label="defaultKey"
               prop="defaultKey"
-              :rules="{
-                required: true,
-                message: '内容不能为空',
-                trigger: 'blur',
-              }"
+              :rules="[
+                {
+                  required: true,
+                  message: '内容不能为空',
+                  trigger: 'blur',
+                },
+              ]"
             >
               <Input
                 type="text"
@@ -876,32 +923,51 @@
               </Select>
             </FormItem>
           </Col>
+          <Col span="5">
+            <FormItem>
+              <Button type="primary" @click="getNewKeywords('contentModalForm')">生成关键词</Button>
+            </FormItem>
+          </Col>
           <!-- <Col span="5">
-            <FormItem label="排序值" prop="sortNo" style="width: 100%">
+            <FormItem
+              label="排序值"
+              prop="sortNo"
+              style="width: 100%"
+              :rules="[
+                {
+                  required: true,
+                  type:'number',
+                  message: '排序值不能为空',
+                  trigger: 'blur',
+                },
+                { validator: validateSort, trigger: 'blur' },
+              ]"
+            >
               <Tooltip
                 trigger="hover"
                 placement="right"
                 content="值越小越靠前，不支持小数"
                 style="width: 100%"
               >
-                <InputNumber
-                  :max="1000"
-                  :step="1"
-                  :min="1"
-                  v-model="contentModalForm.sortNo"
-                ></InputNumber>
+              <InputNumber
+                :max="1000"
+                :step="1"
+                :min="1"
+                v-model="contentModalForm.sortNo"
+              ></InputNumber>
               </Tooltip>
             </FormItem>
           </Col> -->
         </Row>
         <Row>
           <FormItem label="关键词" prop="keywords" style="width: 100%">
-              <Input
-                type="text"
-                v-model="contentModalForm.keywords"
-                readonly
-              ></Input>
-            </FormItem>
+            <!-- <Input
+              type="text"
+              v-model="contentModalForm.keywords"
+              readonly
+            ></Input> -->
+            <span>{{contentModalForm.keywords}}</span>
+          </FormItem>
         </Row>
       </Form>
       <div slot="footer">
@@ -941,6 +1007,21 @@
             placeholder="请输入彩色模块数据,数据之间使用空格隔开,如:水泥 石材 混凝土"
           ></Input>
         </FormItem>
+        <!-- <FormItem
+          prop="url"
+          :rules="{
+            required: true,
+            message: '访问路径不能为空',
+            trigger: 'blur',
+          }"
+          label="内容地址"
+        >
+          <Input
+            type="text"
+            v-model="colorfulModalForm.url"
+            placeholder="请输入内容访问地址"
+          ></Input>
+        </FormItem> -->
         <FormItem
           prop="imgurl"
           :rules="{
@@ -978,6 +1059,37 @@
         >
       </div>
     </Modal>
+
+    <Modal title="添加URL"
+      v-model="urlVisible"
+      :mask-closable="false"
+      :width="600">
+      <Form
+        ref="colorfulModalForm"
+        :model="colorfulModalForm"
+        :label-width="80"
+      >
+        <FormItem
+          prop="url"
+          label="URL"
+        >
+          <Input
+            type="text"
+            v-model="colorfulModalForm.imgurl"
+            placeholder="请输入URL"
+          ></Input>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="text" @click="handleColorfulCancel">取消</Button>
+        <Button
+          type="primary"
+          :loading="submitLoading"
+          @click="handleColorfulSubmit"
+          >确认</Button
+        >
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -985,18 +1097,18 @@
 import {
   getAllThemeList, // 获取主题列表接口
   themeAddModal, // 添加主题模块接口
-  addModal,
-  themeBlockId,
-  importExcel,
-  addManualData,
-  saveshowdataBlock,
+  // addModal,
+  // themeBlockId,
+  // importExcel,
+  // addManualData,
+  // saveshowdataBlock,
+  // saveNewData,
+  // saveDownloadData,
+  // saveContentData,
+  // saveRightData,
   removeLabelBlock,
-  saveNewData,
-  saveDownloadData,
-  saveContentData,
   saveColorData,
   delContentData,
-  saveRightData,
   // -------------
   addNav, // 添加导航栏模块接口
   addMenu,
@@ -1004,8 +1116,9 @@ import {
   addRight,
   addData,
   channelDetail,
-  labelDetail,    // 数据展示模块回显
-  colorfulDetail,  // 彩色模块数据回显
+  labelDetail, // 数据展示模块回显
+  colorfulDetail, // 彩色模块数据回显
+  getKeywords, // 生成关键词
 } from "@/api/channel";
 import qs from "qs";
 // excel转换工具类
@@ -1015,8 +1128,8 @@ export default {
   name: "blocksManage",
   data() {
     return {
-      themeColor: '#000000',
-      channelName: '',
+      themeColor: "#000000",
+      channelName: "",
       ruleValidate: {
         themeId: {
           type: "number",
@@ -1032,10 +1145,10 @@ export default {
         name: { required: true, message: "导航内容不能为空", trigger: "blur" },
         sortNo: [
           {
+            type: "number",
             required: true,
             message: "排序值不能为空",
             trigger: "blur",
-            type: "number",
           },
           { validator: validateSort, trigger: "blur" },
         ],
@@ -1057,13 +1170,13 @@ export default {
       },
       mainLoading: false,
       // 菜单栏
-      menuBlockId: '',
+      menuBlockId: "",
       menuLoading: false,
       uploadfile: {
         name: "",
       },
       // banner图
-      bannerBlockId: '',
+      bannerBlockId: "",
       bannerLoading: false,
       bannerModalForm: {
         bannerList: [
@@ -1085,11 +1198,11 @@ export default {
         orKey: "",
         type: 1,
         name: "",
-        queryType: 0,
+        queryType: 2,
         showType: 1,
         defaultKey: "",
         // sortNo: 1,
-        keywords: '',
+        keywords: "",
       },
       labelData: [],
       labelColumns: [
@@ -1147,28 +1260,28 @@ export default {
         },
       ],
       // 新模块
-      newBlockId: '',
+      newBlockId: "",
       newModalForm: {
         andKey: "",
         orKey: "",
         type: 1,
         name: "",
-        queryType: 0,
-        showType: 1,
+        queryType: 4,
+        showType: 3,
         defaultKey: "",
-        keywords: '',
+        keywords: "",
       },
       // 下载模块
-      downloadBlockId: '',
+      downloadBlockId: "",
       downloadModalForm: {
         andKey: "",
         orKey: "",
         type: 1,
         name: "",
-        queryType: 0,
-        showType: 1,
+        queryType: 3,
+        showType: 4,
         defaultKey: "",
-        keywords: '',
+        keywords: "",
       },
       // 中间模块
       contentBlockId: "",
@@ -1183,7 +1296,7 @@ export default {
         showType: 1,
         defaultKey: "",
         // sortNo: 1,
-        keywords: ''
+        keywords: "",
       },
       modalContentText: "添加中间模块数据",
       contentData: [],
@@ -1285,13 +1398,14 @@ export default {
         color: "",
       },
       // 右边数据模块
-      asideBlockId: '',
+      asideBlockId: "",
       asideLoading: false,
       asideModalForm: {
         name: "",
         asideList: [
           {
             name: "",
+            url: '',
           },
         ],
       },
@@ -1306,16 +1420,16 @@ export default {
     // 获取详情
     getDetail() {
       channelDetail(this.channelId).then((res) => {
-        if(!res){
-          this.$router.push({name: 'error-402'})
+        if (!res) {
+          this.$router.push({ name: "error-402" });
         }
         let data;
-        if(res[0]) {
-          data = res[0]
-        }else {
-          return
+        if (res[0]) {
+          data = res[0];
+        } else {
+          return;
         }
-        if(data.AchannelName) {
+        if (data.AchannelName) {
           this.channelName = data.AchannelName;
         }
         if (data.theme_block) {
@@ -1323,33 +1437,34 @@ export default {
           this.themeForm.themeId = data.theme_block.theme_id;
           this.themeBlockId = data.theme_block.theme_block_id;
         }
-        if(data.navi_block.length > 0) {
+        if (data.navi_block.length > 0) {
           this.mainBlockId = data.navi_block[0].navi_block_id;
           this.mainUrlModalForm.title = data.navi_block[0].title;
-          let str = ''
-          data.navi_block.forEach(item => {
-            str += item.name + ' ';
-          })
+          let str = "";
+          data.navi_block.forEach((item) => {
+            str += item.name + " ";
+          });
           this.mainUrlModalForm.name = str;
         }
-        if(data.menu_block) {
+        if (data.menu_block) {
           this.menuBlockId = data.menu_block.menu_block_id;
         }
-        if(data.banner_block.length>0) {
+        if (data.banner_block.length > 0) {
           this.bannerBlockId = data.banner_block[0].banner_block_id;
-          this.bannerModalForm.bannerList = data.banner_block.map(item => {
+          this.bannerModalForm.bannerList = data.banner_block.map((item) => {
             return {
               name: item.name,
               url: item.url,
-              color: item.color
-            }
-          })
+              color: item.color,
+            };
+          });
         }
-        if(data.show_data_block.length > 0) {
-          this.labelSortNo = data.show_data_block[data.show_data_block.length - 1].sort_no;
-          this.labelData = [...data.show_data_block]
+        if (data.show_data_block.length > 0) {
+          this.labelSortNo =
+            data.show_data_block[data.show_data_block.length - 1].sort_no;
+          this.labelData = [...data.show_data_block];
         }
-        if(data.new_data_block){
+        if (data.new_data_block) {
           this.newBlockId = data.new_data_block.new_data_block_id;
           this.newModalForm.name = data.new_data_block.name;
           this.newModalForm.defaultKey = data.new_data_block.default_key;
@@ -1357,7 +1472,7 @@ export default {
           this.newModalForm.showType = data.new_data_block.show_type * 1;
           this.newModalForm.keywords = data.new_data_block.sphinx_query;
         }
-        if(data.download_block) {
+        if (data.download_block) {
           this.downloadBlockId = data.download_block.download_block_id;
           this.downloadModalForm.name = data.download_block.name;
           this.downloadModalForm.defaultKey = data.download_block.default_key;
@@ -1365,18 +1480,20 @@ export default {
           this.downloadModalForm.showType = data.download_block.show_type * 1;
           this.downloadModalForm.keywords = data.download_block.sphinx_query;
         }
-        if(data.content_block.length > 0) {
-          this.contentSortNo = data.content_block[data.content_block.length -1].sort_no;
+        if (data.content_block.length > 0) {
+          this.contentSortNo =
+            data.content_block[data.content_block.length - 1].sort_no;
           this.contentData = [...data.content_block];
         }
-        if(data.right_block.length > 0) {
+        if (data.right_block.length > 0) {
           this.asideBlockId = data.right_block[0].right_block_id;
           this.asideModalForm.name = data.right_block[0].title;
-          this.asideModalForm.asideList = data.right_block.map(item => {
+          this.asideModalForm.asideList = data.right_block.map((item) => {
             return {
-              name: item.name
-            }
-          })
+              name: item.name,
+              url: item.url
+            };
+          });
         }
       });
     },
@@ -1485,9 +1602,11 @@ export default {
       addMenu(formData).then((res) => {
         if (res.success) {
           this.menuLoading = false;
-          this.menuBlockId = res.result.menu_block_id;
+          // this.menuBlockId = res.result.menu_block_id;
+          this.getDetail();
           this.$Message.success("导入成功");
-        }else {
+        } else {
+          this.$Message.error("导入失败");
           this.menuLoading = false;
         }
       });
@@ -1544,8 +1663,8 @@ export default {
     labelEdit(v) {
       this.labelVisible = true;
       this.$refs.labelModalForm.resetFields();
-      labelDetail(v.blocks_id).then(res => {
-        if(res) {
+      labelDetail(v.blocks_id).then((res) => {
+        if (res) {
           this.labelModalForm.name = res.name;
           this.labelModalForm.queryType = res.query_type;
           this.labelModalForm.showType = res.show_type * 1;
@@ -1553,7 +1672,7 @@ export default {
           this.labelModalForm.defaultKey = res.default_key;
           this.labelModalForm.keywords = res.sphinx_query;
         }
-      })
+      });
       this.modalType = 2;
       this.modalLabelText = "编辑数据展示模块";
       this.labelBlockId = v.blocks_id;
@@ -1583,12 +1702,15 @@ export default {
         if (valid) {
           if (this.modalType === 1) {
             let data = {
-              ...this.labelModalForm,
+              name: this.labelModalForm.name,
+              defaultKey: this.labelModalForm.defaultKey,
+              queryType: this.labelModalForm.queryType,
+              showType: this.labelModalForm.showType,
+              sphinxQuery: this.labelModalForm.keywords,
               channelId: this.channelId,
               componentId: 4,
-              sortNo: this.labelSortNo + 1
+              sortNo: this.labelSortNo + 1,
             };
-            console.log(data)
             addData(qs.stringify(data)).then((res) => {
               if (res.result) {
                 this.getDetail();
@@ -1596,9 +1718,13 @@ export default {
                 this.labelVisible = false;
               }
             });
-          } else{
+          } else {
             let data = {
-              ...this.labelModalForm,
+              name: this.labelModalForm.name,
+              defaultKey: this.labelModalForm.defaultKey,
+              queryType: this.labelModalForm.queryType,
+              showType: this.labelModalForm.showType,
+              sphinxQuery: this.labelModalForm.keywords,
               channelId: this.channelId,
               blockId: this.labelBlockId,
               componentId: 4,
@@ -1615,20 +1741,44 @@ export default {
       });
     },
     // 新模块
+    getNewKeywords(model) {
+      let data = {
+        andKey: this[model].andKey,
+        orKey: this[model].orKey,
+        type: this[model].type,
+      }
+      getKeywords(qs.stringify(data)).then(res => {
+        if(res.success){
+          this[model].keywords = res.result
+          this.$Message.success("操作成功");
+        }else {
+          this.getDetail();
+          this.$Message.error("操作失败");
+        }
+      })
+    },
     newModalSubmit() {
       this.$refs.newModalForm.validate((valid) => {
         if (valid) {
           let data;
           if (this.newBlockId) {
             data = {
-              ...this.newModalForm,
+              name: this.newModalForm.name,
+              defaultKey: this.newModalForm.defaultKey,
+              queryType: this.newModalForm.queryType,
+              showType: this.newModalForm.showType,
+              sphinxQuery: this.newModalForm.keywords,
               channelId: this.channelId,
               blockId: this.newBlockId,
               componentId: 5,
             };
           } else {
             data = {
-              ...this.newModalForm,
+              name: this.newModalForm.name,
+              defaultKey: this.newModalForm.defaultKey,
+              queryType: this.newModalForm.queryType,
+              showType: this.newModalForm.showType,
+              sphinxQuery: this.newModalForm.keywords,
               channelId: this.channelId,
               componentId: 5,
             };
@@ -1649,13 +1799,21 @@ export default {
           let data;
           if (this.downloadBlockId) {
             data = {
-              ...this.downloadModalForm,
+              name: this.downloadModalForm.name,
+              defaultKey: this.downloadModalForm.defaultKey,
+              queryType: this.downloadModalForm.queryType,
+              showType: this.downloadModalForm.showType,
+              sphinxQuery: this.downloadModalForm.keywords,
               channelId: this.channelId,
               blockId: this.downloadBlockId,
             };
           } else {
             data = {
-              ...this.downloadModalForm,
+              name: this.downloadModalForm.name,
+              defaultKey: this.downloadModalForm.defaultKey,
+              queryType: this.downloadModalForm.queryType,
+              showType: this.downloadModalForm.showType,
+              sphinxQuery: this.downloadModalForm.keywords,
               channelId: this.channelId,
             };
           }
@@ -1664,7 +1822,6 @@ export default {
           } else {
             data.componentId = 15;
           }
-          console.log(data);
           addData(qs.stringify(data)).then((res) => {
             if (res.success) {
               this.$Message.success("操作成功");
@@ -1682,19 +1839,18 @@ export default {
       this.$refs.contentModalForm.resetFields();
     },
     contentEdit(v) {
-      console.log(v);
       this.contentVisible = true;
       this.$refs.contentModalForm.resetFields();
-      labelDetail(v.content_block_id).then(res => {
-        if(res) {
-          this.contentModalForm.name = res.name
-          this.contentModalForm.defaultKey = res.default_key
-          this.contentModalForm.queryType = res.query_type
-          this.contentModalForm.showType = res.show_type * 1
-          this.contentModalForm.sortNo = res.sort_no
-          this.contentModalForm.keywords = res.sphinx_query
+      labelDetail(v.content_block_id).then((res) => {
+        if (res) {
+          this.contentModalForm.name = res.name;
+          this.contentModalForm.defaultKey = res.default_key;
+          this.contentModalForm.queryType = res.query_type;
+          this.contentModalForm.showType = res.show_type * 1;
+          this.contentModalForm.sortNo = res.sort_no;
+          this.contentModalForm.keywords = res.sphinx_query;
         }
-      })
+      });
       this.modalType = 2;
       this.modalcontentText = "编辑中间数据模块";
       this.contentBlockId = v.content_block_id;
@@ -1726,10 +1882,14 @@ export default {
         if (valid) {
           if (this.modalType === 1) {
             let data = {
-              ...this.contentModalForm,
+              name: this.contentModalForm.name,
+              defaultKey: this.contentModalForm.defaultKey,
+              queryType: this.contentModalForm.queryType,
+              showType: this.contentModalForm.showType,
+              sphinxQuery: this.contentModalForm.keywords,
               channelId: this.channelId,
               componentId: 8,
-              sortNo: this.contentSortNo + 1
+              sortNo: this.contentSortNo + 1,
             };
             addData(qs.stringify(data)).then((res) => {
               if (res.result) {
@@ -1740,7 +1900,11 @@ export default {
             });
           } else if (this.modalType === 2) {
             let data = {
-              ...this.contentModalForm,
+              name: this.contentModalForm.name,
+              defaultKey: this.contentModalForm.defaultKey,
+              queryType: this.contentModalForm.queryType,
+              showType: this.contentModalForm.showType,
+              sphinxQuery: this.contentModalForm.keywords,
               channelId: this.channelId,
               blockId: this.contentBlockId,
               componentId: 8,
@@ -1756,19 +1920,19 @@ export default {
         }
       });
     },
-    
+
     // 编辑彩色模块
     colorfulEdit(v) {
       this.colorfulVisible = true;
       this.colorfulBlockId = v.color_block_id;
       this.$refs.colorfulModalForm.resetFields();
-      colorfulDetail(v.color_block_id).then(res => {
-        if(res) {
+      colorfulDetail(v.color_block_id).then((res) => {
+        if (res.name) {
           this.colorfulModalForm.nameStr = res.name;
-        this.colorfulModalForm.imgurl = res.img_url;
-        this.colorfulModalForm.color = res.color;
+          this.colorfulModalForm.imgurl = res.img_url;
+          this.colorfulModalForm.color = res.color;
         }
-      })
+      });
     },
     handleColorfulSubmit() {
       this.$refs.colorfulModalForm.validate((valid) => {
@@ -1795,13 +1959,18 @@ export default {
     handleAsideAdd() {
       this.asideModalForm.asideList.push({
         name: "",
+        url: '',
       });
     },
     handleAsideSubmit() {
       let data;
       let nameStr = "";
       this.asideModalForm.asideList.forEach((item) => {
-        nameStr += item.name + " ";
+        if(item.url){
+          nameStr += item.name + "+" + item.url + " ";
+        }else {
+          nameStr += item.name + " ";
+        }
       });
       this.$refs.asideModalForm.validate((valid) => {
         if (valid) {
@@ -1824,11 +1993,15 @@ export default {
             if (res.success) {
               this.asideLoading = false;
               this.$Message.success("操作成功");
-              this.asideBlockId = res.result.right_block_id;
+              this.getDetail();
+              // this.asideBlockId = res.result.right_block_id;
             }
           });
         }
       });
+    },
+    showInput(i) {
+      console.log(i)
     },
     // 重置
     ModalReset(name) {
@@ -1836,13 +2009,14 @@ export default {
     },
     ModalAsideReset(name) {
       this.asideModalForm = {
-        name: '',
+        name: "",
         asideList: [
           {
-            name: ''
-          }
-        ]
-      }
+            name: "",
+            url:''
+          },
+        ],
+      };
       this.$refs[name].resetFields();
     },
     ModalBannerReset(name) {
@@ -1854,9 +2028,9 @@ export default {
             color: "",
           },
         ],
-      }
+      };
       this.$refs[name].resetFields();
-    }
+    },
   },
 };
 </script>

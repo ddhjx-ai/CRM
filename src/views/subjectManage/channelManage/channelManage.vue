@@ -100,7 +100,7 @@ import {
   getChanelList,
   channelNameAdd,
   channelUpdate,
-  themeBlockId,
+  // themeBlockId,
   delChannel 
 } from "@/api/channel.js";
 import qs from "qs";
@@ -202,6 +202,24 @@ export default {
                 "Button",
                 {
                   props: {
+                    type: "info",
+                    size: "small",
+                  },
+                  style: {
+                    marginRight: "5px",
+                  },
+                  on: {
+                    click: () => {
+                      this.preview(params.row);
+                    },
+                  },
+                },
+                "预览"
+              ),
+              h(
+                "Button",
+                {
+                  props: {
                     type: "error",
                     size: "small",
                   },
@@ -227,7 +245,7 @@ export default {
       form: {
         // 添加或编辑表单对象初始化数据
         channelName: "",
-        isDeleted: 0,
+        isDeleted: 1,
         description: "",
       },
       formValidate: {
@@ -377,6 +395,15 @@ export default {
       // 重新加载数据
       this.getDataList();
     },
+    // 预览
+    preview (v) {
+      this.$router.push({
+        name: 'channelPreview',
+        query: {
+          id: v.id
+        }
+      })
+    }
   },
 };
 </script>

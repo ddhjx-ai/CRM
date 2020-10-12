@@ -5,7 +5,7 @@
       justify="center"
       align="middle"
       @keydown.enter.native="submitLogin"
-      style="height:100%"
+      style="height: 100%"
       v-if="true"
     >
       <Col class="layout">
@@ -13,13 +13,17 @@
           <Header />
           <Row v-if="!socialLogining">
             <Tabs v-model="tabName">
-              <TabPane :label="$t('usernameLogin')" name="username" icon="md-person">
+              <TabPane
+                :label="$t('usernameLogin')"
+                name="username"
+                icon="md-person"
+              >
                 <Form
                   ref="usernameLoginForm"
                   :model="form"
                   :rules="rules"
                   class="form"
-                  v-if="tabName=='username'"
+                  v-if="tabName == 'username'"
                 >
                   <FormItem prop="username">
                     <Input
@@ -46,7 +50,7 @@
                     <Row
                       type="flex"
                       justify="space-between"
-                      style="align-items: center;overflow: hidden;"
+                      style="align-items: center; overflow: hidden"
                     >
                       <Input
                         v-model="form.imgCode"
@@ -56,26 +60,33 @@
                         :maxlength="10"
                         class="input-verify"
                       />
-                      <div class="code-image" style="position:relative;font-size:12px">
+                      <div
+                        class="code-image"
+                        style="position: relative; font-size: 12px"
+                      >
                         <Spin v-if="loadingCaptcha" fix></Spin>
                         <img
                           :src="captchaImg"
                           @click="getCaptchaImg"
                           alt="加载验证码失败"
-                          style="width:110px;cursor:pointer;display:block"
+                          style="width: 110px; cursor: pointer; display: block"
                         />
                       </div>
                     </Row>
                   </FormItem>
                 </Form>
               </TabPane>
-              <TabPane :label="$t('mobileLogin')" name="mobile" icon="ios-phone-portrait">
+              <TabPane
+                :label="$t('mobileLogin')"
+                name="mobile"
+                icon="ios-phone-portrait"
+              >
                 <Form
                   ref="mobileLoginForm"
                   :model="form"
                   :rules="rules"
                   class="form"
-                  v-if="tabName=='mobile'"
+                  v-if="tabName == 'mobile'"
                 >
                   <FormItem prop="mobile">
                     <Input
@@ -112,13 +123,19 @@
             </Tabs>
 
             <Row type="flex" justify="space-between" align="middle">
-              <Checkbox v-model="saveLogin" size="large">{{ $t('autoLogin') }}</Checkbox>
+              <Checkbox v-model="saveLogin" size="large">{{
+                $t("autoLogin")
+              }}</Checkbox>
               <Dropdown trigger="click" @on-click="handleDropDown">
-                <a class="forget-pass">{{ $t('forgetPass') }}</a>
+                <a class="forget-pass">{{ $t("forgetPass") }}</a>
                 <DropdownMenu slot="list">
                   <DropdownItem name="test">体验测试账号</DropdownItem>
-                  <DropdownItem name="resetByMobile">使用手机号重置密码(付费)</DropdownItem>
-                  <DropdownItem name="resetByEmail">使用邮箱重置密码(付费)</DropdownItem>
+                  <DropdownItem name="resetByMobile"
+                    >使用手机号重置密码(付费)</DropdownItem
+                  >
+                  <DropdownItem name="resetByEmail"
+                    >使用邮箱重置密码(付费)</DropdownItem
+                  >
                 </DropdownMenu>
               </Dropdown>
             </Row>
@@ -131,13 +148,13 @@
                 @click="submitLogin"
                 long
               >
-                <span v-if="!loading">{{ $t('login') }}</span>
-                <span v-else>{{ $t('logining') }}</span>
+                <span v-if="!loading">{{ $t("login") }}</span>
+                <span v-else>{{ $t("logining") }}</span>
               </Button>
             </Row>
             <Row type="flex" justify="space-between" class="other-login">
               <div class="other-way icons">
-                {{ $t('otherLogin') }}
+                {{ $t("otherLogin") }}
                 <div class="other-icon" @click="toGithubLogin">
                   <icon scale="1.3" name="brands/github"></icon>
                 </div>
@@ -152,7 +169,7 @@
                 </div>
               </div>
               <router-link to="/regist">
-                <a class="forget-pass">{{ $t('regist') }}</a>
+                <a class="forget-pass">{{ $t("regist") }}</a>
               </router-link>
             </Row>
           </Row>
@@ -170,12 +187,14 @@
         请选择公司所在地区：
         <i-button
           :type="primary ? 'primary' : ''"
-          @click="getWeCode('ww0c31d7c2891ce172', '1000038',1, true)"
-        >北京</i-button>
+          @click="getWeCode('ww0c31d7c2891ce172', '1000038', 1, true)"
+          >北京</i-button
+        >
         <i-button
           :type="primary ? '' : 'primary'"
-          @click="getWeCode('wwaf72994d2eb35329', '1000004',2,false)"
-        >武汉</i-button>
+          @click="getWeCode('wwaf72994d2eb35329', '1000004', 2, false)"
+          >武汉</i-button
+        >
         <!-- <i-button
           :type="primary ? '' : 'primary'"
           @click="getWeCode('ww446591eeb1c9a3d3', '1000003',2,false)"
@@ -547,6 +566,33 @@ export default {
     }
   },
   mounted() {
+   /*  getTicket("/test").then((res) => {
+​    var sha = new Hashes.SHA1;
+​    var str = sha.hex(`jsapi_ticket=O3SMpm8bG7kJnF36aXbe88y2RTXI2Re_jv0cAJa2bLQbnfHQrrOwknCKxvxyprEpEPXUqQIBvZ8jH1sBz3MhIg&noncestr=nFbShhxVTXuVMAft&timestamp=1597738520175&url=http://iemupq.natappfree.cc/login`)
+​    var str1 = sha1(`jsapi_ticket=O3SMpm8bG7kJnF36aXbe88y2RTXI2Re_jv0cAJa2bLQbnfHQrrOwknCKxvxyprEpEPXUqQIBvZ8jH1sBz3MhIg&noncestr=nFbShhxVTXuVMAft&timestamp=1597738520175&url=http://iemupq.natappfree.cc/login`)
+​    this.wx.config({
+​     beta: true, // 必须这么写，否则wx.invoke调用形式的jsapi会有问题
+​     debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+​     appId: "wwdef3f8f98ff3b878", // 必填，企业微信的corpID
+​     timestamp: 1597738520175, // 必填，生成签名的时间戳
+​     nonceStr: 'nFbShhxVTXuVMAft', // 必填，生成签名的随机串
+​     signature: str1, // 必填，签名，见 附录-JS-SDK使用权限签名算法
+​     jsApiList: ['invoke'], // 必填，需要使用的JS接口列表，凡是要调用的接口都需要传进来
+​    });
+​    this.wx.ready(() => {
+​     this.wx.invoke(
+​      "openDefaultBrowser",
+​      {
+​       url: "http://192.168.0.43:8888/login",
+​      },
+​      function (res) {
+​       if (res.err_msg != "openDefaultBrowser:ok") {
+​        //错误处理
+​       }
+​      }
+​     );
+​    })
+  }); */
     this.getWeCode('ww0c31d7c2891ce172', '1000038',1, true);
     this.relatedLogin();
     this.showNotice();

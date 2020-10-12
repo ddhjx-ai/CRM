@@ -273,3 +273,12 @@ export const delChannel = (id) => {
     url: `/osc/block/channel/delete_channel/` + id,
   })
 }
+
+// 生成关键词
+export const getKeywords = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/generate_key`,
+    data: data
+  })
+}

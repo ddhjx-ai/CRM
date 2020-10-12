@@ -84,10 +84,8 @@ export const validateNum = (rule, value, callback) => {
  */
 export const validateSort = (rule, value, callback) => {
   const reg = /^(0|[1-9][0-9]*)$/;
-  if(value === ''){
-    callback();
-  }else if (!reg.test(value)) {
-    callback(new Error('该值不能是小数'))
+  if (!reg.test(value)) {
+    callback(new Error('该值只能为正整数'))
   } else {
     callback();
   }

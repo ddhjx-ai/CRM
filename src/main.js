@@ -28,8 +28,10 @@ import '@babel/polyfill'
 import Print from 'vue-print-nb'
 Vue.use(Print);  //注册
 
-const WwLogin = window.WwLogin
-Vue.prototype.WwLogin = WwLogin
+const WwLogin = window.WwLogin;
+Vue.prototype.WwLogin = WwLogin;
+const wx = window.wx;
+Vue.prototype.wx = wx
 Vue.config.productionTip = false
 Vue.use(VueLazyload, {
     error: require('./assets/img-error.png'),
