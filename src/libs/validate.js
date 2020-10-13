@@ -70,7 +70,7 @@ export const validateNum = (rule, value, callback) => {
   if(value === ''){
     callback();
   }else if (!reg.test(value)) {
-    callback(new Error('请输入大于等于0的数字，并且不能是小数'))
+    callback(new Error('请输入大于等于0的整数'))
   } else {
     callback();
   }
@@ -100,7 +100,7 @@ export const validateSort = (rule, value, callback) => {
 export const validatePrice = (rule, value, callback) => {
   const reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
   if(!reg.test(value)) {
-    callback(new Error('金额必须大于0并且只能精确到分'))
+    callback(new Error('请输入合法的金额'))
   }else {
     callback();
   }

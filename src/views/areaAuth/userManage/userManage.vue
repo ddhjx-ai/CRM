@@ -1,6 +1,6 @@
 <template>
   <div class="app_container">
-      <iframe src="https://crm.chinabidding.cn/admin.chinabidding.managememberareapermissions/index" frameborder="0"></iframe>
+      Sorry, 您没有权限请核实！
   </div>
 </template>
 

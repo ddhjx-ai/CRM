@@ -26,7 +26,7 @@
             </Select>
           </Form-item>
           <Form-item label="到期时间" prop="start">
-            <DatePicker
+            <!-- <DatePicker
               type="date"
               placeholder="起始时间"
               format="yyyy-MM-dd"
@@ -47,7 +47,8 @@
               @on-change="endChange"
               v-model="searchForm.end"
               style="width: 200px"
-            ></DatePicker>
+            ></DatePicker> -->
+            <DatePicker type="daterange" @on-change="dateChange" split-panels style="width: 200px"></DatePicker>
           </Form-item>
           <Form-item style="margin-left:-35px;" class="br">
             <Button @click="handleSearch" type="primary" icon="ios-search">搜索</Button>
@@ -867,22 +868,10 @@ export default {
     handleDetail(v) {},
     // 启用/停用
     handleStop(v) {},
-    startChange(v) {
-      if (new Date(v) > new Date(this.searchForm.end)) {
-        this.$Message.warning("起始时间不能大于结束时间");
-        this.searchForm.start = "";
-        return;
-      }
-      this.searchForm.start = v;
-    },
-    endChange(v) {
-      if (new Date(v) < new Date(this.searchForm.start)) {
-        this.$Message.warning("结束时间不能小于起始时间");
-        this.searchForm.end = "";
-        return;
-      }
-      this.searchForm.end = v;
-    },
+    dateChange(v) {
+      this.searchForm.start = v[0]
+      this.searchForm.end = v[1]
+    }
   },
   mounted() {
     this.init();

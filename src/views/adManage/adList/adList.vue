@@ -3,7 +3,23 @@
 <template>
   <div class="search">
     <Card>
-      <Row class="operation">
+      <Row>
+        <Form ref="searchForm" :model="searchForm" inline :label-width="80" label-position="right">
+          <Form-item label="查询内容" prop="search">
+            <Input
+              type="text"
+              v-model="searchForm.search"
+              placeholder="按名称或者创建人搜索"
+              style="width: 200px"
+            />
+          </Form-item>
+          <Form-item class="operation">
+            <Button @click="handleSearch" type="primary" icon="ios-search">查询</Button>
+            <Button @click="handleReset">重置</Button>
+          </Form-item>
+        </Form>
+      </Row>
+      <Row class="operation" style="margin-bottom: 10px">
         <Button @click="add" type="primary" icon="md-add">添加</Button>
         <Button @click="uploadMaterial" type="primary" icon="md-cloud-upload">上传物料</Button>
         <Button @click="releasePlan" type="primary" icon="md-clipboard">发布计划</Button>
@@ -202,8 +218,7 @@ export default {
         // 搜索框对应data对象
         pageNumber: 1, // 当前页数
         pageSize: 10, // 页面大小
-        sort: "createTime", // 默认排序字段
-        order: "desc", // 默认排序方式
+        search:''
       },
       modalType: 0, // 添加或编辑标识
       modalVisible: false, // 添加或编辑显示
@@ -242,7 +257,7 @@ export default {
       // 表单验证规则
       formValidate: {
         price: [
-          { required: true, message: "价格不能为空", trigger: "blur" },
+          { type:'number',required: true, message: "价格不能为空", trigger: "blur" },
           { validator: validatePrice, trigger: "blur" },
         ],
         amount: [
@@ -285,26 +300,32 @@ export default {
           title: "ID",
           key: "id",
           width: 100,
+          align: "center",
         },
         {
           title: "名称",
           key: "1",
+          align: "center",
         },
         {
           title: "链接地址",
           key: "2",
+          align: "center",
         },
         {
           title: "物料文件名",
           key: "3",
+          align: "center",
         },
         {
           title: "是否删除",
           key: "4",
+          align: "center",
         },
         {
           title: "类型",
           key: "5",
+          align: "center",
         },
         {
           title: "操作",
@@ -318,7 +339,6 @@ export default {
                   props: {
                     type: "primary",
                     size: "small",
-                    icon: "ios-create-outline",
                   },
                   style: {
                     marginRight: "5px",
@@ -331,7 +351,7 @@ export default {
                 },
                 "编辑"
               ),
-              h(
+              /* h(
                 "Button",
                 {
                   props: {
@@ -346,7 +366,7 @@ export default {
                   },
                 },
                 "删除"
-              ),
+              ), */
             ]);
           },
         },
@@ -752,6 +772,17 @@ export default {
           this.clearSelectAll();
           this.getDataList();
         },
+        // 查询
+    handleSearch() {
+      this.searchForm.page = 1
+      this.searchForm.size = 10
+    },
+    // 重置
+    handleReset() {
+      this.searchForm.page = 1
+      this.searchForm.size = 10
+      this.$refs.searchForm.resetFields();
+    }
       });
     },
   },

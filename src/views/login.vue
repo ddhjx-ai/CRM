@@ -563,9 +563,20 @@ export default {
         state: new Date().getTime(),
         href: "",
       });
+    },
+    getOpenFun() {
+        let ua = window.navigator.userAgent.toLowerCase();
+        if(ua.match(/MicroMessenger/i)&&!ua.match(/wxwork/i)){
+            return 'microMessenger'
+        }else if(ua.match(/MicroMessenger/i)&&ua.match(/wxwork/i)){
+            return 'wxwork'
+        }else{
+            return 'other'
+        }
     }
   },
   mounted() {
+    console.log(this.getOpenFun())
    /*  getTicket("/test").then((res) => {
 ​    var sha = new Hashes.SHA1;
 ​    var str = sha.hex(`jsapi_ticket=O3SMpm8bG7kJnF36aXbe88y2RTXI2Re_jv0cAJa2bLQbnfHQrrOwknCKxvxyprEpEPXUqQIBvZ8jH1sBz3MhIg&noncestr=nFbShhxVTXuVMAft&timestamp=1597738520175&url=http://iemupq.natappfree.cc/login`)

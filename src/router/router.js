@@ -115,7 +115,7 @@ export const otherRouter = {
 
         { path: 'subjectManage/blocksManage', title: '模块管理', name: 'blocksManage', component: () => import('@/views/subjectManage/blocksManage/blocksManage.vue') },
         { path: 'subjectManage/channelPreview', title: '频道预览', name: 'channelPreview', component: () => import('@/views/subjectManage/channelPreview/channelPreview.vue') },
-        // {path: 'adAllList', title: '业主广告列表', name: 'adAllList-index', component: () => import("@/views/adManage/userList/adAllList.vue")},
+        {path: 'adAllList', title: '业主广告列表', name: 'adAllList-index', component: () => import("@/views/adManage/userList/adAllList.vue")},
         // { path: 'subjectManage/channelManage', title: '频道管理', name: 'channelManage', component: () => import('@/views/subjectManage/channelManage/channelManage.vue') },
     ]
 };

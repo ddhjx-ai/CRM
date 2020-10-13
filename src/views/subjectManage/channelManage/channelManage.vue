@@ -198,7 +198,7 @@ export default {
                 },
                 "编辑"
               ),
-              h(
+              /* h(
                 "Button",
                 {
                   props: {
@@ -215,7 +215,7 @@ export default {
                   },
                 },
                 "预览"
-              ),
+              ), */
               h(
                 "Button",
                 {

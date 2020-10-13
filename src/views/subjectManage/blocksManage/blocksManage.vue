@@ -384,13 +384,25 @@
               </Row>
               <Row>
                 <Col span="19">
-                  <FormItem label="关键词" prop="keywords" style="width: 100%">
+                  <FormItem label="关键词" style="width: 100%">
                     <!-- <Input
                       type="text"
                       v-model="newModalForm.keywords"
                       readonly
                     ></Input> -->
                     <span>{{newModalForm.keywords}}</span>
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <FormItem label="blockId" style="width: 100%">
+                    <!-- <Input
+                      type="text"
+                      v-model="newModalForm.keywords"
+                      readonly
+                    ></Input> -->
+                    <span>{{newBlockId}}</span>
                   </FormItem>
                 </Col>
               </Row>
@@ -518,13 +530,15 @@
               </Row>
               <Row>
                 <Col span="19">
-                  <FormItem label="关键词" prop="keywords" style="width: 100%">
-                    <!-- <Input
-                      type="text"
-                      v-model="downloadModalForm.keywords"
-                      readonly
-                    ></Input> -->
+                  <FormItem label="关键词" style="width: 100%">
                     <span>{{downloadModalForm.keywords}}</span>
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col>
+                  <FormItem label="blockId" style="width: 100%">
+                    <span>{{downloadBlockId}}</span>
                   </FormItem>
                 </Col>
               </Row>
@@ -1217,6 +1231,11 @@ export default {
           align: "center",
         },
         {
+          title: "blockId",
+          key: "blocks_id",
+          align: "center",
+        },
+        {
           title: "操作",
           key: "action",
           align: "center",
@@ -1309,6 +1328,11 @@ export default {
         {
           title: "name",
           key: "name",
+          align: "center",
+        },
+        {
+          title: "blockId",
+          key: "content_block_id",
           align: "center",
         },
         {
