@@ -208,7 +208,6 @@ export default {
               name: this.form.name,
               alias: this.form.alias
             }
-            console.log(data)
             postCrmRequest("/website/sites/update/" + this.updateId, qs.stringify(data)).then(res => {
               this.submitLoading = false;
               if (res.success) {

@@ -1,51 +1,58 @@
 <style lang="less">
+@import "./planList.less";
 </style>
 <template>
   <div class="search">
     <Card>
       <Row>
-        <Form ref="searchForm" :model="searchForm" inline :label-width="80" label-position="right">
-          <Form-item label="查询内容" prop="search">
+        <Form
+          ref="searchForm"
+          :model="searchForm"
+          inline
+          :label-width="80"
+          label-position="right"
+        >
+          <Form-item label="快速查找" prop="search">
             <Input
               type="text"
               v-model="searchForm.search"
-              placeholder="按名称或者创建人搜索"
-              style="width: 200px"
+              placeholder="按名称、广告位、广告查找"
+              style="width: 260px"
             />
           </Form-item>
           <Form-item class="operation">
-            <Button @click="handleSearch" type="primary" icon="ios-search">查询</Button>
+            <Button @click="handleSearch" type="primary" icon="ios-search"
+              >查询</Button
+            >
             <Button @click="handleReset">重置</Button>
           </Form-item>
         </Form>
       </Row>
       <Row class="operation" style="margin-bottom: 10px">
         <Button @click="add" type="primary" icon="md-add">添加</Button>
-        <Button @click="endPlan" type="primary" icon="ios-power">结束</Button>
-        <Button @click="releasePlan" type="primary" icon="md-refresh-circle">重发</Button>
-        <Button @click="addAd" type="primary" icon="ios-create-outline">编辑广告</Button>
+        <Button @click="endPlan" type="primary">结束</Button>
+        <Button @click="releasePlan" type="primary">重发</Button>
+        <!-- <Button @click="addAd" type="primary" icon="ios-create-outline">编辑广告</Button> -->
         <Button @click="getDataList" icon="md-refresh">刷新</Button>
       </Row>
       <Row>
         <Table
           :loading="loading"
           border
-          :columns="dynamicColums"
+          :columns="columns"
           :data="data"
           ref="table"
-          sortable="custom"
-          @on-sort-change="changeSort"
           @on-selection-change="changeSelect"
         ></Table>
       </Row>
       <Row type="flex" justify="end" class="page">
         <Page
-          :current="searchForm.pageNumber"
+          :current="searchForm.page"
           :total="total"
-          :page-size="searchForm.pageSize"
+          :page-size="searchForm.size"
           @on-change="changePage"
-          @on-page-size-change="changePageSize"
-          :page-size-opts="[10,20,50]"
+          @on-page-size-change="changesize"
+          :page-size-opts="[10, 20, 50]"
           size="small"
           show-total
           show-elevator
@@ -55,65 +62,135 @@
     </Card>
 
     <!-- -->
-    <Modal :title="modalTitle" v-model="modalVisible" :mask-closable="false" :width="500">
-      <Form ref="form" :model="form" :label-width="80" :rules="formValidate">
-        <FormItem label="登录名">
-          <Input v-model="form.loginName" />
+    <Modal
+      :title="modalTitle"
+      v-model="modalVisible"
+      :mask-closable="false"
+      :width="600"
+      @on-visible-change="modelCancel"
+    >
+      <Form ref="form" :model="form" :label-width="90" :rules="formValidate">
+        <FormItem label="登录名" prop="name">
+          <Input v-model="form.name" />
         </FormItem>
-        <FormItem label="广告">
-          <i-select v-model="form.advertisement">
-            <i-option v-for="item in adList" :key="item" :value="item.value">{{item.label}}</i-option>
-          </i-select>
+        <FormItem label="广告" prop="guanggaoId">
+          <Select v-model="form.guanggaoId">
+            <Option v-for="item in adList" :key="item.id" :value="item.id">{{
+              item.name
+            }}</Option>
+          </Select>
         </FormItem>
-        <FormItem label="关键字">
-          <Input v-model="form.keyWords" />
+        <FormItem label="关键字" prop="keywords">
+          <Input v-model="form.keywords" />
         </FormItem>
-        <FormItem label="开始时间" prop="startTime">
+        <FormItem label="开始时间" prop="startDate">
           <Date-picker
             type="date"
-            v-model="form.startTime"
+            v-model="form.startDate"
             format="yyyy-MM-dd"
+            @on-change="startChange"
             placeholder="选择时间"
           ></Date-picker>
         </FormItem>
-        <FormItem label="结束时间" prop="endTime">
+        <FormItem label="结束时间" prop="endDate">
           <Date-picker
             type="date"
-            v-model="form.endTime"
+            v-model="form.endDate"
             format="yyyy-MM-dd"
             placeholder="选择时间"
-            width="100%"
+            @on-change="endChange"
           ></Date-picker>
         </FormItem>
-        <FormItem label="状态">
-          <i-select v-model="form.status" >
-            <i-option value="disabled">disabled</i-option>
-            <i-option value="active">active</i-option>
-            <i-option value="stop">stop</i-option>
-            <i-option value="bill">bill</i-option>
-          </i-select>
+        <FormItem label="状态" prop="state">
+          <Select v-model="form.state">
+            <Option :value="0">disabled</Option>
+            <Option :value="1">active</Option>
+            <Option :value="2">stop</Option>
+            <Option :value="3">bill</Option>
+          </Select>
         </FormItem>
-        <FormItem label="排序字段">
-          <Input v-model="form.sort" />
+        <FormItem label="排序字段" number prop="sortId">
+          <Input v-model="form.sortId" />
         </FormItem>
         <FormItem label="金额" prop="amount">
-          <Input v-model="form.amount"  />
+          <Input v-model="form.amount" number />
         </FormItem>
-        <FormItem label="广告位">
-          <Input v-model="form.adSpace" />
-        </FormItem>
+        <Row type="flex" :gutter="10">
+          <Col :span="10">
+            <FormItem label="广告位" prop="channelId">
+              <Select
+                v-model="form.channelId"
+                @on-change="selectChange1"
+                placeholder="请选择"
+              >
+                <Option
+                  v-for="item in channelList"
+                  :key="item.id"
+                  :value="item.id"
+                  >{{ item.alias }}</Option
+                >
+              </Select>
+            </FormItem>
+          </Col>
+          <Col :span="7" v-show="pageListFlag">
+            <FormItem class="leftBtnForm" prop="pageId">
+              <Select
+                v-model="form.pageId"
+                @on-change="selectChange2"
+                placeholder="请选择页面"
+              >
+                <Option
+                  v-for="item in pageList"
+                  :key="item.id"
+                  :value="item.id"
+                  >{{ item.alias }}</Option
+                >
+              </Select>
+            </FormItem>
+          </Col>
+          <Col :span="7" v-show="ggwListFlag">
+            <FormItem class="leftBtnForm" prop="guanggaoweiId">
+              <Select
+                v-model="form.guanggaoweiId"
+                @on-change="selectChange3"
+                :placeholder="
+                  ggwList.length > 0 ? '请选择广告位' : '该页面没有广告位'
+                "
+              >
+                <Option
+                  v-for="item in ggwList"
+                  :key="item.id"
+                  :value="item.id"
+                  >{{ item.alias }}</Option
+                >
+              </Select>
+            </FormItem>
+          </Col>
+        </Row>
       </Form>
       <div slot="footer">
         <Button type="text" @click="handleCancel">取消</Button>
-        <Button type="primary" :loading="submitLoading" @click="handleSubmit">提交</Button>
+        <Button type="primary" :loading="submitLoading" @click="handleSubmit"
+          >提交</Button
+        >
       </div>
     </Modal>
 
     <!-- 编辑广告弹出框 -->
-    <Modal title="编辑广告" v-model="adVisible" :mask-closable="false" :width="500">
-      <Form ref="adForm" :model="adForm" :label-width="80" :rules="formValidate">
-        <FormItem label="登录名">
-          <Input v-model="adForm.loginName" />
+    <Modal
+      title="编辑广告"
+      v-model="adVisible"
+      :mask-closable="false"
+      :width="600"
+    >
+      <Form
+        ref="adForm"
+        :model="adForm"
+        :label-width="80"
+        :rules="formValidate"
+      >
+        <FormItem label="登录名" prop="name">
+          <Input v-model="adForm.name" />
         </FormItem>
         <FormItem label="别名">
           <Input v-model="adForm.alias" />
@@ -122,9 +199,11 @@
           <Input v-model="adForm.title" />
         </FormItem>
         <FormItem label="业主">
-          <i-select v-model="form.owner">
-            <i-option v-for="item in ownerList" :key="item" :value="item.value">{{item.label}}</i-option>
-          </i-select>
+          <Select v-model="form.owner">
+            <Option v-for="item in ownerList" :key="item" :value="item.value">{{
+              item.label
+            }}</Option>
+          </Select>
         </FormItem>
         <FormItem label="链接地址">
           <Input v-model="adForm.linkUrl" />
@@ -136,70 +215,62 @@
           </RadioGroup>
         </FormItem>
         <FormItem label="文件类型">
-          <i-select v-model="adForm.fileType" >
-            <i-option value="word">word</i-option>
-            <i-option value="swf">swf</i-option>
-            <i-option value="flv">flv</i-option>
-            <i-option value="bmp">bmp</i-option>
-            <i-option value="gif">gif</i-option>
-            <i-option value="jpg">jpg</i-option>
-            <i-option value="png">png</i-option>
-            <i-option value="other">other</i-option>
-          </i-select>
+          <Select v-model="adForm.fileType">
+            <Option value="word">word</Option>
+            <Option value="swf">swf</Option>
+            <Option value="flv">flv</Option>
+            <Option value="bmp">bmp</Option>
+            <Option value="gif">gif</Option>
+            <Option value="jpg">jpg</Option>
+            <Option value="png">png</Option>
+            <Option value="other">other</Option>
+          </Select>
         </FormItem>
         <FormItem label="宽度">
-          <Input v-model="adForm.width"  />
+          <Input v-model="adForm.width" />
         </FormItem>
         <FormItem label="高度">
-          <Input v-model="adForm.height"  />
+          <Input v-model="adForm.height" />
         </FormItem>
         <FormItem label="活动描述">
-          <Input v-model="adForm.describe" placeholder="请输入..." type="textarea" />
+          <Input
+            v-model="adForm.describe"
+            placeholder="请输入..."
+            type="textarea"
+          />
         </FormItem>
       </Form>
       <div slot="footer">
         <Button type="text" @click="adCancel">取消</Button>
-        <Button type="primary" :loading="submitLoading" @click="adSubmit">提交</Button>
+        <Button type="primary" :loading="submitLoading" @click="adSubmit"
+          >提交</Button
+        >
       </div>
     </Modal>
   </div>
 </template>
 
 <script>
-import { getCrmRequest, removeCrm } from "@/api/crm";
-import { validatePrice } from "@/libs/validate";
-import axios from "axios";
+import { getCrmRequest, deleteCrm, postCrmRequest } from "@/api/crm";
+import { validatePrice, validateNum } from "@/libs/validate";
 import qs from "qs";
 export default {
   name: "planList",
   data() {
     return {
-      adList: [
-        {value: '1', label: '北京城市景观研究院国内知名设计院'},
-        {value: '2', label: '福建省水利水电勘测设计研究院'},
-        {value: '3', label: '广西壮族自治区交通规划勘'},
-        {value: '5', label: '贵州乌江水电开发有限责任公司'},
-        {value: '6', label: '北京万科'},
-        {value: '8', label: '贵港港务总公司'},
-        {value: '11', label: '上海瑞惠'},
-        {value: '12', label: '西门子（中国）有限公司'},
-      ],
-      ownerList: [
-        { value: "1", label: "hhh" },
-        { value: "2", label: "zhangnan" },
-        { value: "3", label: "zxc" },
-        { value: "4", label: "特价机票" },
-        { value: "5", label: "swb" },
-        { value: "6", label: "补数据" },
-        { value: "7", label: "百度推广" },
-        { value: "9", label: "宝胜电缆" },
-      ],
-      loading: true, // 表单加载状态
+      pageListFlag: false,
+      ggwListFlag: false,
+      channelList: [],
+      pageList: [],
+      ggwList: [],
+      adList: [],
+      ownerList: [],
+      loading: false, // 表单加载状态
       searchForm: {
         // 搜索框对应data对象
-        pageNumber: 1, // 当前页数
-        pageSize: 10, // 页面大小
-        search:'',
+        page: 1, // 当前页数
+        size: 10, // 页面大小
+        search: "",
       },
       modalType: 0, // 添加或编辑标识
       modalVisible: false, // 添加或编辑显示
@@ -207,21 +278,25 @@ export default {
       adVisible: false, // 广告弹出框
       form: {
         // 添加或编辑表单对象初始化数据
-        loginName: "",
-        advertisement: '',
-        keyWords: '',
-        startTiem: '',
-        endTime: '',
-        status: '',
-        sort: '',
-        amount: '',
-        adSpace: ''
+        name: "",
+        keywords: "",
+        sortId: 0,
+        startDate: "",
+        endDate: "",
+        startUseDate: "",
+        endUseDate: "",
+        state: 1,
+        amount: 0,
+        guanggaoId: "",
+        guanggaoweiId: "",
+        channelId: "",
+        pageId: "",
       },
       adForm: {
         loginName: "",
-        owner: '',
-        title: '',
-        alias: '',
+        owner: "",
+        title: "",
+        alias: "",
         linkUrl: "",
         isUse: 0,
         fileType: "",
@@ -236,101 +311,134 @@ export default {
           { validator: validatePrice, trigger: "blur" },
         ],
         amount: [
-          { required: true, message: "金额不能为空", trigger: "blur" },
+          {
+            type: "number",
+            required: true,
+            message: "请输入合法的金额",
+            trigger: "blur",
+          },
           { validator: validatePrice, trigger: "blur" },
         ],
         owner: [{ required: true, message: "请选择一个业主", trigger: "blur" }],
-        startTime: [
+        startDate: [
           {
-            required: true,
             type: "date",
+            required: true,
             message: "请选择日期",
             trigger: "change",
           },
         ],
-        endTime: [
+        endDate: [
           {
-            required: true,
             type: "date",
+            required: true,
             message: "请选择日期",
             trigger: "change",
           },
         ],
+        sortId: [{ validator: validateNum, trigger: "blur" }],
       },
       submitLoading: false, // 添加或编辑提交状态
       selectList: [], // 多选数据
       selectCount: 0, // 多选计数
-      // 表格动态列 默认勾选显示的列的key
-      columnSettings: ["name", "sex", "createTime", "updateTime"],
-      // 不能配置的列（不显示）
-      whiteColumns: ["action"],
       columns: [
         // 表头
         {
           type: "selection",
           width: 60,
           align: "center",
+          fixed: "left",
         },
         {
           title: "ID",
           key: "id",
           width: 100,
-          align: "center"
+          align: "center",
+          fixed: "left",
         },
         {
           title: "名称",
-          key: "1",
+          key: "name",
           align: "center",
+          minWidth: 180,
         },
         {
           title: "广告位",
-          key: "2",
+          key: "guanggaoweiName",
           align: "center",
+          minWidth: 150,
         },
         {
           title: "广告位页面",
-          key: "3",
+          key: "pageAlias",
           align: "center",
+          minWidth: 150,
         },
         {
           title: "广告",
-          key: "4",
+          key: "guanggaoName",
           align: "center",
+          minWidth: 180,
         },
         {
           title: "开始时间",
-          key: "5",
+          key: "startDate",
           align: "center",
+          minWidth: 120,
+          render: (h, params) => {
+            return h("div", {}, this.formdate(params.row.startDate));
+          },
         },
         {
           title: "结束时间",
-          key: "6",
+          key: "endDate",
           align: "center",
+          minWidth: 120,
+          render: (h, params) => {
+            return h("div", {}, this.formdate(params.row.endDate));
+          },
         },
         {
           title: "广告小计",
-          key: "7",
+          key: "payable",
           align: "center",
+          width: 100,
         },
         {
           title: "状态",
-          key: "8",
+          key: "state",
           align: "center",
+          width: 100,
+          render: (h, params) => {
+            if (params.row.state == 0) {
+              return h("div", {}, "disabled");
+            } else if (params.row.state == 1) {
+              return h("div", {}, "active");
+            } else if (params.row.state == 2) {
+              return h("div", {}, "stop");
+            } else {
+              return h("div", {}, "bill");
+            }
+          },
         },
         {
           title: "排序字段",
-          key: "9",
+          key: "sortId",
           align: "center",
+          width: 100,
         },
         {
           title: "广告金额",
-          key: "10",
+          key: "amount",
           align: "center",
+          width: 100,
         },
         {
           title: "操作",
           key: "action",
           align: "center",
+          width: 150,
+          fixed: "right",
           render: (h, params) => {
             return h("div", [
               h(
@@ -351,13 +459,12 @@ export default {
                 },
                 "编辑"
               ),
-              /* h(
+              h(
                 "Button",
                 {
                   props: {
                     type: "error",
                     size: "small",
-                    icon: "md-trash",
                   },
                   on: {
                     click: () => {
@@ -366,298 +473,137 @@ export default {
                   },
                 },
                 "删除"
-              ), */
+              ),
             ]);
           },
         },
       ],
-      columnChange: false,
       data: [], // 表单数据
       total: 0, // 表单数据总数
-      dataList: {
-        page: 1,
-        total: 2019,
-        rows: [
-          {
-            id: 9617152,
-            cell: [
-              "9617152",
-              "<a href='javascript:edit_fbjh(9617152)'>招标信息-客服兑换—C1东雪天隆</a> ",
-              "zbxxIndexAd-c1 ",
-              "招标信息页广告 ",
-              "<a href='javascript:edit_guanggao(6235904)'>招标信息-客服兑换—C1东雪天隆</a> ",
-              "2020-04-27 00:00:00.0 ",
-              "2020-06-26 00:00:00.0 ",
-              "0 ",
-              "active ",
-              "0 ",
-              "1 ",
-            ],
-          },
-          {
-            id: 9599232,
-            cell: [
-              "9599232",
-              "<a href='javascript:edit_fbjh(9599232)'>会员赠送—日上电缆</a> ",
-              "zbxxIndexAd-b4 ",
-              "招标信息页广告 ",
-              "<a href='javascript:edit_guanggao(3590400)'>会员赠送—日上电缆</a> ",
-              "2020-07-14 00:00:00.0 ",
-              "2020-08-13 00:00:00.0 ",
-              "0 ",
-              "active ",
-              "0 ",
-              "13 ",
-            ],
-          },
-          {
-            id: 9592192,
-            cell: [
-              "9592192",
-              "<a href='javascript:edit_fbjh(9592192)'>招标信息-太阳能-C3</a> ",
-              "zbxxIndexAd-c3 ",
-              "招标信息页广告 ",
-              "<a href='javascript:edit_guanggao(6013056)'>招标信息-客服兑换</a> ",
-              "2020-03-23 00:00:00.0 ",
-              "2020-06-15 16:52:52.0 ",
-              "84 ",
-              "disabled ",
-              "0 ",
-              "1 ",
-            ],
-          },
-          {
-            id: 9537408,
-            cell: [
-              "9537408",
-              "<a href='javascript:edit_fbjh(9537408)'>中瑞</a> ",
-              "searchgj-right-A2 ",
-              "高级搜索 ",
-              "<a href='javascript:edit_guanggao(3936128)'>高级搜索—中瑞</a> ",
-              "2020-06-17 14:22:46.0 ",
-              "2020-07-24 09:21:30.0 ",
-              "36 ",
-              "disabled ",
-              "0 ",
-              " ",
-            ],
-          },
-          {
-            id: 8990208,
-            cell: [
-              "8990208",
-              "<a href='javascript:edit_fbjh(8990208)'>首页—成都青冶—丁金玉赠送b1</a> ",
-              "index4ad-b1 ",
-              "首页4广告 ",
-              "<a href='javascript:edit_guanggao(6985984)'>首页—成都青冶—丁金玉赠送</a> ",
-              "2020-04-14 00:00:00.0 ",
-              "2020-05-13 00:00:00.0 ",
-              "0 ",
-              "active ",
-              "0 ",
-              "3 ",
-            ],
-          },
-          {
-            id: 8691584,
-            cell: [
-              "8691584",
-              "<a href='javascript:edit_fbjh(8691584)'>index4ad-top免费查看疫情相关招标</a> ",
-              "index4ad-top ",
-              "首页4广告 ",
-              "<a href='javascript:edit_guanggao(9300608)'>index4ad-top免费查看疫情相关招标</a> ",
-              "2019-11-20 00:00:00.0 ",
-              "2020-12-20 00:00:00.0 ",
-              "0 ",
-              "active ",
-              "0 ",
-              "0 ",
-            ],
-          },
-          {
-            id: 8647040,
-            cell: [
-              "8647040",
-              "<a href='javascript:edit_fbjh(8647040)'>招标信息-客服兑换-C2</a> ",
-              "zbxxIndexAd-c2 ",
-              "招标信息页广告 ",
-              "<a href='javascript:edit_guanggao(6013056)'>招标信息-客服兑换</a> ",
-              "2020-03-23 00:00:00.0 ",
-              "2020-07-22 00:00:00.0 ",
-              "0 ",
-              "stop ",
-              "0 ",
-              "0 ",
-            ],
-          },
-          {
-            id: 8554752,
-            cell: [
-              "8554752",
-              "<a href='javascript:edit_fbjh(8554752)'>招标信息-客服兑换</a> ",
-              "zbxxIndexAd-b3 ",
-              "招标信息页广告 ",
-              "<a href='javascript:edit_guanggao(6013056)'>招标信息-客服兑换</a> ",
-              "2020-03-23 00:00:00.0 ",
-              "2020-07-22 00:00:00.0 ",
-              "0 ",
-              "active ",
-              "0 ",
-              "0 ",
-            ],
-          },
-          {
-            id: 8464896,
-            cell: [
-              "8464896",
-              "<a href='javascript:edit_fbjh(8464896)'>招标信息页-3A-齐鑫-B1</a> ",
-              "zbxxIndexAd-b1 ",
-              "招标信息页广告 ",
-              "<a href='javascript:edit_guanggao(9111680)'>招标信息页-3A-齐鑫</a> ",
-              "2019-11-29 00:00:00.0 ",
-              "2020-05-29 00:00:00.0 ",
-              "0 ",
-              "active ",
-              "0 ",
-              "1 ",
-            ],
-          }
-        ],
-      },
+      updateId: "",
     };
   },
   // 表格动态列 计算属性
-  computed: {
-    dynamicColums: function () {
-      this.columnChange;
-      return this.columns.filter((item) => item.hide != true);
-    },
-  },
+  computed: {},
   methods: {
-    getListData() {
-      var params = qs.stringify({
-        page: 1,
-        rp: 10,
-        sortname: "id",
-        sortorder: "desc",
-        query: "",
-        qtype: "",
-        area: "",
-        year: "",
-        date_select: "",
-        assigned_select: "",
-        categoryid: "",
-        book_type: "",
-        agency_type: "",
-        agency_kind: "",
-      });
-      getCrmRequest("/ad.FaBuJiHuas/getList", params);
-    },
     init() {
       this.getDataList();
-    },
-    changeColumns(v) {
-      this.columns.map((item) => {
-        let hide = true;
-        for (let i = 0; i < v.length; i++) {
-          if (!item.key) {
-            hide = false;
-            break;
-          }
-          if (item.key == v[i] || item.key.indexOf(this.whiteColumns) > -1) {
-            hide = false;
-            break;
-          }
-        }
-        item.hide = hide;
-        return item;
-      });
-      // 触发计算方法
-      this.columnChange = !this.columnChange;
-    },
-    changePage(v) {
-      this.searchForm.pageNumber = v;
-      this.getDataList();
-      this.clearSelectAll();
-    },
-    changePageSize(v) {
-      this.searchForm.pageSize = v;
-      this.getDataList();
-    },
-    changeSort(e) {
-      this.searchForm.sort = e.key;
-      this.searchForm.order = e.order;
-      if (e.order == "normal") {
-        this.searchForm.order = "";
-      }
-      this.getDataList();
+      this.getGGList();
+      this.getChannelList();
     },
     getDataList() {
       this.loading = true;
       // 请求后端获取表单数据 请自行修改接口
-      // this.getRequest("请求路径", this.searchForm).then(res => {
-      //   this.loading = false;
-      //   if (res.success) {
-      //     this.data = res.result.content;
-      //     this.total = res.result.totalElements;
-      //   }
-      // });
-      // 以下为模拟数据 "<a href='javascript:edit_ggw(2377)'>cgxxIndexAd-b5-lb</a> "
-      let list = this.dataList.rows;
-      this.data = list.map((item) => {
-        item.cell[4] = item.cell[4].replace(
-          /<a[\s\S]*>([\s\S]*)<\/[\s\S]*>/g,
-          "$1"
-        );
-        item.cell[1] = item.cell[1].replace(
-          /<a[\s\S]*>([\s\S]*)<\/[\s\S]*>/g,
-          "$1"
-        )
-        item = { ...item.cell, id: item.id };
-        return item;
+      getCrmRequest("/ad/fbjh/list", this.searchForm).then((res) => {
+        this.loading = false;
+        if (res.success) {
+          this.loading = false;
+          this.data = res.result.list;
+          this.total = res.result.total;
+        }
       });
-      this.total = this.data.length;
-      this.loading = false;
+    },
+    // 获取广告下拉列表
+    getGGList() {
+      getCrmRequest("/ad/fbjh/gg_list").then((res) => {
+        if (res.success) {
+          this.adList = res.result;
+        }
+      });
+    },
+    // 获取下拉列表channel
+    getChannelList() {
+      getCrmRequest("/ad/fbjh/channel_list").then((res) => {
+        if (res.success) {
+          this.channelList = res.result;
+        }
+      });
+    },
+    // 获取下拉列表page
+    getPageList(id, otherId) {
+      getCrmRequest("/ad/fbjh/page_list", { channelId: id }).then((res) => {
+        if (res.success) {
+          this.pageList = res.result;
+          if (otherId) {
+            this.form.pageId = otherId;
+          }
+        }
+      });
+    },
+    // 获取下拉列表广告位ggw
+    getGGWList(id, otherId) {
+      getCrmRequest("/ad/fbjh/ggw_list", { pageId: id }).then((res) => {
+        if (res.success) {
+          this.ggwList = res.result;
+          if (otherId) {
+            this.form.guanggaoweiId = otherId;
+          }
+        }
+      });
+    },
+    // 时间处理函数
+    formdate(date) {
+      if (!date) {
+        return "-";
+      }
+      let time = new Date(date);
+      let year = time.getFullYear();
+      let month = (time.getMonth() + 1).toString().padStart(2, "0");
+      let day = time.getDate().toString().padStart(2, "0");
+      let hour = time.getHours().toString().padStart(2, "0");
+      let minute = time.getMinutes().toString().padStart(2, "0");
+      let second = time.getSeconds().toString().padStart(2, "0");
+      return `${year}-${month}-${day} ${hour}:${minute}`;
+    },
+    changePage(v) {
+      this.searchForm.page = v;
+      this.getDataList();
+      this.clearSelectAll();
+    },
+    changesize(v) {
+      this.searchForm.size = v;
+      this.getDataList();
     },
     handleCancel() {
       this.modalVisible = false;
     },
     handleSubmit() {
-      console.log(this.form);
+      let data = {
+        name: this.form.name,
+        keywords: this.form.keywords,
+        sortId: this.form.sortId,
+        startDate: this.form.startUseDate,
+        endDate: this.form.endUseDate,
+        state: this.form.state,
+        amount: this.form.amount,
+        guanggaoId: this.form.guanggaoId,
+        guanggaoweiId: this.form.guanggaoweiId,
+      };
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.submitLoading = true;
           if (this.modalType == 0) {
-            // 添加 避免编辑后传入id等数据 记得删除
-            delete this.form.id;
-            // this.postRequest("请求地址", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟请求成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.getDataList();
-            this.modalVisible = false;
+            // 添加
+            postCrmRequest("/ad/fbjh/add", data).then((res) => {
+              this.submitLoading = false;
+              if (res.success) {
+                this.$Message.success("添加成功");
+                this.getDataList();
+                this.modalVisible = false;
+              }
+            });
           } else {
             // 编辑
-            // this.postRequest("请求地址", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟请求成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.getDataList();
-            this.modalVisible = false;
+            postCrmRequest("/ad/fbjh/update/" + this.updateId, data).then(
+              (res) => {
+                this.submitLoading = false;
+                if (res.success) {
+                  this.$Message.success("编辑成功");
+                  this.getDataList();
+                  this.modalVisible = false;
+                }
+              }
+            );
           }
         }
       });
@@ -666,51 +612,40 @@ export default {
       this.modalType = 0;
       this.modalTitle = "添加";
       this.$refs.form.resetFields();
-      delete this.form.id;
+      this.pageListFlag = false;
+      this.ggwListFlag = false;
       this.modalVisible = true;
     },
     edit(v) {
       this.modalType = 1;
       this.modalTitle = "编辑";
-      this.$refs.form.resetFields();
-      var currentData = this.data.find((item) => {
-        return item.id == v.id;
-      });
-      this.form.loginName = currentData["1"];
-
+      this.pageListFlag = true;
+      this.ggwListFlag = true;
+      this.updateId = v.id;
+      this.getPageList(v.channelId, v.pageId);
+      this.getGGWList(v.pageId, v.guanggaoweiId);
       // 转换null为""
-      /* for (let attr in v) {
+      for (let attr in v) {
         if (v[attr] == null) {
           v[attr] = "";
         }
       }
       let str = JSON.stringify(v);
       let data = JSON.parse(str);
-      this.form = data; */
+      this.form = data;
+      this.form.startUseDate = this.formdate(this.form.startDate).slice(0, 10);
+      this.form.endUseDate = this.formdate(this.form.endDate).slice(0, 10);
       this.modalVisible = true;
     },
     remove(v) {
-      console.log(v);
       this.$Modal.confirm({
         title: "确认删除",
         // 记得确认修改此处
-        content: "您确认要删除 " + v["1"] + " ?",
+        content: "您确认要删除 " + v.name + " ?",
         loading: true,
         onOk: () => {
           // 删除
-          // this.deleteRequest("请求地址，如/deleteByIds/" + v.id).then(res => {
-          //   this.$Modal.remove();
-          //   if (res.success) {
-          //     this.$Message.success("操作成功");
-          //     this.getDataList();
-          //   }
-          // });
-          // 模拟请求成功
-          // this.$Message.success("操作成功");
-          // this.$Modal.remove();
-          // this.getDataList();
-          var params = qs.stringify({ id: v.id });
-          removeCrm("/ad.GuangGaos/delete", params).then((res) => {
+          deleteCrm("/ad/fbjh/delete/" + v.id).then((res) => {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("操作成功");
@@ -720,8 +655,31 @@ export default {
         },
       });
     },
+    selectChange1(v) {
+      this.pageList = [];
+      this.ggwList = [];
+      this.form.pageId = "";
+      this.form.guanggaoweiId = "";
+      this.pageListFlag = true;
+      this.ggwListFlag = false;
+      this.getPageList(v);
+    },
+    selectChange2(v) {
+      if (v === undefined) {
+        return;
+      }
+      this.ggwList = [];
+      this.form.guanggaoweiId = "";
+      this.ggwListFlag = true;
+      this.getGGWList(v);
+    },
+    selectChange3(v) {
+      /* console.log(v);
+      console.log(this.form.guanggaoweiId); */
+    },
     // 发布计划出账
     releasePlan() {
+      return;
       if (this.selectCount <= 0) {
         this.$Message.warning("请选择一条数据");
         return;
@@ -730,13 +688,12 @@ export default {
         return;
       }
       var id = this.selectList[0].id;
-      getCrmRequest(
-        "/ad.FaBuJiHuas/chuzhang",
-        qs.stringify({ yzId: id })
-      ).then(() => {
-        this.$Message.success("操作成功");
-        this.getDataList();
-      });
+      getCrmRequest("/ad.FaBuJiHuas/chuzhang", qs.stringify({ yzId: id })).then(
+        () => {
+          this.$Message.success("操作成功");
+          this.getDataList();
+        }
+      );
     },
     // 结束所有发布计划
     endPlan() {
@@ -748,12 +705,20 @@ export default {
         return;
       }
       var id = this.selectList[0].id;
-      getCrmRequest(
-        "/ad.FaBuJiHuas/toOver",
-        qs.stringify({ fbjhId: id })
-      ).then(() => {
-        this.$Message.success("操作成功");
-        this.getDataList();
+      this.$Modal.confirm({
+        title: "确认结束",
+        // 记得确认修改此处
+        content: "您确认要结束发布当前广告 ?",
+        loading: true,
+        onOk: () => {
+          // 结束
+          getCrmRequest("/ad/fbjh/over/" + id).then((res) => {
+            if (res.success) {
+              this.$Message.success("操作成功");
+              this.getDataList();
+            }
+          });
+        },
       });
     },
     // 添加广告
@@ -774,7 +739,7 @@ export default {
       this.adVisible = false;
     },
     // 跳转到业主广告列表页
-    toAddList(row) {
+    toAdList(row) {
       var id = row.id;
       this.$router.push({
         name: "adAllList-index",
@@ -782,7 +747,6 @@ export default {
           id,
         },
       });
-      console.log(id);
     },
     clearSelectAll() {
       this.$refs.table.selectAll(false);
@@ -821,23 +785,50 @@ export default {
           this.clearSelectAll();
           this.getDataList();
         },
-        // 查询
+      });
+    },
+    // 查询
     handleSearch() {
-      this.searchForm.page = 1
-      this.searchForm.size = 10
+      this.searchForm.page = 1;
+      this.searchForm.size = 10;
+      this.getDataList();
     },
     // 重置
     handleReset() {
-      this.searchForm.page = 1
-      this.searchForm.size = 10
+      this.searchForm.page = 1;
+      this.searchForm.size = 10;
       this.$refs.searchForm.resetFields();
-    }
-      });
+      this.getDataList();
+    },
+    startChange(v) {
+      if (new Date(v) > new Date(this.form.endDate)) {
+        this.$Message.warning("起始时间不能大于截止时间");
+        this.form.startDate = "";
+        return;
+      }
+      this.form.startUseDate = v;
+    },
+    endChange(v) {
+      if (new Date(v) < new Date(this.form.startDate)) {
+        this.$Message.warning("截止时间不能小于起始时间");
+        this.form.endDate = "";
+        return;
+      }
+      this.form.endUseDate = v;
+    },
+    // 弹出框关闭时
+    modelCancel(v) {
+      if (!v) {
+        this.$refs.form.resetFields();
+        this.pageListFlag = false;
+        this.ggwListFlag = false;
+        this.pageList = [];
+        this.ggwList = [];
+      }
     },
   },
   mounted() {
     this.init();
-    this.getListData();
   },
 };
 </script>

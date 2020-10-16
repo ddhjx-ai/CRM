@@ -408,7 +408,6 @@ export default {
       this.modalVisible = true;
     },
     remove(v) {
-      console.log(v);
       this.$Modal.confirm({
         title: "确认删除",
         // 记得确认修改此处

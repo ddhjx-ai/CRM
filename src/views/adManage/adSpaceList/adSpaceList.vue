@@ -1,5 +1,3 @@
-<style lang="less">
-</style>
 <template>
   <div class="search">
     <Card>
@@ -11,11 +9,11 @@
           :label-width="80"
           label-position="right"
         >
-          <Form-item label="查询内容" prop="search">
+          <Form-item label="快速查找" prop="search">
             <Input
               type="text"
               v-model="searchForm.search"
-              placeholder="按名称或者创建人搜索"
+              placeholder="按名称或者创建人查找"
               style="width: 200px"
             />
           </Form-item>
@@ -77,14 +75,14 @@
           <Input v-model="form.price" />
         </FormItem>
         <FormItem label="文件类型" prop="fileType">
-          <i-select v-model="form.fileType">
-            <i-option
+          <Select v-model="form.fileType">
+            <Option
               v-for="item in fileTypeList"
-              :key="item"
-              :value="item.value"
-              >{{ item.label }}</i-option
+              :key="item.id"
+              :value="item.id"
+              >{{ item.name }}</Option
             >
-          </i-select>
+          </Select>
         </FormItem>
         <FormItem label="个数" prop="amount">
           <Input v-model="form.amount" />
@@ -101,15 +99,12 @@
             <Radio :label="1">yes</Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem label="页面" prop="pageName">
-          <i-select v-model="form.pageName">
-            <i-option
-              v-for="item in pageList"
-              :key="item"
-              :value="item.value"
-              >{{ item.label }}</i-option
-            >
-          </i-select>
+        <FormItem label="页面" prop="pageId">
+          <Select v-model="form.pageId">
+            <Option v-for="item in pageList" :value="item.id" :key="item.id">{{
+              item.name
+            }}</Option>
+          </Select>
         </FormItem>
       </Form>
       <div slot="footer">
@@ -137,11 +132,11 @@
           <Input v-model="releaseForm.name" />
         </FormItem>
         <FormItem label="广告">
-          <i-select v-model="releaseForm.advertisement">
-            <i-option v-for="item in adList" :key="item" :value="item.value">{{
+          <Select v-model="releaseForm.advertisement">
+            <Option v-for="item in adList" :key="item" :value="item.value">{{
               item.label
-            }}</i-option>
-          </i-select>
+            }}</Option>
+          </Select>
         </FormItem>
         <FormItem label="关键字">
           <Input v-model="releaseForm.keyWords" />
@@ -163,12 +158,12 @@
           ></Date-picker>
         </FormItem>
         <FormItem label="状态">
-          <i-select v-model="releaseForm.status">
-            <i-option value="disabled">disabled</i-option>
-            <i-option value="active">active</i-option>
-            <i-option value="stop">stop</i-option>
-            <i-option value="bill">bill</i-option>
-          </i-select>
+          <Select v-model="releaseForm.status">
+            <Option value="disabled">disabled</Option>
+            <Option value="active">active</Option>
+            <Option value="stop">stop</Option>
+            <Option value="bill">bill</Option>
+          </Select>
         </FormItem>
         <FormItem label="金额" prop="amount">
           <Input v-model="releaseForm.amount" />
@@ -186,23 +181,149 @@
 
 <script>
 import { getCrmRequest, removeCrm, postCrmRequest } from "@/api/crm";
-import { validatePrice,validateNum } from "@/libs/validate";
+import { validatePrice, validateNum } from "@/libs/validate";
 import qs from "qs";
 export default {
   name: "adSpaceList",
   data() {
     return {
-      adList: [
-        { value: "1", label: "北京城市景观研究院国内知名设计院" },
-        { value: "2", label: "福建省水利水电勘测设计研究院" },
-        { value: "3", label: "广西壮族自治区交通规划勘" },
-        { value: "5", label: "贵州乌江水电开发有限责任公司" },
-        { value: "6", label: "北京万科" },
-        { value: "8", label: "贵港港务总公司" },
-        { value: "11", label: "上海瑞惠" },
-        { value: "12", label: "西门子（中国）有限公司" },
+      /* 
+        jingtaitupian(0,"静态图片及flash"),
+        tupianqiehuan(1,"图片切换"),
+        zmd_shangxia(2,"走马灯,图片上下滚动"),
+        zmd_zuoyou(3,"走马灯,图片左右滚动"),
+        shipintanchukuang(4,"视频弹出框"),
+        openwindow(5,"弹出页面广告"),
+        shengmingwenzilian(6,"声明文字链"),
+        guanggaowenzilian(7,"广告文字链"),
+        float_leftbottom(8,"左下浮动广告"),
+        float_rightbottom(9,"右下角浮动广告"),
+        float_leftmiddle(10,"置左居中浮动广告"),
+        float_lefttop(11,"左上角浮动广告"),
+        float_righttop(12,"右上角浮动广告"),
+        float_middle(13,"居中浮动广告"),
+        float_middletop(14,"居中置顶浮动广告"),
+        float_middlebottom(15,"居中置底浮动广告"),
+        float_rightmiddle(16,"置右居中浮动广告"),
+        float_rightbottom_onload(17,"置右下浮动广告"),
+        float_rightbottom_delay(18,"置右下浮动广告"),
+        tupianqiehuan_js(19,"图片切换"),
+        float_rightbottom_zoom(20,"右下缩放效果"),
+        top_zoom(21,"顶部通栏缩放效果"),
+        openguanggao(22,"弹出广告"),
+        shengmingwz(23,"声明文字无连接地址"),
+        hot_agency(24,"热门招标机构"),
+        null_value(25,null);
+      */
+      fileTypeList: [
+        {
+          name: "jingtaitupian",
+          id: 0,
+        },
+        {
+          name: "tupianqiehuan",
+          id: 1,
+        },
+        {
+          name: "zmd_shangxia",
+          id: 2,
+        },
+        {
+          name: "zmd_zuoyou",
+          id: 3,
+        },
+        {
+          name: "shipintanchukuang",
+          id: 4,
+        },
+        {
+          name: "openwindow",
+          id: 5,
+        },
+        {
+          name: "shengmingwenzilian",
+          id: 6,
+        },
+        {
+          name: "guanggaowenzilian",
+          id: 7,
+        },
+        {
+          name: "float_leftbottom",
+          id: 8,
+        },
+        {
+          name: "float_rightbottom",
+          id: 9,
+        },
+        {
+          name: "float_leftmiddle",
+          id: 10,
+        },
+        {
+          name: "float_lefttop",
+          id: 11,
+        },
+        {
+          name: "float_righttop",
+          id: 12,
+        },
+        {
+          name: "float_middle",
+          id: 13,
+        },
+        {
+          name: "float_middletop",
+          id: 14,
+        },
+        {
+          name: "float_middlebottom",
+          id: 15,
+        },
+        {
+          name: "float_rightmiddle",
+          id: 16,
+        },
+        {
+          name: "float_rightbottom_onload",
+          id: 17,
+        },
+        {
+          name: "float_rightbottom_delay",
+          id: 18,
+        },
+        {
+          name: "tupianqiehuan_js",
+          id: 19,
+        },
+        {
+          name: "float_rightbottom_zoom",
+          id: 20,
+        },
+        {
+          name: "top_zoom",
+          id: 21,
+        },
+        {
+          name: "openguanggao",
+          id: 22,
+        },
+        {
+          name: "shengmingwz",
+          id: 23,
+        },
+        {
+          name: "hot_agency",
+          id: 24,
+        },
+        {
+          name: "other",
+          id: 25,
+        },
       ],
-      loading: true, // 表单加载状态
+      pageList: [],
+      adList: [],
+      loading: false, // 表单加载状态
       searchForm: {
         // 搜索框对应data对象
         page: 1, // 当前页数
@@ -217,13 +338,13 @@ export default {
         // 添加或编辑表单对象初始化数据
         name: "",
         alias: "",
-        price: '0',
-        fileType: "",
+        price: "0",
+        fileType: 0,
         amount: 0,
         width: 0,
         height: 0,
         delFlag: 0,
-        pageName: "",
+        pageId: "",
       },
       releaseForm: {
         // 发布计划表单
@@ -270,9 +391,9 @@ export default {
             trigger: "change",
           },
         ],
-        height:[{ validator: validateNum, trigger: "blur" }],
+        height: [{ validator: validateNum, trigger: "blur" }],
         width: [{ validator: validateNum, trigger: "blur" }],
-        amount: [{ validator: validateNum, trigger: "blur" }]
+        amount: [{ validator: validateNum, trigger: "blur" }],
       },
       submitLoading: false, // 添加或编辑提交状态
       selectList: [], // 多选数据
@@ -314,6 +435,7 @@ export default {
           title: "价格",
           key: "price",
           align: "center",
+          sortable: true
         },
         {
           title: "文件类型",
@@ -324,6 +446,7 @@ export default {
           title: "个数",
           key: "amount",
           align: "center",
+          sortable: true
         },
         {
           title: "是否删除",
@@ -387,18 +510,16 @@ export default {
   methods: {
     init() {
       this.getDataList();
+      this.getpageList();
     },
-
-    changePage(v) {
-      this.searchForm.page = v;
-      this.getDataList();
-      this.clearSelectAll();
+    
+    getpageList() {
+      getCrmRequest("/website/blocks/pages_list").then((res) => {
+        if (res.success) {
+          this.pageList = res.result;
+        }
+      });
     },
-    changesize(v) {
-      this.searchForm.size = v;
-      this.getDataList();
-    },
-
     getDataList() {
       this.loading = true;
       // 请求后端获取表单数据 请自行修改接口
@@ -410,45 +531,65 @@ export default {
         }
       });
     },
+    changePage(v) {
+      this.searchForm.page = v;
+      this.getDataList();
+      this.clearSelectAll();
+    },
+    changesize(v) {
+      this.searchForm.size = v;
+      this.getDataList();
+    },
     handleCancel() {
       this.modalVisible = false;
     },
     handleSubmit() {
-      console.log(this.form);
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.submitLoading = true;
           if (this.modalType == 0) {
             // 添加 避免编辑后传入id等数据 记得删除
-            delete this.form.id;
-            // this.postRequest("请求地址", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟请求成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.getDataList();
-            this.modalVisible = false;
+            postCrmRequest("/ad/ggw/add", qs.stringify(this.form)).then(
+              (res) => {
+                this.submitLoading = false;
+                if (res.success) {
+                  this.$Message.success("添加成功");
+                  this.getDataList();
+                  this.modalVisible = false;
+                } else {
+                  this.$Message.error("添加失败");
+                  this.getDataList();
+                  this.modalVisible = false;
+                }
+              }
+            );
           } else {
             // 编辑
-            // this.postRequest("请求地址", this.form).then(res => {
-            //   this.submitLoading = false;
-            //   if (res.success) {
-            //     this.$Message.success("操作成功");
-            //     this.getDataList();
-            //     this.modalVisible = false;
-            //   }
-            // });
-            // 模拟请求成功
-            this.submitLoading = false;
-            this.$Message.success("操作成功");
-            this.getDataList();
-            this.modalVisible = false;
+            let data = {
+              name: this.form.name,
+              alias: this.form.alias,
+              price: this.form.price,
+              fileType: this.form.fileType,
+              amount: this.form.amount,
+              width: this.form.width,
+              height: this.form.height,
+              delFlag: this.form.delFlag,
+              pageId: this.form.delFlag,
+            }
+            postCrmRequest("/ad/ggw/update/" + this.updateId, qs.stringify(data)).then(
+              (res) => {
+                this.submitLoading = false;
+                if (res.success) {
+                  this.$Message.success("编辑成功");
+                  this.getDataList();
+                  this.modalVisible = false;
+                } else {
+                  this.$Message.error("编辑失败");
+                  this.getDataList();
+                  this.modalVisible = false;
+                }
+              }
+            );
           }
         }
       });
@@ -470,9 +611,13 @@ export default {
         if (v[attr] == null) {
           v[attr] = "";
         }
+        if (attr == "price") {
+          v[attr] = "" + v[attr];
+        }
       }
       let str = JSON.stringify(v);
       let data = JSON.parse(str);
+      console.log(data);
       this.form = data;
       this.modalVisible = true;
     },

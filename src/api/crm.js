@@ -1,25 +1,46 @@
-import axios from 'axios'; 
+import axios from 'axios';
+import { getStore, setStore } from '../libs/storage';
 
+let accessToken = getStore('accessToken');
 /* crm请求 */
-export const getCrmRequest = (url, params={}) => {
+export const getCrmRequest = (url, params = {}) => {
   return axios({
-      method: 'get',
-      url: '/osc' + url,
-      params: params
+    method: 'get',
+    url: '/osc' + url,
+    params: params,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
-export const postCrmRequest = (url, params={}) => {
+export const postCrmRequest = (url, params = {}) => {
   return axios({
-      method: 'post',
-      url: '/osc' + url,
-      data: params
+    method: 'post',
+    url: '/osc' + url,
+    data: params,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
 export const removeCrm = (url) => {
   return axios({
-      method: 'delete',
-      url: '/osc' + url,
+    method: 'delete',
+    url: '/osc' + url,
+    headers: {
+      'accessToken': accessToken
+    }
+  })
+}
+
+export const deleteCrm = (url, id) => {
+  return axios({
+    method: 'delete',
+    url: '/osc' + url,
+    headers: {
+      'accessToken': accessToken
+    },
   })
 }

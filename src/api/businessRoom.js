@@ -1,5 +1,6 @@
 import axios from 'axios';
-
+import { getStore, setStore } from '../libs/storage';
+let accessToken = getStore('accessToken');
 /* 
     商务室后台请求
 */
@@ -8,7 +9,10 @@ export const getCateList = (params) => {
   return axios({
     method: 'get',
     url: `/xmallend/item/cat/list`,
-    params: params
+    params: params,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -17,7 +21,10 @@ export const cateUpdate = (params) => {
   return axios({
     method: 'post',
     url: '/xmallend/item/cat/update',
-    data: params
+    data: params,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -25,7 +32,10 @@ export const cateUpdate = (params) => {
 export const cateRemove = (id) => {
   return axios({
     method: 'delete',
-    url: '/xmallend/item/cat/del/' + id
+    url: '/xmallend/item/cat/del/' + id,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -34,7 +44,10 @@ export const cateAdd = (params) => {
   return axios({
     method: 'post',
     url: '/xmallend/item/cat/add',
-    data: params
+    data: params,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -46,7 +59,10 @@ export const getProductList = (params) => {
   return axios({
     method: 'get',
     url: '/xmallend/item/list',
-    params: params
+    params: params,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -54,7 +70,10 @@ export const getProductList = (params) => {
 export const getCount = () => {
   return axios({
     method: 'get',
-    url: '/xmallend/item/count'
+    url: '/xmallend/item/count',
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -63,7 +82,10 @@ export const changeStatus = (params) => {
   return axios({
     method: 'put',
     url: '/xmallend/item/changestatus',
-    data: params
+    data: params,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -71,7 +93,10 @@ export const changeStatus = (params) => {
 export const getItemById = (id) => {
   return axios({
     method: 'get',
-    url: '/xmallend/item/' + id
+    url: '/xmallend/item/' + id,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -83,7 +108,10 @@ export const updateProduct = (id, data) => {
   return axios({
     method: 'post',
     url: '/xmallend/item/update/' + id,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -92,7 +120,10 @@ export const addProduct = (data) => {
   return axios({
     method: 'post',
     url: '/xmallend/item/add',
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -100,7 +131,10 @@ export const addProduct = (data) => {
 export const removeProduct = (ids) => {
   return axios({
     method: 'delete',
-    url: '/xmallend/item/del/' + ids
+    url: '/xmallend/item/del/' + ids,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -109,7 +143,10 @@ export const searchProduct = (data) => {
   return axios({
     method: 'get',
     url: '/xmallend/item/search',
-    params: data
+    params: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -121,7 +158,10 @@ export const getOrderList = (data) => {
   return axios({
     method: 'get',
     url: '/xmallend/order-manager/list',
-    params: data
+    params: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -129,7 +169,10 @@ export const getOrderList = (data) => {
 export const getOrderCount = () => {
   return axios({
     method: 'get',
-    url: '/xmallend/order-manager/count'
+    url: '/xmallend/order-manager/count',
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -137,7 +180,10 @@ export const getOrderCount = () => {
 export const removeOrder = (ids) => {
   return axios({
     method: 'delete',
-    url: '/xmallend/order-manager/del/' + ids
+    url: '/xmallend/order-manager/del/' + ids,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -146,6 +192,9 @@ export const updateOrder = (id, data) => {
   return axios({
     method: 'put',
     url: '/xmallend/order-manager/update/' + id,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }

@@ -1,5 +1,6 @@
 import axios from 'axios';
-
+import { getStore, setStore } from '../libs/storage';
+let accessToken = getStore('accessToken');
 /* 
   主题接口
 */
@@ -8,7 +9,10 @@ export const getThemeList = (params) => {
   return axios({
     method: 'get',
     url: `/osc/block/theme/list`,
-    params: params
+    params: params,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -17,7 +21,10 @@ export const themeAdd = (params) => {
   return axios({
     method: 'post',
     url: `/osc/block/theme/add`,
-    data: params
+    data: params,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -26,7 +33,10 @@ export const themeUpdate = (id, params) => {
   return axios({
     method: 'put',
     url: `/osc/block/theme/update/` + id,
-    data: params
+    data: params,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -35,6 +45,9 @@ export const themeDel = (id) => {
   return axios({
     method: 'delete',
     url: `/osc/block/theme/del/` + id,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -46,7 +59,10 @@ export const getChanelList = (params) => {
   return axios({
     method: 'get',
     url: `/osc/block/channel/list`,
-    params: params
+    params: params,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -55,7 +71,10 @@ export const channelNameAdd = (params) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/add`,
-    data: params
+    data: params,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -64,7 +83,10 @@ export const channelUpdate = (id, data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/update/` + id,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -76,6 +98,9 @@ export const getAllThemeList = () => {
   return axios({
     method: 'get',
     url: `/osc/block/channel/themelist`,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -84,7 +109,10 @@ export const themeBlockId = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/add_block`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -93,7 +121,10 @@ export const themeAddModal = (params) => {
   return axios({
     method: 'get',
     url: `/osc/block/channel/select_theme`,
-    params: params
+    params: params,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -102,7 +133,10 @@ export const addModal = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/save_block`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -111,7 +145,10 @@ export const addManualData = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/add_manual_data`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -120,7 +157,10 @@ export const importExcel = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/excel_upload`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -129,7 +169,10 @@ export const saveshowdataBlock = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/save_showdata_block`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -138,7 +181,10 @@ export const removeLabelBlock = (data) => {
   return axios({
     method: 'get',
     url: `/osc/block/channel/delete_showdata`,
-    params: data
+    params: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -147,7 +193,10 @@ export const saveNewData = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/save_newdata_block`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -156,7 +205,10 @@ export const saveDownloadData = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/save_download_block`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -165,7 +217,10 @@ export const saveContentData = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/save_content_block`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -174,7 +229,10 @@ export const delContentData = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/delete_content_block`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -183,7 +241,10 @@ export const saveColorData = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/save_color_block`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -192,7 +253,10 @@ export const saveRightData = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/save_right_block`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -202,7 +266,10 @@ export const addNav = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/add_navi`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -211,7 +278,10 @@ export const addMenu = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/add_menu`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -220,7 +290,10 @@ export const addBanner = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/add_banner`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -229,7 +302,10 @@ export const addRight = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/add_right`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -238,7 +314,10 @@ export const addData = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/add_data`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -247,6 +326,9 @@ export const channelDetail = (id) => {
   return axios({
     method: 'get',
     url: `/osc/block/channel/detail/` + id,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -255,6 +337,9 @@ export const labelDetail = (id) => {
   return axios({
     method: 'get',
     url: `/osc/block/channel/showdata/detail/` + id,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -263,6 +348,9 @@ export const colorfulDetail = (id) => {
   return axios({
     method: 'get',
     url: `/osc/block/channel/colorblock/detail/` + id,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -271,6 +359,9 @@ export const delChannel = (id) => {
   return axios({
     method: 'get',
     url: `/osc/block/channel/delete_channel/` + id,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }
 
@@ -279,6 +370,9 @@ export const getKeywords = (data) => {
   return axios({
     method: 'post',
     url: `/osc/block/channel/generate_key`,
-    data: data
+    data: data,
+    headers: {
+      'accessToken': accessToken
+    }
   })
 }

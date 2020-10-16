@@ -771,10 +771,11 @@ export default {
     showSelect(e) {
       this.selectList = e;
       this.selectCount = e.length;
+      this.clearSelectAll();
     },
-    /* clearSelectAll() {
+    clearSelectAll() {
       this.$refs.table.selectAll(false);
-    }, */
+    },
     // 添加
     add() {
       this.modalType = 0;
@@ -1011,7 +1012,7 @@ export default {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("操作成功");
-              // this.clearSelectAll();
+              this.clearSelectAll();
               this.getDataList();
               this.getAllCount();
             }
