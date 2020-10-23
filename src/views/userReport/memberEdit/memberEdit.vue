@@ -3,10 +3,34 @@
 <template>
   <div class="search">
     <Card>
-      <Row class="operation" style="margin-bottom: 10px">
+      <Row>
+        <Form
+          ref="searchForm"
+          :model="searchForm"
+          inline
+          :label-width="80"
+          label-position="right"
+        >
+          <Form-item label="快速查找" prop="memberId">
+            <Input
+              type="text"
+              v-model="searchForm.memberId"
+              placeholder="根据用户ID查找"
+              style="width: 200px"
+            />
+          </Form-item>
+          <Form-item class="operation">
+            <Button @click="handleSearch" type="primary" icon="ios-search"
+              >查询</Button
+            >
+            <Button @click="handleReset">重置</Button>
+          </Form-item>
+        </Form>
+      </Row>
+      <!-- <Row class="operation" style="margin-bottom: 10px">
         <Button @click="handleShow" type="primary">显示</Button>
         <Button @click="getDataList" icon="md-refresh">刷新</Button>
-      </Row>
+      </Row> -->
       <Row>
         <Table
           :loading="loading"
@@ -21,12 +45,12 @@
       </Row>
       <Row type="flex" justify="end" class="page">
         <Page
-          :current="searchForm.pageNumber"
+          :current="searchForm.page"
           :total="total"
-          :page-size="searchForm.pageSize"
+          :page-size="searchForm.size"
           @on-change="changePage"
-          @on-page-size-change="changePageSize"
-          :page-size-opts="[10,20,50]"
+          @on-page-size-change="changesize"
+          :page-size-opts="[10, 20, 50]"
           size="small"
           show-total
           show-elevator
@@ -35,24 +59,35 @@
       </Row>
     </Card>
 
-    <Modal title="编辑" v-model="editVisible" :mask-closable="false" :width="500">
-      <Form ref="editForm" :model="editForm" :label-width="100" :rules="formValidate">
-        <FormItem label="keyword：" prop="keyword">
+    <Modal
+      title="编辑"
+      v-model="editVisible"
+      :mask-closable="false"
+      :width="500"
+    >
+      <Form
+        ref="editForm"
+        :model="editForm"
+        :label-width="100"
+        :rules="formValidate"
+      >
+        <FormItem label="关键词：" prop="keyword">
           <Input v-model="editForm.keyword" />
         </FormItem>
       </Form>
       <div slot="footer">
         <Button type="text" @click="editVisible = false">取消</Button>
-        <Button type="primary" :loading="submitLoading" @click="editSubmit">提交</Button>
+        <Button type="primary" :loading="submitLoading" @click="editSubmit"
+          >提交</Button
+        >
       </div>
     </Modal>
   </div>
 </template>
 
 <script>
-import { getCrmRequest, removeCrm } from "@/api/crm";
+import { getCrmRequest, removeCrm, postCrmRequest, putCrmRequest } from "@/api/crm";
 import { validatePrice } from "@/libs/validate";
-import axios from "axios";
 import qs from "qs";
 export default {
   name: "memberEdit",
@@ -60,44 +95,74 @@ export default {
     return {
       editVisible: false,
       editForm: {
-        keyword: ''
+        keyword: "",
       },
       submitLoading: false,
-      loading: true, // 表单加载状态
+      loading: false, // 表单加载状态
       searchForm: {
         // 搜索框对应data对象
-        pageNumber: 1, // 当前页数
-        pageSize: 10, // 页面大小
+        page: 1, // 当前页数
+        size: 10, // 页面大小
+        memberId: "",
+        sortOrder: "",
+        sortName: "",
       },
       selectList: [], // 多选数据
       selectCount: 0, // 多选计数
       columns: [
         // 表头
         {
-          type: "selection",
-          width: 60,
+          type: "index",
+          width: 100,
           align: "center",
+          title: '序号'
         },
         {
           title: "ID",
           key: "id",
           width: 100,
+          align: "center",
+          sortable: true,
         },
         {
           title: "用户id",
-          key: "1",
+          key: "memberId",
+          align: "center",
+          sortable: true,
         },
         {
           title: "搜索次数",
-          key: "2",
+          key: "seachCount",
+          align: "center",
+          sortable: true,
         },
         {
           title: "是否显示",
-          key: "3",
+          key: "isShow",
+          align: "center",
+          sortable: true,
+          render: (h, params) => {
+            return h(
+              "Button",
+              {
+                props: {
+                  type: params.row.isShow ? "success" : error,
+                },
+                on: {
+                  click: () => {
+                    this.handleShow(params.row);
+                  },
+                },
+              },
+              params.row.isShow ? "显示" : "不显示"
+            );
+          },
         },
         {
           title: "关键词",
-          key: "4",
+          key: "keyword",
+          align: "center",
+          sortable: true,
         },
 
         {
@@ -147,241 +212,112 @@ export default {
       ],
       data: [], // 表单数据
       total: 0, // 表单数据总数
-      dataList: {
-        page: 1,
-        total: 1100,
-        rows: [
-          {
-            id: 6377984,
-            cell: [
-              "6377984",
-              "31954",
-              "279",
-              "显示",
-              "<a href='javascript:edit_keyWord(6377984)'>福建广电网络集团股份有限公司</a>",
-            ],
-          },
-          {
-            id: 2181248,
-            cell: [
-              "2181248",
-              "200338202",
-              "254",
-              "显示",
-              "<a href='javascript:edit_keyWord(2181248)'>合肥庐源电力工程有限公司</a>",
-            ],
-          },
-          {
-            id: 6998144,
-            cell: [
-              "6998144",
-              "31954",
-              "94",
-              "显示",
-              "<a href='javascript:edit_keyWord(6998144)'>秦皇岛福电实业集团有限公司</a>",
-            ],
-          },
-          {
-            id: 9049088,
-            cell: [
-              "9049088",
-              "12859035",
-              "80",
-              "显示",
-              "<a href='javascript:edit_keyWord(9049088)'>中通服咨询设计研究院有限公司</a>",
-            ],
-          },
-          {
-            id: 1200236740799975424,
-            cell: [
-              "1200236740799975424",
-              "12705871",
-              "66",
-              "显示",
-              "<a href='javascript:edit_keyWord(1200236740799975424)'>河北建投新能源有限公司</a>",
-            ],
-          },
-          {
-            id: 4220160,
-            cell: [
-              "4220160",
-              "73042996",
-              "66",
-              "显示",
-              "<a href='javascript:edit_keyWord(4220160)'>中科软科技股份有限公司</a>",
-            ],
-          },
-          {
-            id: 7934336,
-            cell: [
-              "7934336",
-              "12737474",
-              "57",
-              "显示",
-              "<a href='javascript:edit_keyWord(7934336)'>中国人民财产保险股份有限公司</a>",
-            ],
-          },
-          {
-            id: 3257728,
-            cell: [
-              "3257728",
-              "15978229",
-              "55",
-              "显示",
-              "<a href='javascript:edit_keyWord(3257728)'>长江存储科技有限责任公司</a>",
-            ],
-          },
-          {
-            id: 2077696,
-            cell: [
-              "2077696",
-              "31954",
-              "47",
-              "显示",
-              "<a href='javascript:edit_keyWord(2077696)'>承德昊源电力承装集团有限公司</a>",
-            ],
-          },
-          {
-            id: 5963264,
-            cell: [
-              "5963264",
-              "2851567",
-              "47",
-              "显示",
-              "<a href='javascript:edit_keyWord(5963264)'>安徽中科自动化股份有限公司</a>",
-            ],
-          },
-        ],
-      },
+      updateId: "",
     };
   },
   // 表格动态列 计算属性
   computed: {},
   methods: {
-    requestData(url, data) {
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", url, true);
-      xhr.send(data);
-      xhr.onreadystatechange = function (res) {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-        }
-      };
-    },
-    getListData() {
-      var params = qs.stringify({
-        page: 1,
-        rp: 10,
-        sortname: "id",
-        sortorder: "desc",
-        query: "",
-        qtype: "",
-        area: "",
-        year: "",
-        date_select: "",
-        assigned_select: "",
-        categoryid: "",
-        book_type: "",
-        agency_type: "",
-        agency_kind: "",
-      });
-      getCrmRequest("/website.Channels/getList", params);
-      // this.requestData('https://crm.chinabidding.cn/admin/website.Channels/getList', params)
-    },
     init() {
       this.getDataList();
     },
     changePage(v) {
-      this.searchForm.pageNumber = v;
+      this.searchForm.page = v;
       this.getDataList();
-      this.clearSelectAll();
     },
-    changePageSize(v) {
-      this.searchForm.pageSize = v;
+    changesize(v) {
+      this.searchForm.size = v;
       this.getDataList();
     },
     changeSort(e) {
-      this.searchForm.sort = e.key;
-      this.searchForm.order = e.order;
+      console.log(e);
+      this.searchForm.sortName = e.key.replace(/[A-Z]/g, (s) => {
+        return "_" + s.toLowerCase();
+      });
+      this.searchForm.sortOrder = e.order;
       if (e.order == "normal") {
-        this.searchForm.order = "";
+        this.searchForm.sortOrder = "";
       }
       this.getDataList();
     },
     getDataList() {
       this.loading = true;
       // 请求后端获取表单数据 请自行修改接口
-      // this.getRequest("请求路径", this.searchForm).then(res => {
-      //   this.loading = false;
-      //   if (res.success) {
-      //     this.data = res.result.content;
-      //     this.total = res.result.totalElements;
-      //   }
-      // });
-      // 以下为模拟数据 "<a href='javascript:edit_ggw(2377)'>cgxxIndexAd-b5-lb</a> "
-      let list = this.dataList.rows;
-      this.data = list.map((item) => {
-        item.cell[4] = item.cell[4].replace(
-          /<a[\s\S]*>([\s\S]*)<\/[\s\S]*>/g,
-          "$1"
-        );
-        console.log(item.cell[2]);
-        item = { ...item.cell, id: item.id };
-        return item;
+      postCrmRequest(
+        "/up/report/aimuser_list",
+        qs.stringify(this.searchForm)
+      ).then((res) => {
+        if (res.success) {
+          this.loading = false;
+          this.data = res.result.list;
+          this.total = res.result.total;
+        }
       });
-      this.total = this.data.length;
-      this.loading = false;
     },
     changeSelect(e) {
       this.selectList = e;
       this.selectCount = e.length;
     },
     // 显示
-    handleShow() {
-      if (this.selectCount <= 0) {
-        this.$Message.warning("您还未选择数据");
-        return;
-      }
-      if (this.selectCount > 1) {
-        this.$Message.warning("请选择一条数据");
-        return;
-      }
+    handleShow(v) {
+      let data = {
+        isShow: v.isShow ? 0 : 1,
+      };
       this.$Modal.confirm({
-        title: "确认删除",
-        content: "您确认要删除所选的 " + this.selectCount + " 条数据?",
+        title: "提示",
+        content: "您确认要改变该数据的显示状态?",
         loading: true,
         onOk: () => {
-          // 批量删除
-          // this.deleteRequest("请求地址，如/deleteByIds/" + ids).then(res => {
-          //   this.$Modal.remove();
-          //   if (res.success) {
-          //     this.$Message.success("操作成功");
-          //     this.clearSelectAll();
-          //     this.getDataList();
-          //   }
-          // });
-          // 模拟请求成功
-          this.$Message.success("操作成功");
-          this.$Modal.remove();
-          this.clearSelectAll();
-          this.getDataList();
+          putCrmRequest("/up/report/aimuser_update/" + v.id, data).then(
+            (res) => {
+              this.$Modal.remove();
+              if (res.success) {
+                this.$Message.success("操作成功");
+                this.getDataList();
+              }
+            }
+          );
         },
       });
     },
     // 编辑
     editSubmit() {
-
+      putCrmRequest("/up/report/aimuser_update/" + this.updateId, {
+        keyword: this.editForm.keyword,
+      }).then((res) => {
+        if (res.success) {
+          this.$Message.success("操作成功");
+          this.editVisible = false;
+          this.getDataList();
+        }
+      });
     },
     // 获取商品详情
     edit(v) {
+      console.log(v);
       this.$refs.editForm.resetFields();
-      this.editVisible = true
-      this.editForm.keyword = v['4']
-      console.log(v)
+      this.editVisible = true;
+      this.editForm.keyword = v.keyword;
+      this.updateId = v.id;
+    },
+    // 查询
+    handleSearch() {
+      this.searchForm.page = 1;
+      this.searchForm.size = 10;
+      this.getDataList();
+    },
+    // 重置
+    handleReset() {
+      this.$refs.searchForm.resetFields();
+      this.searchForm.page = 1;
+      this.searchForm.size = 10;
+      this.searchForm.sortOrder = "";
+      this.searchForm.sortName = "";
+      this.getDataList();
     },
   },
   mounted() {
     this.init();
-    this.getListData();
   },
 };
 </script>

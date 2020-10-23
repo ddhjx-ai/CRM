@@ -44,3 +44,15 @@ export const deleteCrm = (url, id) => {
     },
   })
 }
+
+// PUT
+export const putCrmRequest = (url, data={}) => {
+  return axios({
+    method: 'put',
+    url: '/osc' + url,
+    headers: {
+      'accessToken': accessToken
+    },
+    data:data
+  })
+}

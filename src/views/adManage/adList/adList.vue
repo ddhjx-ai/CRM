@@ -135,6 +135,7 @@
       v-model="releaseVisible"
       :mask-closable="false"
       :width="600"
+      @on-visible-change="selectClear"
     >
       <Form
         ref="releaseForm"
@@ -240,6 +241,8 @@
       v-model="uploadVisible"
       :mask-closable="false"
       :width="600"
+      class="overflowX"
+      @on-visible-change="selectClear"
     >
       <Form
         ref="uploadForm"
@@ -526,20 +529,6 @@ export default {
         }
       })
     },
-    // 时间处理函数
-    formdate(date) {
-      if (!date) {
-        return "-";
-      }
-      let time = new Date(date);
-      let year = time.getFullYear();
-      let month = (time.getMonth() + 1).toString().padStart(2, "0");
-      let day = time.getDate().toString().padStart(2, "0");
-      let hour = time.getHours().toString().padStart(2, "0");
-      let minute = time.getMinutes().toString().padStart(2, "0");
-      let second = time.getSeconds().toString().padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    },
     changePage(v) {
       this.searchForm.page = v;
       this.getDataList();
@@ -596,7 +585,7 @@ export default {
                 this.getDataList();
                 this.modalVisible = false;
               } else {
-                this.$Message.success("编辑失败");
+                this.$Message.error("编辑失败");
                 this.getDataList();
                 this.modalVisible = false;
               }
@@ -654,10 +643,6 @@ export default {
         this.$Message.warning("只能选择一条数据进行操作！");
         return;
       }
-      /* console.log(this.releaseForm.startDate)
-      console.log(this.releaseForm.endDate)
-      this.releaseForm.startDate = this.formdate(this.releaseForm.startDate)
-      this.releaseForm.endDate = this.formdate(this.releaseForm.endDate) */
       this.releaseVisible = true;
       this.pageListFlag = false;
       this.ggwListFlag = false;
@@ -846,9 +831,20 @@ export default {
       }
       this.releaseForm.endDate = v;
     },
+    // 
+    selectClear(v) {
+      if(!v) {
+        this.getDataList();
+        // this.clearSelectAll();
+      }
+    }
   },
   mounted() {
     this.init();
   },
 };
 </script>
+
+<style lang="less">
+@import './adList.less';
+</style>

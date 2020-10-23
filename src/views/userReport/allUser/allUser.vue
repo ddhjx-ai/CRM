@@ -3,6 +3,30 @@
 <template>
   <div class="search">
     <Card>
+      <Row>
+        <Form
+          ref="searchForm"
+          :model="searchForm"
+          inline
+          :label-width="80"
+          label-position="right"
+        >
+          <Form-item label="快速查找" prop="search">
+            <Input
+              type="text"
+              v-model="searchForm.search"
+              placeholder="根据用户ID查找"
+              style="width: 200px"
+            />
+          </Form-item>
+          <Form-item class="operation">
+            <Button @click="handleSearch" type="primary" icon="ios-search"
+              >查询</Button
+            >
+            <Button @click="handleReset">重置</Button>
+          </Form-item>
+        </Form>
+      </Row>
       <Row class="operation" style="margin-bottom: 10px">
         <Button @click="handleShow" type="primary">显示</Button>
         <Button @click="getDataList" icon="md-refresh">刷新</Button>
@@ -21,11 +45,11 @@
       </Row>
       <Row type="flex" justify="end" class="page">
         <Page
-          :current="searchForm.pageNumber"
+          :current="searchForm.page"
           :total="total"
-          :page-size="searchForm.pageSize"
+          :page-size="searchForm.size"
           @on-change="changePage"
-          @on-page-size-change="changePageSize"
+          @on-page-size-change="changesize"
           :page-size-opts="[10,20,50]"
           size="small"
           show-total
@@ -49,9 +73,8 @@
 </template>
 
 <script>
-import { getCrmRequest, removeCrm } from "@/api/crm";
+import { getCrmRequest, removeCrm, postCrmRequest } from "@/api/crm";
 import { validatePrice } from "@/libs/validate";
-import axios from "axios";
 import qs from "qs";
 export default {
   name: "memberEdit",
@@ -65,8 +88,8 @@ export default {
       loading: true, // 表单加载状态
       searchForm: {
         // 搜索框对应data对象
-        pageNumber: 1, // 当前页数
-        pageSize: 10, // 页面大小
+        page: 1, // 当前页数
+        size: 10, // 页面大小
       },
       selectList: [], // 多选数据
       selectCount: 0, // 多选计数
@@ -146,156 +169,21 @@ export default {
       ],
       data: [], // 表单数据
       total: 0, // 表单数据总数
-      dataList: {
-        page: 1,
-        total: 15377,
-        rows: [
-          {
-            id: 19429,
-            cell: [
-              "19429",
-              "14745251",
-              "56",
-              '<span style="color:red">不显示</span>',
-              "<a href='javascript:edit_keyWord(19429)'>中移建设有限公司吉林分公司2018-2019</a>",
-            ],
-          },
-          {
-            id: 22162,
-            cell: [
-              "22162",
-              "4754988",
-              "35",
-              '<span style="color:red">不显示</span>',
-              "<a href='javascript:edit_keyWord(22162)'>云南电网有限责任公司昆明供电局2019-2021年非生产区域</a>",
-            ],
-          },
-          {
-            id: 20343,
-            cell: [
-              "20343",
-              "15835144",
-              "30",
-              '<span style="color:red">不显示</span>',
-              "<a href='javascript:edit_keyWord(20343)'>宜昌市交通投资有限公司</a>",
-            ],
-          },
-          {
-            id: 18041,
-            cell: [
-              "18041",
-              "14440797",
-              "26",
-              '<span style="color:red">不显示</span>',
-              "<a href='javascript:edit_keyWord(18041)'>中国电信武汉分公司2018-2020年市政配合管线迁改维护</a>",
-            ],
-          },
-          {
-            id: 19898,
-            cell: [
-              "19898",
-              "15556163",
-              "25",
-              '<span style="color:red">不显示</span>',
-              "<a href='javascript:edit_keyWord(19898)'>内蒙古电力（集团）有限责任公司2018年配网工程第一批设备材料采购</a>",
-            ],
-          },
-          {
-            id: 22095,
-            cell: [
-              "22095",
-              "4754988",
-              "17",
-              '<span style="color:red">不显示</span>',
-              "<a href='javascript:edit_keyWord(22095)'>交通银行股份有限公司云南省分行</a>",
-            ],
-          },
-          {
-            id: 19891,
-            cell: [
-              "19891",
-              "15556163",
-              "16",
-              '<span style="color:red">不显示</span>',
-              "<a href='javascript:edit_keyWord(19891)'>国网山西省电力公司2018年第二次物资集中规模招标采</a>",
-            ],
-          },
-          {
-            id: 19922,
-            cell: [
-              "19922",
-              "15556163",
-              "14",
-              '<span style="color:red">不显示</span>',
-              "<a href='javascript:edit_keyWord(19922)'>浙江华云清洁能源有限公司华云能源2018年舟山项目物资类采购</a>",
-            ],
-          },
-          {
-            id: 17754,
-            cell: [
-              "17754",
-              "15917750",
-              "14",
-              '<span style="color:red">不显示</span>',
-              "<a href='javascript:edit_keyWord(17754)'>2018-2019年度绍兴建元电力集团有限公司及下属公司合格供应商资格预审公告</a>",
-            ],
-          },
-          {
-            id: 21370,
-            cell: [
-              "21370",
-              "14243113",
-              "13",
-              '<span style="color:red">不显示</span>',
-              "<a href='javascript:edit_keyWord(21370)'>   国网新源控股有限公司2018年第二批</a>",
-            ],
-          },
-        ],
-      },
     };
   },
   // 表格动态列 计算属性
   computed: {},
   methods: {
-    requestData(url, data) {
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", url, true);
-      xhr.send(data);
-      xhr.onreadystatechange = function (res) {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-        }
-      };
-    },
-    getListData() {
-      var params = qs.stringify({
-        page: 1,
-        rp: 10,
-        sortname: "id",
-        sortorder: "desc",
-        query: "",
-        qtype: "",
-        area: "",
-        year: "",
-        date_select: "",
-        assigned_select: "",
-        categoryid: "",
-        book_type: "",
-        agency_type: "",
-        agency_kind: "",
-      });
-      getCrmRequest("/website.Channels/getList", params);
-      // this.requestData('https://crm.chinabidding.cn/admin/website.Channels/getList', params)
-    },
     init() {
       this.getDataList();
     },
     changePage(v) {
-      this.searchForm.pageNumber = v;
+      this.searchForm.page = v;
       this.getDataList();
       this.clearSelectAll();
     },
-    changePageSize(v) {
-      this.searchForm.pageSize = v;
+    changesize(v) {
+      this.searchForm.size = v;
       this.getDataList();
     },
     changeSort(e) {
@@ -316,22 +204,6 @@ export default {
       //     this.total = res.result.totalElements;
       //   }
       // });
-      // 以下为模拟数据 "<a href='javascript:edit_ggw(2377)'>cgxxIndexAd-b5-lb</a> "
-      let list = this.dataList.rows;
-      this.data = list.map((item) => {
-        item.cell[3] = item.cell[3].replace(
-          /<[\s\S]*>([\s\S]*)<\/[\s\S]*>/g,
-          "$1"
-        );
-        item.cell[4] = item.cell[4].replace(
-          /<a[\s\S]*>([\s\S]*)<\/[\s\S]*>/g,
-          "$1"
-        );
-        item = { ...item.cell, id: item.id };
-        return item;
-      });
-      this.total = this.data.length;
-      this.loading = false;
     },
     changeSelect(e) {
       this.selectList = e;
@@ -383,7 +255,6 @@ export default {
   },
   mounted() {
     this.init();
-    this.getListData();
   },
 };
 </script>

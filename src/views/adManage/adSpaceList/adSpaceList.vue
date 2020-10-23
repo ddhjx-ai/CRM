@@ -58,6 +58,7 @@
       </Row>
     </Card>
 
+    <!-- 添加、编辑 -->
     <Modal
       :title="modalTitle"
       v-model="modalVisible"
@@ -121,6 +122,7 @@
       v-model="releaseVisible"
       :mask-closable="false"
       :width="500"
+      @on-visible-change="selectClear"
     >
       <Form
         ref="releaseForm"
@@ -132,37 +134,39 @@
           <Input v-model="releaseForm.name" />
         </FormItem>
         <FormItem label="广告">
-          <Select v-model="releaseForm.advertisement">
-            <Option v-for="item in adList" :key="item" :value="item.value">{{
-              item.label
+          <Select v-model="releaseForm.guanggaoId">
+            <Option v-for="item in adList" :key="item.id" :value="item.id">{{
+              item.name
             }}</Option>
           </Select>
         </FormItem>
         <FormItem label="关键字">
-          <Input v-model="releaseForm.keyWords" />
+          <Input v-model="releaseForm.keywords" />
         </FormItem>
-        <FormItem label="开始时间" prop="startTime">
+        <FormItem label="开始时间" prop="startDate">
           <Date-picker
             type="date"
-            v-model="releaseForm.startTime"
+            v-model="releaseForm.startDate"
+            @on-change="startChange"
             format="yyyy-MM-dd"
             placeholder="选择时间"
           ></Date-picker>
         </FormItem>
-        <FormItem label="结束时间" prop="endTime">
+        <FormItem label="结束时间" prop="endDate">
           <Date-picker
             type="date"
-            v-model="releaseForm.endTime"
+            v-model="releaseForm.endDate"
             format="yyyy-MM-dd"
             placeholder="选择时间"
+            @on-change="endChange"
           ></Date-picker>
         </FormItem>
-        <FormItem label="状态">
-          <Select v-model="releaseForm.status">
-            <Option value="disabled">disabled</Option>
-            <Option value="active">active</Option>
-            <Option value="stop">stop</Option>
-            <Option value="bill">bill</Option>
+        <FormItem label="状态" prop='state'>
+          <Select v-model="releaseForm.state">
+            <Option :value="0">disabled</Option>
+            <Option :value="1">active</Option>
+            <Option :value="2">stop</Option>
+            <Option :value="3">bill</Option>
           </Select>
         </FormItem>
         <FormItem label="金额" prop="amount">
@@ -180,7 +184,7 @@
 </template>
 
 <script>
-import { getCrmRequest, removeCrm, postCrmRequest } from "@/api/crm";
+import { getCrmRequest, deleteCrm, postCrmRequest } from "@/api/crm";
 import { validatePrice, validateNum } from "@/libs/validate";
 import qs from "qs";
 export default {
@@ -349,16 +353,16 @@ export default {
       releaseForm: {
         // 发布计划表单
         name: "",
-        advertisement: "",
-        keyWords: "",
-        startTime: "",
-        endTime: "",
-        status: "",
+        guanggaoId: "",
+        keywords: "",
+        startDate: "",
+        endDate: "",
+        state: 1,
         amount: "",
       },
       // 表单验证规则
       formValidate: {
-        name: { required: true, message: "登录名不能为空", trigger: "blur" },
+        name: { required:true, message: "登录名不能为空", trigger: "blur" },
         price: [
           {
             required: true,
@@ -375,18 +379,16 @@ export default {
           },
           { validator: validatePrice, trigger: "blur" },
         ],
-        startTime: [
+        startDate: [
           {
             required: true,
-            type: "date",
             message: "请选择日期",
             trigger: "change",
           },
         ],
-        endTime: [
+        endDate: [
           {
             required: true,
-            type: "date",
             message: "请选择日期",
             trigger: "change",
           },
@@ -435,7 +437,7 @@ export default {
           title: "价格",
           key: "price",
           align: "center",
-          sortable: true
+          // sortable: true
         },
         {
           title: "文件类型",
@@ -446,7 +448,7 @@ export default {
           title: "个数",
           key: "amount",
           align: "center",
-          sortable: true
+          // sortable: true
         },
         {
           title: "是否删除",
@@ -460,7 +462,7 @@ export default {
           title: "操作",
           key: "action",
           align: "center",
-          width: 100,
+          width: 150,
           render: (h, params) => {
             return h("div", [
               h(
@@ -481,7 +483,7 @@ export default {
                 },
                 "编辑"
               ),
-              /* h(
+              h(
                 "Button",
                 {
                   props: {
@@ -495,7 +497,7 @@ export default {
                   },
                 },
                 "删除"
-              ), */
+              ),
             ]);
           },
         },
@@ -511,8 +513,17 @@ export default {
     init() {
       this.getDataList();
       this.getpageList();
+      this.getGGList();
     },
-    
+    // 获取广告下拉列表
+    getGGList() {
+      getCrmRequest("/ad/fbjh/gg_list").then((res) => {
+        if (res.success) {
+          this.adList = res.result;
+        }
+      });
+    },
+    // 获取页面下拉列表
     getpageList() {
       getCrmRequest("/website/blocks/pages_list").then((res) => {
         if (res.success) {
@@ -549,7 +560,7 @@ export default {
           this.submitLoading = true;
           if (this.modalType == 0) {
             // 添加 避免编辑后传入id等数据 记得删除
-            postCrmRequest("/ad/ggw/add", qs.stringify(this.form)).then(
+            postCrmRequest("/ad/ggw/add", this.form).then(
               (res) => {
                 this.submitLoading = false;
                 if (res.success) {
@@ -574,9 +585,9 @@ export default {
               width: this.form.width,
               height: this.form.height,
               delFlag: this.form.delFlag,
-              pageId: this.form.delFlag,
+              pageId: this.form.pageId,
             }
-            postCrmRequest("/ad/ggw/update/" + this.updateId, qs.stringify(data)).then(
+            postCrmRequest("/ad/ggw/update/" + this.updateId, data).then(
               (res) => {
                 this.submitLoading = false;
                 if (res.success) {
@@ -621,28 +632,17 @@ export default {
       this.form = data;
       this.modalVisible = true;
     },
+    // 删除
     remove(v) {
       console.log(v);
       this.$Modal.confirm({
         title: "确认删除",
         // 记得确认修改此处
-        content: "您确认要删除 " + v["1"] + " ?",
+        content: "您确认要删除 " + v.name + " ?",
         loading: true,
         onOk: () => {
           // 删除
-          // this.deleteRequest("请求地址，如/deleteByIds/" + v.id).then(res => {
-          //   this.$Modal.remove();
-          //   if (res.success) {
-          //     this.$Message.success("操作成功");
-          //     this.getDataList();
-          //   }
-          // });
-          // 模拟请求成功
-          // this.$Message.success("操作成功");
-          // this.$Modal.remove();
-          // this.getDataList();
-          var params = qs.stringify({ id: v.id });
-          removeCrm("/website.Sites/remove", params).then((res) => {
+          deleteCrm("/ad/ggw/delete/" + v.id).then((res) => {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("操作成功");
@@ -662,16 +662,36 @@ export default {
         return;
       }
       this.releaseVisible = true;
+      this.$refs.releaseForm.resetFields();
     },
     releaseCancel() {
       this.releaseVisible = false;
     },
     releaseSubmit() {
       this.$refs.releaseForm.validate((valid) => {
-        console.log(valid);
         if (valid) {
-          this.releaseVisible = false;
+          let data = {
+            name: this.releaseForm.name,
+            keywords: this.releaseForm.keywords,
+            startDate: this.releaseForm.startDate,
+            sortId: 0,
+            endDate: this.releaseForm.endDate,
+            state: this.releaseForm.state,
+            amount: this.releaseForm.amount,
+            guanggaoId: this.releaseForm.id,
+            guanggaoweiId: this.selectList[0].id,
+          };
           this.submitLoading = true;
+          postCrmRequest("/ad/ggw/fbjh", data).then(res => {
+            if(res.success) {
+              this.$Message.success("发布成功");
+              this.releaseVisible = false;
+              this.submitLoading = false;
+            }else {
+              this.$Message.error("发布失败");
+              this.submitLoading = false;
+            }
+          });
         }
       });
     },
@@ -722,10 +742,32 @@ export default {
     },
     // 重置
     handleReset() {
-      this.$refs.searchForm.resetFields();
       this.searchForm.page = 1;
       this.searchForm.size = 10;
+      this.$refs.searchForm.resetFields();
+      this.getDataList();
     },
+    startChange(v) {
+      if (new Date(v) > new Date(this.releaseForm.endDate)) {
+        this.$Message.warning("起始时间不能大于截止时间");
+        this.releaseForm.startDate = "";
+        return;
+      }
+      this.releaseForm.startDate = v;
+    },
+    endChange(v) {
+      if (new Date(v) < new Date(this.releaseForm.startDate)) {
+        this.$Message.warning("截止时间不能小于起始时间");
+        this.releaseForm.endDate = "";
+        return;
+      }
+      this.releaseForm.endDate = v;
+    },
+    selectClear(v) {
+      if(!v) {
+        this.clearSelectAll();
+      }
+    }
   },
   mounted() {
     this.init();

@@ -517,7 +517,7 @@ export default {
       let hour = time.getHours().toString().padStart(2, "0");
       let minute = time.getMinutes().toString().padStart(2, "0");
       let second = time.getSeconds().toString().padStart(2, "0");
-      return `${year}-${month}-${day} ${hour}:${minute}`;
+      return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
     },
     changePage(v) {
       this.searchForm.page = v;

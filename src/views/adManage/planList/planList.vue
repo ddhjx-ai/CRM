@@ -216,14 +216,14 @@
         </FormItem>
         <FormItem label="文件类型">
           <Select v-model="adForm.fileType">
-            <Option value="word">word</Option>
-            <Option value="swf">swf</Option>
-            <Option value="flv">flv</Option>
-            <Option value="bmp">bmp</Option>
-            <Option value="gif">gif</Option>
-            <Option value="jpg">jpg</Option>
-            <Option value="png">png</Option>
-            <Option value="other">other</Option>
+            <Option :value="0">word</Option>
+            <Option :value="1">swf</Option>
+            <Option :value="2">flv</Option>
+            <Option :value="3">bmp</Option>
+            <Option :value="4">gif</Option>
+            <Option :value="5">jpg</Option>
+            <Option :value="6">png</Option>
+            <Option :value="7">other</Option>
           </Select>
         </FormItem>
         <FormItem label="宽度">
@@ -553,7 +553,7 @@ export default {
       let hour = time.getHours().toString().padStart(2, "0");
       let minute = time.getMinutes().toString().padStart(2, "0");
       let second = time.getSeconds().toString().padStart(2, "0");
-      return `${year}-${month}-${day} ${hour}:${minute}`;
+      return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
     },
     changePage(v) {
       this.searchForm.page = v;

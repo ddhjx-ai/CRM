@@ -7,19 +7,19 @@ module.exports = {
         proxy:
         {
             '/xboot': {
-                // target: 'http://192.168.0.32:8888',
+                // target: 'http://192.168.0.44:8888',
                 target: 'http://127.0.0.1:8888',
                 ws: true,
             },
             '/osc': {
-                // target: 'http://192.168.0.32:8888',
+                // target: 'http://192.168.0.44:8888',
                 target: 'http://127.0.0.1:8888',
                 ws: true,
                 /* secure: false,
                 changeOrigin: true, */
             },
             '/xmallend': {
-                // target: 'http://192.168.0.32:8888',
+                // target: 'http://192.168.0.44:8888',
                 target: 'http://127.0.0.1:8888',
                 ws: true,
             },

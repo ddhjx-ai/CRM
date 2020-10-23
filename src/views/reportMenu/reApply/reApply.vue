@@ -39,7 +39,7 @@
 
     <Modal title="添加" v-model="addVisible" :mask-closable="false" :width="500">
       <Form ref="addForm" :model="addForm" :label-width="110" :rules="formValidate">
-        <FormItem label="账号ID：" prop="id">
+        <FormItem label="用户ID：" prop="id">
           <Input v-model="addForm.id" />
         </FormItem>
       </Form>

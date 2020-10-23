@@ -387,6 +387,7 @@ export default {
           key: "price",
           align: "center",
           width: 120,
+          // sortable: true
         },
         {
           title: "创建日期",
@@ -556,7 +557,7 @@ export default {
       let hour = time.getHours().toString().padStart(2, "0");
       let minute = time.getMinutes().toString().padStart(2, "0");
       let second = time.getSeconds().toString().padStart(2, "0");
-      return `${year}-${month}-${day} ${hour}:${minute}`;
+      return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
     },
     // 链接跳转
     locationTo(v) {

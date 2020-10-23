@@ -3,9 +3,33 @@
 <template>
   <div class="search">
     <Card>
+      <Row>
+        <Form
+          ref="searchForm"
+          :model="searchForm"
+          inline
+          :label-width="80"
+          label-position="right"
+        >
+          <Form-item label="快速查找" prop="search">
+            <Input
+              type="text"
+              v-model="searchForm.search"
+              placeholder="根据用户ID、客服查找"
+              style="width: 200px"
+            />
+          </Form-item>
+          <Form-item class="operation">
+            <Button @click="handleSearch" type="primary" icon="ios-search"
+              >查询</Button
+            >
+            <Button @click="handleReset">重置</Button>
+          </Form-item>
+        </Form>
+      </Row>
       <Row class="operation" style="margin-bottom: 10px">
         <Button @click="handleAdd" type="primary" icon="md-add">添加</Button>
-        <Button @click="handleDel" type="primary" icon="md-remove">删除</Button>
+        <Button @click="handleDel" type="primary" icon="md-trash">批量删除</Button>
         <Button @click="getDataList" icon="md-refresh">刷新</Button>
       </Row>
       <Row>
@@ -22,11 +46,11 @@
       </Row>
       <Row type="flex" justify="end" class="page">
         <Page
-          :current="searchForm.pageNumber"
+          :current="searchForm.page"
           :total="total"
-          :page-size="searchForm.pageSize"
+          :page-size="searchForm.size"
           @on-change="changePage"
-          @on-page-size-change="changePageSize"
+          @on-page-size-change="changesize"
           :page-size-opts="[10,20,50]"
           size="small"
           show-total
@@ -38,7 +62,7 @@
 
     <Modal title="添加" v-model="addVisible" :mask-closable="false" :width="500">
       <Form ref="addForm" :model="addForm" :label-width="110" :rules="formValidate">
-        <FormItem label="账号ID：" prop="id">
+        <FormItem label="用户ID：" prop="id">
           <Input v-model="addForm.id" />
         </FormItem>
       </Form>
@@ -51,9 +75,8 @@
 </template>
 
 <script>
-import { getCrmRequest, removeCrm } from "@/api/crm";
+import { getCrmRequest, removeCrm ,postCrmRequest} from "@/api/crm";
 import { validatePrice } from "@/libs/validate";
-import axios from "axios";
 import qs from "qs";
 export default {
   name: "reportApply",
@@ -67,8 +90,8 @@ export default {
       loading: true, // 表单加载状态
       searchForm: {
         // 搜索框对应data对象
-        pageNumber: 1, // 当前页数
-        pageSize: 10, // 页面大小
+        page: 1, // 当前页数
+        size: 10, // 页面大小
       },
       selectList: [], // 多选数据
       selectCount: 0, // 多选计数
@@ -93,8 +116,17 @@ export default {
           key: "2",
         },
         {
-          title: "数据",
+          title: "完成情况",
+          // 已收集/未收集，初始都是未收集，已收集会有完成时间
           key: "3",
+          render:(h,params) => {
+            return h('div', {
+              style: {
+                color: 'red'
+              }
+            },
+            '未收集')
+          }
         },
         {
           title: "客服",
@@ -111,53 +143,21 @@ export default {
       ],
       data: [], // 表单数据
       total: 0, // 表单数据总数
-      dataList: {
-        
-      },
     };
   },
   // 表格动态列 计算属性
   computed: {},
   methods: {
-    requestData(url, data) {
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", url, true);
-      xhr.send(data);
-      xhr.onreadystatechange = function (res) {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-        }
-      };
-    },
-    getListData() {
-      var params = qs.stringify({
-        page: 1,
-        rp: 10,
-        sortname: "id",
-        sortorder: "desc",
-        query: "",
-        qtype: "",
-        area: "",
-        year: "",
-        date_select: "",
-        assigned_select: "",
-        categoryid: "",
-        book_type: "",
-        agency_type: "",
-        agency_kind: "",
-      });
-      getCrmRequest("/website.Channels/getList", params);
-      // this.requestData('https://crm.chinabidding.cn/admin/website.Channels/getList', params)
-    },
     init() {
       this.getDataList();
     },
     changePage(v) {
-      this.searchForm.pageNumber = v;
+      this.searchForm.page = v;
       this.getDataList();
       this.clearSelectAll();
     },
-    changePageSize(v) {
-      this.searchForm.pageSize = v;
+    changesize(v) {
+      this.searchForm.size = v;
       this.getDataList();
     },
     changeSort(e) {
@@ -178,18 +178,6 @@ export default {
       //     this.total = res.result.totalElements;
       //   }
       // });
-      // 以下为模拟数据 "<a href='javascript:edit_ggw(2377)'>cgxxIndexAd-b5-lb</a> "
-      let list = this.dataList.rows;
-      this.data = list.map((item) => {
-        item.cell[1] = item.cell[1].replace(
-          /<a[\s\S]*>([\s\S]*)<\/[\s\S]*>/g,
-          "$1"
-        );
-        item = { ...item.cell, id: item.id };
-        return item;
-      });
-      this.total = this.data.length;
-      this.loading = false;
     },
     changeSelect(e) {
       this.selectList = e;
@@ -236,7 +224,6 @@ export default {
   },
   mounted() {
     this.init();
-    this.getListData();
   },
 };
 </script>
