@@ -120,7 +120,7 @@ export default {
         {
           title: "ID",
           key: "id",
-          width: 100,
+          minWidth: 100,
           align: "center",
           sortable: true,
         },
@@ -129,24 +129,27 @@ export default {
           key: "memberId",
           align: "center",
           sortable: true,
+          minWidth: 120,
         },
         {
           title: "搜索次数",
           key: "seachCount",
           align: "center",
           sortable: true,
+          minWidth: 120,
         },
         {
           title: "是否显示",
           key: "isShow",
           align: "center",
           sortable: true,
+          minWidth: 120,
           render: (h, params) => {
             return h(
               "Button",
               {
                 props: {
-                  type: params.row.isShow ? "success" : error,
+                  type: params.row.isShow === 1 ? "success" : 'error',
                 },
                 on: {
                   click: () => {
@@ -154,7 +157,7 @@ export default {
                   },
                 },
               },
-              params.row.isShow ? "显示" : "不显示"
+              params.row.isShow===1 ? "显示" : "不显示"
             );
           },
         },
@@ -163,12 +166,14 @@ export default {
           key: "keyword",
           align: "center",
           sortable: true,
+          minWidth:280
         },
 
         {
           title: "操作",
           key: "action",
           align: "center",
+          width: 120,
           render: (h, params) => {
             return h("div", [
               h(
@@ -180,7 +185,6 @@ export default {
                     icon: "ios-create-outline",
                   },
                   style: {
-                    marginRight: "5px",
                   },
                   on: {
                     click: () => {
@@ -230,7 +234,6 @@ export default {
       this.getDataList();
     },
     changeSort(e) {
-      console.log(e);
       this.searchForm.sortName = e.key.replace(/[A-Z]/g, (s) => {
         return "_" + s.toLowerCase();
       });
@@ -294,7 +297,6 @@ export default {
     },
     // 获取商品详情
     edit(v) {
-      console.log(v);
       this.$refs.editForm.resetFields();
       this.editVisible = true;
       this.editForm.keyword = v.keyword;

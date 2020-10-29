@@ -181,7 +181,7 @@
       </Col>
       <LangSwitch />
     </Row>
-    <div class="selectCity">
+    <div class="selectCity" v-if="!isWeiXin">
       <div id="qrcode"></div>
       <div>
         请选择公司所在地区：
@@ -201,6 +201,11 @@
         >武汉</i-button> -->
       </div>
     </div>
+
+    <!-- <div v-if="isWeiXin" class="weiXinLogin">
+      <h1>欢迎使用中台管理系统</h1>
+      <i-button type="primary" @click="loginToCRM">立即进入</i-button>
+    </div> -->
   </div>
 </template>
 
@@ -220,6 +225,7 @@ import {
   getOtherSet,
   getNotice,
 } from "@/api/index";
+// import { weiXinLogin } from "@/api/crm";
 import { validateMobile } from "@/libs/validate";
 import Cookies from "js-cookie";
 import Header from "@/views/main-components/header";
@@ -229,7 +235,7 @@ import RectLoading from "@/views/my-components/xboot/rect-loading";
 import CountDownButton from "@/views/my-components/xboot/count-down-button";
 import util from "@/libs/util.js";
 import sha1 from "js-sha1";
-let Hashes = require('jshashes')
+let Hashes = require("jshashes");
 export default {
   components: {
     CountDownButton,
@@ -240,6 +246,7 @@ export default {
   },
   data() {
     return {
+      isWeiXin: false,
       primary: true,
       captchaId: "",
       captchaImg: "",
@@ -549,7 +556,7 @@ export default {
         desc: "账号：test或test2<br>密码：123456",
       });
     },
-    getWeCode(appid,agentid,query,flag=true) {
+    getWeCode(appid, agentid, query, flag = true) {
       this.primary = flag;
       this.WwLogin({
         id: "qrcode",
@@ -564,51 +571,56 @@ export default {
         href: "",
       });
     },
-    getOpenFun() {
-        let ua = window.navigator.userAgent.toLowerCase();
-        if(ua.match(/MicroMessenger/i)&&!ua.match(/wxwork/i)){
-            return 'microMessenger'
-        }else if(ua.match(/MicroMessenger/i)&&ua.match(/wxwork/i)){
-            return 'wxwork'
-        }else{
-            return 'other'
-        }
-    }
+    // 判断是否是微信浏览器打开
+    /* is_weixin() {
+      var ua = navigator.userAgent.toLowerCase();
+      if (ua.match(/MicroMessenger/i) == "micromessenger") {
+        return true;
+      } else {
+        return false;
+      }
+    }, */
+    // 跳转
+    /* loginToCRM() {
+      var url = location.href.split("#")[0];
+      weiXinLogin().then((res) => {
+        var str1 = sha1(
+          `jsapi_ticket=${res.jsapi_ticket}&noncestr=${res.nonceStr}&timestamp=${res.timestamp}&url=${url}`
+        );
+        this.wx.config({
+          beta: true, // 必须这么写，否则wx.invoke调用形式的jsapi会有问题
+          debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+          appId: res.corpid, // 必填，企业微信的corpID
+          timestamp: res.timestamp, // 必填，生成签名的时间戳
+          nonceStr: res.nonceStr, // 必填，生成签名的随机串
+          signature: str1, // 必填，签名，见 附录-JS-SDK使用权限签名算法
+          jsApiList: ["openDefaultBrowser"], // 必填，需要使用的JS接口列表，凡是要调用的接口都需要传进来
+        });
+        this.wx.ready(() => {
+          this.wx.invoke(
+            "openDefaultBrowser",
+            {
+              url: url, // 在默认浏览器打开redirect_uri，并附加code参数；也可以直接指定要打开的url，此时不会附带上code参数。
+            },
+            function (res) {
+              if (res.errMsg == "openDefaultBrowser:ok") {
+              }
+            }
+          );
+        });
+        this.wx.error((res) => {
+        });
+      });
+    }, */
   },
   mounted() {
-   /*  getTicket("/test").then((res) => {
-​    var sha = new Hashes.SHA1;
-​    var str = sha.hex(`jsapi_ticket=O3SMpm8bG7kJnF36aXbe88y2RTXI2Re_jv0cAJa2bLQbnfHQrrOwknCKxvxyprEpEPXUqQIBvZ8jH1sBz3MhIg&noncestr=nFbShhxVTXuVMAft&timestamp=1597738520175&url=http://iemupq.natappfree.cc/login`)
-​    var str1 = sha1(`jsapi_ticket=O3SMpm8bG7kJnF36aXbe88y2RTXI2Re_jv0cAJa2bLQbnfHQrrOwknCKxvxyprEpEPXUqQIBvZ8jH1sBz3MhIg&noncestr=nFbShhxVTXuVMAft&timestamp=1597738520175&url=http://iemupq.natappfree.cc/login`)
-​    this.wx.config({
-​     beta: true, // 必须这么写，否则wx.invoke调用形式的jsapi会有问题
-​     debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
-​     appId: "wwdef3f8f98ff3b878", // 必填，企业微信的corpID
-​     timestamp: 1597738520175, // 必填，生成签名的时间戳
-​     nonceStr: 'nFbShhxVTXuVMAft', // 必填，生成签名的随机串
-​     signature: str1, // 必填，签名，见 附录-JS-SDK使用权限签名算法
-​     jsApiList: ['invoke'], // 必填，需要使用的JS接口列表，凡是要调用的接口都需要传进来
-​    });
-​    this.wx.ready(() => {
-​     this.wx.invoke(
-​      "openDefaultBrowser",
-​      {
-​       url: "http://192.168.0.43:8888/login",
-​      },
-​      function (res) {
-​       if (res.err_msg != "openDefaultBrowser:ok") {
-​        //错误处理
-​       }
-​      }
-​     );
-​    })
-  }); */
-    this.getWeCode('ww0c31d7c2891ce172', '1000038',1, true);
+    // this.isWeiXin = this.is_weixin();
+    this.getWeCode("ww0c31d7c2891ce172", "1000038", 1, true);
     this.relatedLogin();
     this.showNotice();
     this.getCaptchaImg();
-  }
-}
+  },
+};
 </script>
 
 <style lang="less">

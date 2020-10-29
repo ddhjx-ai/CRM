@@ -33,6 +33,14 @@ router.beforeEach((to, from, next) => {
         // 白名单
         var whiteList = name != 'login' && name != 'regist' && name != 'regist-result' && name != 'relate' && name != 'reset' && name != 'authorize';
         if (!Cookies.get('userInfo') && whiteList) {
+            if (name == 'wuhan') {
+                next();
+                return
+            }
+            if (name == 'beijing') {
+                next();
+                return
+            }
             // 判断是否已经登录且前往的页面不是登录页
             next({
                 name: 'login'
@@ -43,7 +51,7 @@ router.beforeEach((to, from, next) => {
             next({
                 name: 'home_index'
             });
-        } else  {
+        } else {
             Util.toDefaultPage([...routers], name, router, next);
         }
     }

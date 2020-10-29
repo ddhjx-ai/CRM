@@ -1,4 +1,5 @@
 <style lang="less">
+@import "./reportApply.less";
 </style>
 <template>
   <div class="search">
@@ -15,10 +16,15 @@
             <Input
               type="text"
               v-model="searchForm.search"
-              placeholder="根据用户ID、客服查找"
               style="width: 200px"
             />
           </Form-item>
+          <FormItem prop="searchType" class="leftBtnForm" style="width: 100px">
+            <Select v-model="searchForm.searchType" placeholder="请选择">
+              <Option value="0">用户ID</Option>
+              <Option value="1">客服</Option>
+            </Select>
+          </FormItem>
           <Form-item class="operation">
             <Button @click="handleSearch" type="primary" icon="ios-search"
               >查询</Button
@@ -29,7 +35,9 @@
       </Row>
       <Row class="operation" style="margin-bottom: 10px">
         <Button @click="handleAdd" type="primary" icon="md-add">添加</Button>
-        <Button @click="handleDel" type="primary" icon="md-trash">批量删除</Button>
+        <Button @click="handleDel" type="primary" icon="md-trash"
+          >批量删除</Button
+        >
         <Button @click="getDataList" icon="md-refresh">刷新</Button>
       </Row>
       <Row>
@@ -51,7 +59,7 @@
           :page-size="searchForm.size"
           @on-change="changePage"
           @on-page-size-change="changesize"
-          :page-size-opts="[10,20,50]"
+          :page-size-opts="[10, 20, 50]"
           size="small"
           show-total
           show-elevator
@@ -60,22 +68,42 @@
       </Row>
     </Card>
 
-    <Modal title="添加" v-model="addVisible" :mask-closable="false" :width="500">
-      <Form ref="addForm" :model="addForm" :label-width="110" :rules="formValidate">
-        <FormItem label="用户ID：" prop="id">
-          <Input v-model="addForm.id" />
+    <Modal
+      title="添加"
+      v-model="addVisible"
+      :mask-closable="false"
+      :width="500"
+    >
+      <Form
+        ref="addForm"
+        :model="addForm"
+        :label-width="110"
+        :rules="formValidate"
+      >
+        <FormItem
+          label="用户ID："
+          prop="memberId"
+          :rules="{
+            required: true,
+            message: '用户名不能为空',
+            blur: 'trigger',
+          }"
+        >
+          <Input v-model="addForm.memberId" />
         </FormItem>
       </Form>
       <div slot="footer">
         <Button type="text" @click="addVisible = false">取消</Button>
-        <Button type="primary" :loading="submitLoading" @click="addSubmit">提交</Button>
+        <Button type="primary" :loading="submitLoading" @click="addSubmit"
+          >提交</Button
+        >
       </div>
     </Modal>
   </div>
 </template>
 
 <script>
-import { getCrmRequest, removeCrm ,postCrmRequest} from "@/api/crm";
+import { getCrmRequest, removeCrm, postCrmRequest } from "@/api/crm";
 import { validatePrice } from "@/libs/validate";
 import qs from "qs";
 export default {
@@ -83,7 +111,7 @@ export default {
   data() {
     return {
       addForm: {
-        id: "",
+        memberId: "",
       },
       addVisible: false,
       submitLoading: false,
@@ -92,6 +120,10 @@ export default {
         // 搜索框对应data对象
         page: 1, // 当前页数
         size: 10, // 页面大小
+        sortOrder: "",
+        sortName: "",
+        searchType: "",
+        search: "",
       },
       selectList: [], // 多选数据
       selectCount: 0, // 多选计数
@@ -105,40 +137,63 @@ export default {
         {
           title: "ID",
           key: "id",
-          width: 100,
+          minWidth: 100,
+          align: "center",
+          sortable: true,
         },
         {
           title: "用户id",
-          key: "1",
+          key: "memberId",
+          align: "center",
+          sortable: true,
+          minWidth: 120,
         },
         {
           title: "企业名称",
           key: "2",
+          align: "center",
+          sortable: true,
+          minWidth: 200,
         },
         {
           title: "完成情况",
           // 已收集/未收集，初始都是未收集，已收集会有完成时间
-          key: "3",
-          render:(h,params) => {
-            return h('div', {
-              style: {
-                color: 'red'
-              }
-            },
-            '未收集')
-          }
+          key: "companyName",
+          align: "center",
+          sortable: true,
+          minWidth: 200,
+          render: (h, params) => {
+            return h(
+              "span",
+              {
+                style: {
+                  color: "red",
+                },
+              },
+              "未收集"
+            );
+          },
         },
         {
           title: "客服",
           key: "4",
+          align: "center",
+          sortable: true,
+          minWidth: 120,
         },
         {
           title: "开始时间",
-          key: "5",
+          key: "createDate",
+          align: "center",
+          sortable: true,
+          minWidth: 150,
         },
         {
           title: "完成时间",
-          key: "6",
+          key: "finishDate",
+          align: "center",
+          sortable: true,
+          minWidth: 150,
         },
       ],
       data: [], // 表单数据
@@ -161,10 +216,12 @@ export default {
       this.getDataList();
     },
     changeSort(e) {
-      this.searchForm.sort = e.key;
-      this.searchForm.order = e.order;
+      this.searchForm.sortName = e.key.replace(/[A-Z]/g, (s) => {
+        return "_" + s.toLowerCase();
+      });
+      this.searchForm.sortOrder = e.order;
       if (e.order == "normal") {
-        this.searchForm.order = "";
+        this.searchForm.sortOrder = "";
       }
       this.getDataList();
     },
@@ -186,11 +243,7 @@ export default {
     // 删除
     handleDel() {
       if (this.selectCount <= 0) {
-        this.$Message.warning("您还未选择要删除的数据");
-        return;
-      }
-      if (this.selectCount > 1) {
-        this.$Message.warning("请选择一条数据");
+        this.$Message.warning("请选择要删除的数据");
         return;
       }
       this.$Modal.confirm({
@@ -207,20 +260,38 @@ export default {
           //     this.getDataList();
           //   }
           // });
-          // 模拟请求成功
-          this.$Message.success("操作成功");
-          this.$Modal.remove();
-          this.clearSelectAll();
-          this.getDataList();
         },
       });
     },
     // 添加
-    addSubmit() {},
+    addSubmit() {
+      this.$refs.addForm.validate((valid) => {
+        if (valid) {
+          this.$Message.success("Success!");
+        } else {
+          this.$Message.error("Fail!");
+        }
+      });
+    },
     handleAdd() {
-        this.addVisible = true
-        this.$refs.addForm.resetFields()
-    }
+      this.addVisible = true;
+      this.$refs.addForm.resetFields();
+    },
+    // 重置
+    handleReset() {
+      this.$refs.searchForm.resetFields();
+      this.searchForm.page = 1;
+      this.searchForm.size = 10;
+      this.searchForm.sortOrder = "";
+      this.searchForm.sortName = "";
+      this.getDataList();
+    },
+    // 查询
+    handleSearch() {
+      this.searchForm.page = 1;
+      this.searchForm.size = 10;
+      this.getDataList();
+    },
   },
   mounted() {
     this.init();

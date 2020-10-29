@@ -106,7 +106,7 @@ export default {
         {
           title: "ID",
           key: "id",
-          width: 100,
+          minWidth: 100,
           align: "center",
           sortable: true,
         },
@@ -115,12 +115,14 @@ export default {
           key: "memberId",
           align: "center",
           sortable: true,
+          minWidth: 120,
         },
         {
           title: "第一候选人",
           slot: "isFirst",
           key: 'isFirst',
           sortable: true,
+          minWidth: 150,
           renderHeader: (h, params) => {
             return h("span", {}, "第一候选人" + "(" + this.firstTotal + ")");
           },
@@ -147,6 +149,7 @@ export default {
           title: "信息标题",
           key: "title",
           align: "center",
+          minWidth: 500,
           sortable: true,
           render: (h, params) => {
             return h(
@@ -158,6 +161,10 @@ export default {
                 style: {
                   color: "#2d8cf0",
                 },
+                domProps: {
+                  title: params.row.title,
+                },
+                class: "buttonDom",
                 on: {
                   click: () => {
                     this.titleToHerf(params.row);
@@ -173,6 +180,7 @@ export default {
           key: "publishDate",
           align: "center",
           sortable: true,
+          minWidth:150,
         },
       ],
       data: [], // 表单数据
@@ -213,7 +221,6 @@ export default {
       this.selectCount = e.length;
     },
     changeSort(e) {
-      console.log(e);
       this.searchForm.sortName = e.key.replace(/[A-Z]/g, (s) => {
         return "_" + s.toLowerCase();
       });
@@ -240,7 +247,6 @@ export default {
     },
     // 切换候选人开关
     changeSwitch(v) {
-      console.log(v);
       this.$Modal.confirm({
         title: "确认",
         content: "您确认要继续执行当前操作？",
@@ -266,7 +272,6 @@ export default {
     },
     // 点击信息标题跳转
     titleToHerf(v) {
-      console.log(v);
       window.open("https://www.chinabidding.cn" + v.zbwUrl);
     },
   },
@@ -275,5 +280,6 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped>
+<style lang="less">
+@import './useReport.less';
 </style>

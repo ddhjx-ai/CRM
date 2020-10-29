@@ -3,10 +3,13 @@
 </style>
 
 <template>
-  <div class="main" :class="{'main-hide-text': shrink}">
+  <div class="main" :class="{ 'main-hide-text': shrink }">
     <div
       class="sidebar-menu-con menu-bar"
-      :style="{width: shrink ? '60px' : '220px', overflow: shrink ? 'visible' : 'auto'}"
+      :style="{
+        width: shrink ? '60px' : '220px',
+        overflow: shrink ? 'visible' : 'auto',
+      }"
     >
       <shrinkable-menu
         :shrink="shrink"
@@ -21,16 +24,24 @@
           <img v-show="shrink" src="../assets/logo-min.png" key="min-logo" />
         </div> -->
         <div slot="top" class="logo-con">
-          <h3 v-show="!shrink" style="color:#fff; font-size: 25px;">运营中心</h3>
-          <h3 v-show="shrink" style="color:#fff; font-size: 20px;">OSC</h3>
+          <h3 v-show="!shrink" style="color: #fff; font-size: 25px">
+            运营中心
+          </h3>
+          <h3 v-show="shrink" style="color: #fff; font-size: 20px">OSC</h3>
         </div>
       </shrinkable-menu>
     </div>
-    <div class="main-header-con" :style="{paddingLeft: shrink?'60px':'220px'}" >
+    <div
+      class="main-header-con"
+      :style="{ paddingLeft: shrink ? '60px' : '220px' }"
+    >
       <div class="main-header">
         <div class="navicon-con">
           <Button
-            :style="{transform: 'rotateZ(' + (this.shrink ? '-90' : '0') + 'deg)', height: '48px'}"
+            :style="{
+              transform: 'rotateZ(' + (this.shrink ? '-90' : '0') + 'deg)',
+              height: '48px',
+            }"
             type="text"
             @click="toggleClick"
           >
@@ -38,10 +49,10 @@
           </Button>
         </div>
         <div class="header-middle-con">
-          <div class="main-breadcrumb" v-if="navType==4">
+          <div class="main-breadcrumb" v-if="navType == 4">
             <breadcrumb-nav :currentPath="currentPath"></breadcrumb-nav>
           </div>
-          <div class="main-nav-menu" v-if="navType==1||navType==2">
+          <div class="main-nav-menu" v-if="navType == 1 || navType == 2">
             <!-- <Menu mode="horizontal" :active-name="currNav" @on-select="selectNav">
               <MenuItem v-for="(item, i) in navList.slice(0, 1)" :key="i" :name="item.name">
                 <Icon :type="item.icon" v-if="navType==1" />
@@ -60,10 +71,10 @@
               </Submenu>
             </Menu> -->
           </div>
-          <div class="main-nav" v-if="navType==3">
+          <div class="main-nav" v-if="navType == 3">
             <Dropdown transfer @on-click="selectNav">
               <div style="cursor: pointer">
-                {{currNavTitle}}
+                {{ currNavTitle }}
                 <Icon type="ios-arrow-down"></Icon>
               </div>
               <DropdownMenu slot="list">
@@ -71,35 +82,51 @@
                   v-for="(item, i) in navList"
                   :key="i"
                   :name="item.name"
-                  :selected="currNav==item.name"
+                  :selected="currNav == item.name"
                 >
                   <div class="nav-item">
-                    <Icon :type="item.icon" :size="16" style="margin: 0 10px 3px 0"></Icon>
-                    {{item.title}}
+                    <Icon
+                      :type="item.icon"
+                      :size="16"
+                      style="margin: 0 10px 3px 0"
+                    ></Icon>
+                    {{ item.title }}
                   </div>
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
         </div>
-        <div :class="{'header-avator-con':navType!=4, 'header-avator-con nav4':navType==4}">
-          <Dropdown @on-click="selectNav" class="options" v-if="navType==4">
+        <div
+          :class="{
+            'header-avator-con': navType != 4,
+            'header-avator-con nav4': navType == 4,
+          }"
+        >
+          <Dropdown @on-click="selectNav" class="options" v-if="navType == 4">
             <Icon type="ios-apps" :size="24" class="language"></Icon>
             <DropdownMenu slot="list">
               <DropdownItem
                 v-for="(item, i) in navList"
                 :key="i"
                 :name="item.name"
-                :selected="currNav==item.name"
+                :selected="currNav == item.name"
               >
                 <div>
-                  <Icon :type="item.icon" :size="14" style="margin: 0 10px 2px 0"></Icon>
-                  {{item.title}}
+                  <Icon
+                    :type="item.icon"
+                    :size="14"
+                    style="margin: 0 10px 2px 0"
+                  ></Icon>
+                  {{ item.title }}
                 </div>
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <full-screen v-model="isFullScreen" @on-change="fullscreenChange"></full-screen>
+          <full-screen
+            v-model="isFullScreen"
+            @on-change="fullscreenChange"
+          ></full-screen>
           <Dropdown @on-click="handleLanDropdown" class="options">
             <Icon type="md-globe" :size="24" class="language"></Icon>
             <DropdownMenu slot="list">
@@ -110,17 +137,35 @@
           <lock-screen></lock-screen>
           <message-tip v-model="mesCount"></message-tip>
           <div class="user-dropdown-menu-con">
-            <Row type="flex" justify="end" align="middle" class="user-dropdown-innercon">
-              <Dropdown transfer trigger="hover" @on-click="handleClickUserDropdown">
+            <Row
+              type="flex"
+              justify="end"
+              align="middle"
+              class="user-dropdown-innercon"
+            >
+              <Dropdown
+                transfer
+                trigger="hover"
+                @on-click="handleClickUserDropdown"
+              >
                 <a>
                   <span class="main-user-name">{{ username }}</span>
                   <Icon type="md-arrow-dropdown" />
-                  <Avatar :src="avatarPath" style="background: #619fe7;margin-left: 10px;"></Avatar>
+                  <Avatar
+                    :src="avatarPath"
+                    style="background: #619fe7; margin-left: 10px"
+                  ></Avatar>
                 </a>
                 <DropdownMenu slot="list">
-                  <DropdownItem name="ownSpace">{{ $t('userCenter') }}</DropdownItem>
-                  <DropdownItem name="changePass">{{ $t('changePass') }}</DropdownItem>
-                  <DropdownItem name="loginout" divided>{{ $t('logout') }}</DropdownItem>
+                  <DropdownItem name="ownSpace">{{
+                    $t("userCenter")
+                  }}</DropdownItem>
+                  <DropdownItem name="changePass">{{
+                    $t("changePass")
+                  }}</DropdownItem>
+                  <DropdownItem name="loginout" divided>{{
+                    $t("logout")
+                  }}</DropdownItem>
                 </DropdownMenu>
               </Dropdown>
             </Row>
@@ -131,10 +176,10 @@
         <tags-page-opened :pageTagsList="pageTagsList"></tags-page-opened>
       </div>
     </div>
-    <div class="single-page-con" :style="{left: shrink?'60px':'220px'}">
+    <div class="single-page-con" :style="{ left: shrink ? '60px' : '220px' }">
       <div class="single-page">
         <!-- <keep-alive :include="cachePage"> -->
-          <router-view></router-view>
+        <router-view></router-view>
         <!-- </keep-alive> -->
       </div>
     </div>
@@ -165,7 +210,7 @@ export default {
     fullScreen,
     lockScreen,
     messageTip,
-    circleLoading
+    circleLoading,
   },
   data() {
     return {
@@ -177,7 +222,7 @@ export default {
       openedSubmenuArr: this.$store.state.app.openedSubmenuArr,
       firstThreeNav: [],
       lastNav: [],
-      navType: 1
+      navType: 1,
     };
   },
   computed: {
@@ -216,13 +261,20 @@ export default {
     },
     mesCount() {
       return this.$store.state.app.messageCount;
-    }
+    },
   },
   stompClient: {
     monitorIntervalTime: 100,
     stompReconnect: true,
-    timeout(orgCmd) {}
+    timeout(orgCmd) {},
   },
+  /* beforeRouteEnter: (to, from, next) => {
+    console.log(from)
+    if(from.name == 'login'){
+      location.reload()
+    }
+    next()
+  }, */
   methods: {
     init() {
       // 菜单
@@ -242,8 +294,8 @@ export default {
       // 读取未读消息数
       getMessageSendData({
         userId: userInfo.id,
-        status: 0
-      }).then(res => {
+        status: 0,
+      }).then((res) => {
         if (res.success) {
           this.$store.commit("setMessageCount", res.result.totalElements);
         }
@@ -284,7 +336,7 @@ export default {
       // this.$store.commit("clearAllTags");
       if (this.$route.name != "home_index") {
         this.$router.push({
-          name: "home_index"
+          name: "home_index",
         });
       }
       util.initRouter(this);
@@ -296,27 +348,27 @@ export default {
       this.$i18n.locale = name;
       this.$store.commit("switchLang", name);
     },
-    handleClickUserDropdown(name) {   
+    handleClickUserDropdown(name) {
       if (name == "ownSpace") {
         util.openNewPage(this, "ownspace_index");
         this.$router.push({
-          name: "ownspace_index"
+          name: "ownspace_index",
         });
       } else if (name == "changePass") {
         util.openNewPage(this, "change_pass");
         this.$router.push({
-          name: "change_pass"
+          name: "change_pass",
         });
       } else if (name == "loginout") {
         // 退出登录
         this.$store.commit("setLoading", true);
-        getOtherSet().then(res => {
+        getOtherSet().then((res) => {
           this.$store.commit("setLoading", false);
           if (res.result) {
             let domain = res.result.ssoDomain;
             Cookies.set("accessToken", "", {
               domain: domain,
-              expires: 7
+              expires: 7,
             });
           }
           this.$store.commit("logout", this);
@@ -328,7 +380,7 @@ export default {
       }
     },
     checkTag(name) {
-      let openpageHasTag = this.pageTagsList.some(item => {
+      let openpageHasTag = this.pageTagsList.some((item) => {
         if (item.name == name) {
           return true;
         }
@@ -365,7 +417,7 @@ export default {
         this.sliceNum = 3;
         this.shrink = false;
       }
-    }
+    },
   },
   watch: {
     $route(to) {
@@ -379,19 +431,19 @@ export default {
     },
     lang() {
       util.setCurrentPath(this, this.$route.name); // 在切换语言时用于刷新面包屑
-    }
+    },
   },
   mounted() {
     this.init();
     let that = this;
     this.resize();
-    window.addEventListener("resize", function() {
+    window.addEventListener("resize", function () {
       that.resize();
     });
   },
   created() {
     // 显示打开的页面的列表
     this.$store.commit("setOpenedList");
-  }
+  },
 };
 </script>

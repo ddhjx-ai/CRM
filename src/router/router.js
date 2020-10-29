@@ -10,6 +10,24 @@ export const loginRouter = {
     component: () => import('@/views/login.vue')
 };
 
+// 武汉地区
+export const wuhanRouter = {
+    path: '/wuhan',
+    name: 'wuhan',
+    meta: {
+        title: '采购与招标网-运营中台'
+    },
+    component: () => import('@/views/weiXin/wuHan.vue')
+};
+export const beijingRouter = {
+    path: '/beijing',
+    name: 'beijing',
+    meta: {
+        title: '采购与招标网-运营中台'
+    },
+    component: () => import('@/views/weiXin/beiJing.vue')
+};
+
 export const registRouter = {
     path: '/regist',
     name: 'regist',
@@ -135,5 +153,8 @@ export const routers = [
     ...appRouter,
     page500,
     page403,
-    page402
+    page402,
+
+    wuhanRouter,
+    beijingRouter
 ];
