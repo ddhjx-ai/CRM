@@ -104,7 +104,7 @@ export default {
     return {
       optionList: [],
       openTip: false, // 显示提示
-      loading: true, // 表单加载状态
+      loading: false, // 表单加载状态
       searchForm: {
         // 搜索框对应data对象
         page: 1, // 当前页数

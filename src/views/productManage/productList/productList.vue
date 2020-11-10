@@ -772,7 +772,6 @@ export default {
     showSelect(e) {
       this.selectList = e;
       this.selectCount = e.length;
-      this.clearSelectAll();
     },
     clearSelectAll() {
       this.$refs.table.selectAll(false);

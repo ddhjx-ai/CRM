@@ -153,14 +153,16 @@ export default {
           sortable: true,
           render: (h, params) => {
             return h(
-              "Button",
+              "a",
               {
-                props: {
+                /* props: {
                   type: "text",
-                },
+                }, */
                 style: {
                   color: "#2d8cf0",
+                  "text-decoration": "none",
                 },
+                attrs: {},
                 domProps: {
                   title: params.row.title,
                 },
@@ -208,8 +210,9 @@ export default {
         "/up/report/part_list",
         qs.stringify(this.searchForm)
       ).then((res) => {
+        this.loading = false;
         if (res.success) {
-          this.loading = false;
+          if (!res.result) return;
           this.data = res.result.list;
           this.total = res.result.total;
           this.firstTotal = res.result.firstTotal;

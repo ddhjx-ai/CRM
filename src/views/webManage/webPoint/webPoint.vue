@@ -58,7 +58,7 @@ export default {
   name: "webPoint",
   data() {
     return {
-      loading: true, // 表单加载状态
+      loading: false, // 表单加载状态
       searchForm: {
         // 搜索框对应data对象
         page: 1, // 当前页数

@@ -56,3 +56,15 @@ export const putCrmRequest = (url, data={}) => {
     data:data
   })
 }
+
+// 报告申请删除
+export const deleteReport = (url, ids) => {
+  return axios({
+    method: 'delete',
+    url: '/osc' + url,
+    headers: {
+      'accessToken': accessToken
+    },
+    params: ids
+  })
+}

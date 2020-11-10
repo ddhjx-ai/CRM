@@ -142,6 +142,9 @@
                   >导入</Button
                 >
                 <Button @click="clearImportData">重置</Button>
+                <Button type="primary" @click="getMenuView" :disabled="!menuBlockId" :title="!menuBlockId ? '未上传Excel文件，请先上传' : ''"
+                  >查看文件内容</Button
+                >
               </FormItem>
             </Row>
           </Col>
@@ -378,19 +381,22 @@
                 </Col>
                 <Col span="5">
                   <FormItem>
-                    <Button type="primary" @click="getNewKeywords('newModalForm')">生成关键词</Button>
+                    <Button
+                      type="primary"
+                      @click="getNewKeywords('newModalForm')"
+                      >生成关键词</Button
+                    >
                   </FormItem>
                 </Col>
               </Row>
               <Row>
                 <Col span="19">
                   <FormItem label="关键词" style="width: 100%">
-                    <!-- <Input
-                      type="text"
+                    <Input
+                      type="textarea"
                       v-model="newModalForm.keywords"
-                      readonly
-                    ></Input> -->
-                    <span>{{newModalForm.keywords}}</span>
+                    ></Input>
+                    <!-- <span>{{ newModalForm.keywords }}</span> -->
                   </FormItem>
                 </Col>
               </Row>
@@ -402,7 +408,7 @@
                       v-model="newModalForm.keywords"
                       readonly
                     ></Input> -->
-                    <span>{{newBlockId}}</span>
+                    <span>{{ newBlockId }}</span>
                   </FormItem>
                 </Col>
               </Row>
@@ -524,21 +530,29 @@
                 </Col>
                 <Col span="5">
                   <FormItem>
-                    <Button type="primary" @click="getNewKeywords('downloadModalForm')">生成关键词</Button>
+                    <Button
+                      type="primary"
+                      @click="getNewKeywords('downloadModalForm')"
+                      >生成关键词</Button
+                    >
                   </FormItem>
                 </Col>
               </Row>
               <Row>
                 <Col span="19">
                   <FormItem label="关键词" style="width: 100%">
-                    <span>{{downloadModalForm.keywords}}</span>
+                    <!-- <span>{{downloadModalForm.keywords}}</span> -->
+                    <Input
+                      type="textarea"
+                      v-model="downloadModalForm.keywords"
+                    ></Input>
                   </FormItem>
                 </Col>
               </Row>
               <Row>
                 <Col>
                   <FormItem label="blockId" style="width: 100%">
-                    <span>{{downloadBlockId}}</span>
+                    <span>{{ downloadBlockId }}</span>
                   </FormItem>
                 </Col>
               </Row>
@@ -796,7 +810,9 @@
           </Col>
           <Col span="5">
             <FormItem>
-              <Button type="primary" @click="getNewKeywords('labelModalForm')">生成关键词</Button>
+              <Button type="primary" @click="getNewKeywords('labelModalForm')"
+                >生成关键词</Button
+              >
             </FormItem>
           </Col>
           <!-- <Col span="5">
@@ -816,12 +832,8 @@
         </Row>
         <Row>
           <FormItem label="关键词" prop="keywords" style="width: 100%">
-            <!-- <Input
-              type="text"
-              v-model="labelModalForm.keywords"
-              readonly
-            ></Input> -->
-            <span>{{labelModalForm.keywords}}</span>
+            <Input type="textarea" v-model="labelModalForm.keywords"></Input>
+            <!-- <span>{{labelModalForm.keywords}}</span> -->
           </FormItem>
         </Row>
       </Form>
@@ -939,7 +951,9 @@
           </Col>
           <Col span="5">
             <FormItem>
-              <Button type="primary" @click="getNewKeywords('contentModalForm')">生成关键词</Button>
+              <Button type="primary" @click="getNewKeywords('contentModalForm')"
+                >生成关键词</Button
+              >
             </FormItem>
           </Col>
           <!-- <Col span="5">
@@ -975,12 +989,8 @@
         </Row>
         <Row>
           <FormItem label="关键词" prop="keywords" style="width: 100%">
-            <!-- <Input
-              type="text"
-              v-model="contentModalForm.keywords"
-              readonly
-            ></Input> -->
-            <span>{{contentModalForm.keywords}}</span>
+            <Input type="textarea" v-model="contentModalForm.keywords"></Input>
+            <!-- <span>{{ contentModalForm.keywords }}</span> -->
           </FormItem>
         </Row>
       </Form>
@@ -1074,34 +1084,17 @@
       </div>
     </Modal>
 
-    <Modal title="添加URL"
-      v-model="urlVisible"
+    <!-- excel查看弹框 -->
+    <Modal
+      title="Excel内容"
+      v-model="menuViewVisible"
       :mask-closable="false"
-      :width="600">
-      <Form
-        ref="colorfulModalForm"
-        :model="colorfulModalForm"
-        :label-width="80"
-      >
-        <FormItem
-          prop="url"
-          label="URL"
-        >
-          <Input
-            type="text"
-            v-model="colorfulModalForm.imgurl"
-            placeholder="请输入URL"
-          ></Input>
-        </FormItem>
-      </Form>
+      :width="800"
+    >
+      <Tree :data="menuViewTree"></Tree>
       <div slot="footer">
-        <Button type="text" @click="handleColorfulCancel">取消</Button>
-        <Button
-          type="primary"
-          :loading="submitLoading"
-          @click="handleColorfulSubmit"
-          >确认</Button
-        >
+        <!-- <Button type="text" @click="handleColorfulCancel">取消</Button> -->
+        <Button type="primary" @click="menuViewVisible = false">确认</Button>
       </div>
     </Modal>
   </div>
@@ -1133,6 +1126,7 @@ import {
   labelDetail, // 数据展示模块回显
   colorfulDetail, // 彩色模块数据回显
   getKeywords, // 生成关键词
+  getMenuTree, // 查看已上传的文件内容
 } from "@/api/channel";
 import qs from "qs";
 // excel转换工具类
@@ -1142,6 +1136,8 @@ export default {
   name: "blocksManage",
   data() {
     return {
+      menuViewVisible: false,
+      menuViewTree: [],
       themeColor: "#000000",
       channelName: "",
       ruleValidate: {
@@ -1296,7 +1292,7 @@ export default {
         andKey: "",
         orKey: "",
         type: 1,
-        name: "",
+        name: "附件下载",
         queryType: 3,
         showType: 4,
         defaultKey: "",
@@ -1429,7 +1425,7 @@ export default {
         asideList: [
           {
             name: "",
-            url: '',
+            url: "",
           },
         ],
       },
@@ -1515,7 +1511,7 @@ export default {
           this.asideModalForm.asideList = data.right_block.map((item) => {
             return {
               name: item.name,
-              url: item.url
+              url: item.url,
             };
           });
         }
@@ -1593,6 +1589,8 @@ export default {
       this.$refs.excelFile.click();
     },
     getExcelFile() {
+      // console.log(this.$refs.excelFile.files[0])
+      if (!this.$refs.excelFile.files[0]) return;
       let file = this.$refs.excelFile.files[0];
       this.uploadfile = file;
     },
@@ -1601,7 +1599,7 @@ export default {
       this.$refs.excelFile.value = null;
     },
     menuModalSubmit() {
-      if (!this.uploadfile.name) {
+      if (this.uploadfile && !this.uploadfile.name) {
         return this.$Message.error("请先选择excel文件");
       }
       const fileExt = this.uploadfile.name.split(".").pop().toLocaleLowerCase();
@@ -1637,6 +1635,68 @@ export default {
     },
     downloadTemplate() {
       this.$refs.excelDownload.click();
+    },
+    getMenuView() {
+      this.menuViewVisible = true;
+      getMenuTree(this.menuBlockId).then((res) => {
+        if (res.success) {
+          let data = [];
+          res.result.forEach((item, index) => {
+            data[index] = {
+              title: item.title[0].txt1,
+              children: [
+                {
+                  title: "hottxt",
+                  children: [],
+                },
+                {
+                  title: "hotlist",
+                  children: [],
+                },
+              ],
+              render: (h, { root, node, data }) => {
+                return h('span', {style: {
+                  'font-weight': 'bold'
+                }}, data.title)
+              }
+            };
+            item.content[0].hotlist.forEach((listItem, listIndex) => {
+              listItem.render = (h, { root, node, data }) => {
+                return h("div", {}, [
+                  h("p", {}, data.txt1),
+                  h("p", {}, data.txt_a),
+                ]);
+              };
+            });
+            item.content[0].hottxt.forEach((txtItem, txtIndex) => {
+              txtItem.render = (h, { root, node, data }) => {
+                return h("div", {}, [
+                  h("p", {}, data.txt1),
+                  h("p", {}, data.txt_a),
+                ]);
+              };
+            });
+            data[index].children[0].children = item.content[0].hottxt;
+            data[index].children[1].children = item.content[0].hotlist;
+            /* data[index].children[0] = item.content[0].hotlist.forEach(
+              (listItem, listIndex) => {
+                data[index].children[0][listIndex] = {
+                  ...listItem,
+                  render: (h, { root, node, data }) => {
+                    return h("div", {}, [
+                      h("p", {}, data.txt1),
+                      h("p", {}, data.txt_a),
+                    ]);
+                  },
+                };
+              }
+            ); */
+          });
+          console.log(data);
+          this.menuViewTree = data;
+          console.log(this.menuViewTree);
+        }
+      });
     },
     // 添加banner图
     handleBannerAdd() {
@@ -1770,16 +1830,16 @@ export default {
         andKey: this[model].andKey,
         orKey: this[model].orKey,
         type: this[model].type,
-      }
-      getKeywords(qs.stringify(data)).then(res => {
-        if(res.success){
-          this[model].keywords = res.result
+      };
+      getKeywords(qs.stringify(data)).then((res) => {
+        if (res.success) {
+          this[model].keywords = res.result;
           this.$Message.success("操作成功");
-        }else {
+        } else {
           this.getDetail();
           this.$Message.error("操作失败");
         }
-      })
+      });
     },
     newModalSubmit() {
       this.$refs.newModalForm.validate((valid) => {
@@ -1983,16 +2043,16 @@ export default {
     handleAsideAdd() {
       this.asideModalForm.asideList.push({
         name: "",
-        url: '',
+        url: "",
       });
     },
     handleAsideSubmit() {
       let data;
       let nameStr = "";
       this.asideModalForm.asideList.forEach((item) => {
-        if(item.url){
+        if (item.url) {
           nameStr += item.name + "+" + item.url + " ";
-        }else {
+        } else {
           nameStr += item.name + " ";
         }
       });
@@ -2025,7 +2085,7 @@ export default {
       });
     },
     showInput(i) {
-      console.log(i)
+      console.log(i);
     },
     // 重置
     ModalReset(name) {
@@ -2037,7 +2097,7 @@ export default {
         asideList: [
           {
             name: "",
-            url:''
+            url: "",
           },
         ],
       };

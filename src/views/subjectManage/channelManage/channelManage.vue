@@ -111,10 +111,16 @@ export default {
       loading: false,
       submitLoading: false,
       columns: [
-        {
+        /* {
           type: "index",
           title: "序号",
           width: 70,
+          align: "center",
+        }, */
+        {
+          title: "频道ID",
+          width: 80,
+          key: 'id',
           align: "center",
         },
         {
@@ -216,7 +222,7 @@ export default {
                 },
                 "预览"
               ), */
-              h(
+              /* h(
                 "Button",
                 {
                   props: {
@@ -230,7 +236,7 @@ export default {
                   },
                 },
                 "删除"
-              ),
+              ), */
             ]);
           },
         },

@@ -21,8 +21,8 @@
           </Form-item>
           <FormItem prop="searchType" class="leftBtnForm" style="width: 100px">
             <Select v-model="searchForm.searchType" placeholder="请选择">
-              <Option value="0">用户ID</Option>
-              <Option value="1">客服</Option>
+              <Option value="member_id">用户ID</Option>
+              <Option value="kefu">客服</Option>
             </Select>
           </FormItem>
           <Form-item class="operation">
@@ -36,7 +36,7 @@
       <Row class="operation" style="margin-bottom: 10px">
         <Button @click="handleAdd" type="primary" icon="md-add">添加</Button>
         <Button @click="handleDel" type="primary" icon="md-trash"
-          >批量删除</Button
+          >删除</Button
         >
         <Button @click="getDataList" icon="md-refresh">刷新</Button>
       </Row>
@@ -83,11 +83,6 @@
         <FormItem
           label="用户ID："
           prop="memberId"
-          :rules="{
-            required: true,
-            message: '用户名不能为空',
-            blur: 'trigger',
-          }"
         >
           <Input v-model="addForm.memberId" />
         </FormItem>
@@ -103,8 +98,8 @@
 </template>
 
 <script>
-import { getCrmRequest, removeCrm, postCrmRequest } from "@/api/crm";
-import { validatePrice } from "@/libs/validate";
+import { getCrmRequest, removeCrm, postCrmRequest,putCrmRequest ,deleteReport} from "@/api/crm";
+import { validatePrice,validateSort } from "@/libs/validate";
 import qs from "qs";
 export default {
   name: "reportApply",
@@ -112,6 +107,12 @@ export default {
     return {
       addForm: {
         memberId: "",
+      },
+      formValidate:{
+        memberId: [
+          { required: true, message: "用户ID不能为空", trigger: "blur" },
+          { validator: validateSort, trigger: "blur" },
+        ]
       },
       addVisible: false,
       submitLoading: false,
@@ -147,10 +148,31 @@ export default {
           align: "center",
           sortable: true,
           minWidth: 120,
+          render: (h, params) => {
+            return h(
+              'a',
+              {
+                /* props: {
+                  type: 'text'
+                }, */
+                style: {
+                  color: "#2d8cf0",
+                  "text-decoration": "none",
+                },
+                attrs: {},
+                on: {
+                  click: () => {
+                    this.titleToHerf(params.row);
+                  },
+                },
+              },
+              params.row.memberId
+            )
+          }
         },
         {
           title: "企业名称",
-          key: "2",
+          key: "companyName",
           align: "center",
           sortable: true,
           minWidth: 200,
@@ -158,7 +180,7 @@ export default {
         {
           title: "完成情况",
           // 已收集/未收集，初始都是未收集，已收集会有完成时间
-          key: "companyName",
+          key: "status",
           align: "center",
           sortable: true,
           minWidth: 200,
@@ -167,30 +189,30 @@ export default {
               "span",
               {
                 style: {
-                  color: "red",
+                  color: params.row.status === 1 ? '#515a61' : "red",
                 },
               },
-              "未收集"
+              params.row.status === 1 ? "已收集" : "未收集"
             );
           },
         },
         {
           title: "客服",
-          key: "4",
+          key: "kefuName",
           align: "center",
           sortable: true,
           minWidth: 120,
         },
         {
           title: "开始时间",
-          key: "createDate",
+          key: "createTime",
           align: "center",
           sortable: true,
           minWidth: 150,
         },
         {
           title: "完成时间",
-          key: "finishDate",
+          key: "finishTime",
           align: "center",
           sortable: true,
           minWidth: 150,
@@ -211,14 +233,21 @@ export default {
       this.getDataList();
       this.clearSelectAll();
     },
+    clearSelectAll() {
+      this.$refs.table.selectAll(false);
+    },
     changesize(v) {
       this.searchForm.size = v;
       this.getDataList();
     },
     changeSort(e) {
-      this.searchForm.sortName = e.key.replace(/[A-Z]/g, (s) => {
-        return "_" + s.toLowerCase();
-      });
+      if(e.key == 'companyName'){
+        this.searchForm.sortName = e.key
+      }else {
+        this.searchForm.sortName = e.key.replace(/[A-Z]/g, (s) => {
+          return "_" + s.toLowerCase();
+        });
+      }
       this.searchForm.sortOrder = e.order;
       if (e.order == "normal") {
         this.searchForm.sortOrder = "";
@@ -228,13 +257,14 @@ export default {
     getDataList() {
       this.loading = true;
       // 请求后端获取表单数据 请自行修改接口
-      // this.getRequest("请求路径", this.searchForm).then(res => {
-      //   this.loading = false;
-      //   if (res.success) {
-      //     this.data = res.result.content;
-      //     this.total = res.result.totalElements;
-      //   }
-      // });
+      postCrmRequest("/up/report/apply_list", qs.stringify(this.searchForm)).then(res => {
+        this.loading = false;
+        if (res.success) {
+          if(!res.result) return
+          this.data = res.result.list;
+          this.total = res.result.total;
+        }
+      });
     },
     changeSelect(e) {
       this.selectList = e;
@@ -246,20 +276,32 @@ export default {
         this.$Message.warning("请选择要删除的数据");
         return;
       }
+      let ids = "";
+      if (this.selectList.length === 1) {
+        ids = this.selectList[0].id;
+      } else {
+        this.selectList.forEach((e, i) => {
+          if (i == this.selectList.length - 1) {
+            ids += e.id;
+          } else {
+            ids += (e.id + ",");
+          }
+        });
+      }
       this.$Modal.confirm({
         title: "确认删除",
         content: "您确认要删除所选的 " + this.selectCount + " 条数据?",
         loading: true,
         onOk: () => {
           // 批量删除
-          // this.deleteRequest("请求地址，如/deleteByIds/" + ids).then(res => {
-          //   this.$Modal.remove();
-          //   if (res.success) {
-          //     this.$Message.success("操作成功");
-          //     this.clearSelectAll();
-          //     this.getDataList();
-          //   }
-          // });
+          deleteReport("/up/report/delete", {ids: ids}).then(res => {
+            this.$Modal.remove();
+            if (res.success) {
+              this.$Message.success("操作成功");
+              this.clearSelectAll();
+              this.getDataList();
+            }
+          });
         },
       });
     },
@@ -267,9 +309,13 @@ export default {
     addSubmit() {
       this.$refs.addForm.validate((valid) => {
         if (valid) {
-          this.$Message.success("Success!");
-        } else {
-          this.$Message.error("Fail!");
+          postCrmRequest('/up/report/add_apply', qs.stringify({memberId: this.addForm.memberId})).then(res => {
+            if(res.success) {
+              this.$Message.success("添加成功");
+              this.addVisible = false;
+              this.getDataList();
+            }
+          })
         }
       });
     },
@@ -292,6 +338,10 @@ export default {
       this.searchForm.size = 10;
       this.getDataList();
     },
+    // 跳转
+    titleToHerf(v) {
+      window.open("https://crm.chinabidding.cn/up.Report/index?member_id=" + v.memberId);
+    }
   },
   mounted() {
     this.init();

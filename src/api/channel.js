@@ -376,3 +376,14 @@ export const getKeywords = (data) => {
     }
   })
 }
+
+// 查看已上传的excel文件内容
+export const getMenuTree = (id) => {
+  return axios({
+    method: 'get',
+    url: `/osc/block/channel/view_menu/${id}`,
+    headers: {
+      'accessToken': accessToken
+    }
+  })
+}

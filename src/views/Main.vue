@@ -7,7 +7,7 @@
     <div
       class="sidebar-menu-con menu-bar"
       :style="{
-        width: shrink ? '60px' : '220px',
+        width: shrink ? '60px' : '230px',
         overflow: shrink ? 'visible' : 'auto',
       }"
     >
@@ -33,7 +33,7 @@
     </div>
     <div
       class="main-header-con"
-      :style="{ paddingLeft: shrink ? '60px' : '220px' }"
+      :style="{ paddingLeft: shrink ? '60px' : '230px' }"
     >
       <div class="main-header">
         <div class="navicon-con">
@@ -176,7 +176,7 @@
         <tags-page-opened :pageTagsList="pageTagsList"></tags-page-opened>
       </div>
     </div>
-    <div class="single-page-con" :style="{ left: shrink ? '60px' : '220px' }">
+    <div class="single-page-con" :style="{ left: shrink ? '60px' : '230px' }">
       <div class="single-page">
         <!-- <keep-alive :include="cachePage"> -->
         <router-view></router-view>
