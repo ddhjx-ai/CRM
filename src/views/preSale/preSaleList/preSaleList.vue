@@ -1,9 +1,8 @@
-<style lang="less">
-</style>
+
 <template>
   <div class="search">
     <Card>
-      <Row>
+      <Row type="flex" justify="space-between">
         <Form
           ref="searchForm"
           :model="searchForm"
@@ -26,6 +25,9 @@
             <Button @click="handleReset">重置</Button>
           </Form-item>
         </Form>
+        <Button @click="handleQrcode" type="primary" icon="md-qr-scanner"
+          >查看二维码</Button
+        >
       </Row>
       <Row>
         <Table
@@ -52,16 +54,69 @@
         ></Page>
       </Row>
     </Card>
+
+    <Modal
+      title="二维码"
+      v-model="qrcodeVisible"
+      :mask-closable="false"
+      :width="500"
+      class="qrcodeVisible"
+    >
+      <Form
+        ref="qrcodeForm"
+        :model="qrcodeForm"
+        inline
+        :label-width="80"
+        label-position="right"
+        :rules="rules"
+      >
+        <Form-item label="手机号：" prop="phone">
+          <Input
+            type="text"
+            v-model="qrcodeForm.phone"
+            placeholder="请输入完整的手机号"
+          />
+        </Form-item>
+        <Form-item class="operation leftMargin">
+          <Button @click="getQrcode" type="primary">生成二维码</Button>
+        </Form-item>
+      </Form>
+      <Alert
+        type="warning"
+        show-icon
+        style="width: 400px; display: inline-block"
+        v-if="warnIsShow"
+        >当前用户未绑定手机号，请输入手机号获取二维码</Alert
+      >
+      <div class="qrcode" ref="qrCodeUrl"></div>
+      <div slot="footer">
+        <Button type="primary" @click="qrcodeVisible = false">确认</Button>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script>
-import { getCrmRequest, removeCrm, postCrmRequest, putCrmRequest } from "@/api/crm";
+import QRCode from "qrcodejs2";
+import {
+  getCrmRequest,
+  removeCrm,
+  postCrmRequest,
+  putCrmRequest,
+} from "@/api/crm";
+import { validateMobile } from "@/libs/validate";
+import { getStore } from "@/libs/storage";
 import qs from "qs";
 export default {
   name: "preSaleList",
   data() {
     return {
+      warnIsShow: false,
+      userPhone: "",
+      qrcodeForm: {
+        phone: "",
+      },
+      qrcodeVisible: false,
       loading: false, // 表单加载状态
       searchForm: {
         // 搜索框对应data对象
@@ -75,7 +130,7 @@ export default {
           type: "index",
           width: 100,
           align: "center",
-          title: '序号'
+          title: "序号",
         },
         {
           title: "报告ID",
@@ -84,7 +139,7 @@ export default {
           align: "center",
           render: (h, params) => {
             return h(
-              'a',
+              "a",
               {
                 style: {
                   color: "#2d8cf0",
@@ -98,8 +153,8 @@ export default {
                 },
               },
               params.row.id
-            )
-          }
+            );
+          },
         },
         {
           title: "提交时间",
@@ -124,33 +179,30 @@ export default {
           key: "status",
           align: "center",
           minWidth: 120,
-          render: (h,parmas) => {
-            return h('span', {
-              style: {
-                color: parmas.row.status === 1 ? '#19be6b' : '#ed4014'
-              }
-            } ,
-            parmas.row.status === 1 ? '已生成' : '未生成'
-            )
-          }
+          render: (h, parmas) => {
+            return h(
+              "span",
+              {
+                style: {
+                  color: parmas.row.status === 1 ? "#19be6b" : "#ed4014",
+                },
+              },
+              parmas.row.status === 1 ? "已生成" : "未生成"
+            );
+          },
         },
       ],
-      data: [
-        {
-          id: '001',
-          submitTime: '2020-02-02 22:22:22',
-          employName: 'wc',
-          department: '测试',
-          status: 1
-        }
-      ], // 表单数据
+      rules: {
+        phone: [{ validator: validateMobile, trigger: "blur" }],
+      },
+      data: [], // 表单数据
       total: 0, // 表单数据总数
     };
   },
   // 表格动态列 计算属性
   methods: {
     init() {
-      // this.getDataList();
+      this.getDataList();
     },
     changePage(v) {
       this.searchForm.page = v;
@@ -163,10 +215,7 @@ export default {
     getDataList() {
       this.loading = true;
       // 请求后端获取表单数据 请自行修改接口
-      postCrmRequest(
-        "/up/report/aimuser_list",
-        qs.stringify(this.searchForm)
-      ).then((res) => {
+      getCrmRequest("/presale/list").then((res) => {
         this.loading = false;
         if (res.success) {
           if (!res.result) return;
@@ -177,11 +226,11 @@ export default {
     },
     titleToHerf(v) {
       this.$router.push({
-        name: 'preSaleDetail',
+        name: "preSaleDetail",
         query: {
-          id: v.id
-        }
-      })
+          id: v.id,
+        },
+      });
     },
     // 查询
     handleSearch() {
@@ -196,9 +245,60 @@ export default {
       this.searchForm.size = 10;
       this.getDataList();
     },
+    // 查看二维码
+    handleQrcode() {
+      this.$refs.qrcodeForm.resetFields();
+      this.userPhone = JSON.parse(getStore("userInfo").mobile);
+      // this.userPhone ? this.warnIsShow = false : this.warnIsShow = true;
+      if (this.userPhone) {
+        this.creatQrCode(this.userPhone);
+      } else {
+        this.warnIsShow = true;
+        this.$refs.qrCodeUrl.innerHTML = "";
+      }
+      this.qrcodeVisible = true;
+    },
+    creatQrCode(phone) {
+      this.warnIsShow = false;
+      this.$refs.qrCodeUrl.innerHTML = "";
+      var qrcode = new QRCode(this.$refs.qrCodeUrl, {
+        text: `http://www.baidu.com`, // 需要转换为二维码的内容
+        width: 100,
+        height: 100,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H,
+      });
+    },
+    // 生成二维码
+    getQrcode() {
+      this.$refs.qrcodeForm.validate((valid) => {
+        if (valid) {
+          this.creatQrCode(this.qrcodeForm.phone);
+        }
+      });
+    },
   },
   mounted() {
     this.init();
   },
 };
 </script>
+<style lang="less" escoped>
+.leftMargin .ivu-form-item-content {
+  margin-left: 0 !important;
+}
+.qrcode {
+  display: inline-block;
+  img {
+    width: 132px;
+    height: 132px;
+    background-color: #fff; //设置白色背景色
+    padding: 6px; // 利用padding的特性，挤出白边
+    box-sizing: border-box;
+  }
+}
+.qrcodeVisible {
+  text-align: center;
+}
+</style>

@@ -142,7 +142,11 @@
                   >导入</Button
                 >
                 <Button @click="clearImportData">重置</Button>
-                <Button type="primary" @click="getMenuView" :disabled="!menuBlockId" :title="!menuBlockId ? '未上传Excel文件，请先上传' : ''"
+                <Button
+                  type="primary"
+                  @click="getMenuView"
+                  :disabled="!menuBlockId"
+                  :title="!menuBlockId ? '未上传Excel文件，请先上传' : ''"
                   >查看文件内容</Button
                 >
               </FormItem>
@@ -284,8 +288,82 @@
               inline
               :label-width="95"
             >
+              
               <Row>
-                <Col span="7">
+                <Col span="12">
+                  <FormItem
+                    label="queryType"
+                    prop="queryType"
+                    style="width: 100%"
+                  >
+                    <Select v-model="newModalForm.queryType">
+                      <Option :value="0">不匹配</Option>
+                      <Option :value="1">标题</Option>
+                      <Option :value="2">内容</Option>
+                      <Option :value="3">附件</Option>
+                      <Option :value="4">VIP</Option>
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span="12">
+                  <FormItem
+                    label="showType"
+                    prop="showType"
+                    style="width: 100%"
+                  >
+                    <Select v-model="newModalForm.showType">
+                      <Option :value="1">关键词</Option>
+                      <Option :value="2">进展</Option>
+                      <Option :value="3">了解更多</Option>
+                      <Option :value="4">附件下载</Option>
+                      <Option :value="5">立即咨询</Option>
+                    </Select>
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
+                  <FormItem label="与值" prop="andKey" style="width: 100%">
+                    <Input
+                      type="text"
+                      v-model="newModalForm.andKey"
+                      placeholder="关键词之间用空格隔开"
+                    ></Input>
+                  </FormItem>
+                </Col>
+                <Col span="12">
+                  <FormItem label="或值" prop="orKey" style="width: 100%">
+                    <Input
+                      type="text"
+                      v-model="newModalForm.orKey"
+                      placeholder="关键词之间用空格隔开"
+                    ></Input>
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
+                  <FormItem label="type" prop="type" style="width: 100%">
+                    <Select v-model="newModalForm.type">
+                      <Option :value="1">1</Option>
+                      <Option :value="2">2</Option>
+                    </Select>
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
+                  <FormItem>
+                    <Button
+                      type="primary"
+                      @click="getNewKeywords('newModalForm')"
+                      >生成关键词</Button
+                    >
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
                   <FormItem
                     style="width: 100%"
                     label="title"
@@ -303,7 +381,7 @@
                     ></Input>
                   </FormItem>
                 </Col>
-                <Col span="7">
+                <Col span="12">
                   <FormItem
                     style="width: 100%"
                     label="defaultKey"
@@ -321,93 +399,67 @@
                     ></Input>
                   </FormItem>
                 </Col>
-                <Col span="5">
-                  <FormItem
-                    label="queryType"
-                    prop="queryType"
-                    style="width: 100%"
-                  >
-                    <Select v-model="newModalForm.queryType">
-                      <Option :value="0">不匹配</Option>
-                      <Option :value="1">标题</Option>
-                      <Option :value="2">内容</Option>
-                      <Option :value="3">附件</Option>
-                      <Option :value="4">VIP</Option>
-                    </Select>
-                  </FormItem>
-                </Col>
-                <Col span="5">
-                  <FormItem
-                    label="showType"
-                    prop="showType"
-                    style="width: 100%"
-                  >
-                    <Select v-model="newModalForm.showType">
-                      <Option :value="1">关键词</Option>
-                      <Option :value="2">进展</Option>
-                      <Option :value="3">了解更多</Option>
-                      <Option :value="4">附件下载</Option>
-                      <Option :value="5">立即咨询</Option>
-                    </Select>
-                  </FormItem>
-                </Col>
               </Row>
-              <Row>
-                <Col span="7">
-                  <FormItem label="与值" prop="andKey" style="width: 100%">
-                    <Input
-                      type="text"
-                      v-model="newModalForm.andKey"
-                      placeholder="关键词之间用空格隔开"
-                    ></Input>
-                  </FormItem>
-                </Col>
-                <Col span="7">
-                  <FormItem label="或值" prop="orKey" style="width: 100%">
-                    <Input
-                      type="text"
-                      v-model="newModalForm.orKey"
-                      placeholder="关键词之间用空格隔开"
-                    ></Input>
-                  </FormItem>
-                </Col>
-                <Col span="5">
-                  <FormItem label="type" prop="type" style="width: 100%">
-                    <Select v-model="newModalForm.type">
-                      <Option :value="1">1</Option>
-                      <Option :value="2">2</Option>
-                    </Select>
-                  </FormItem>
-                </Col>
-                <Col span="5">
-                  <FormItem>
-                    <Button
-                      type="primary"
-                      @click="getNewKeywords('newModalForm')"
-                      >生成关键词</Button
+              <Row v-if="newModalForm.queryType == 4">
+                <Col span="12">
+                  <FormItem
+                    label="一级行业"
+                    prop="categoryIds"
+                    style="width: 100%"
+                  >
+                    <Select
+                      v-model="newModalForm.categoryIds"
+                      @on-change="newCategoryChange"
                     >
+                      <Option :value="1">交通运输</Option>
+                      <Option :value="2">能源化工--电力</Option>
+                      <Option :value="3">能源化工--化工</Option>
+                      <Option :value="4">冶金矿产</Option>
+                      <Option :value="5">机械电子</Option>
+                      <Option :value="6">网络通讯计算机</Option>
+                      <Option :value="7">市政房地产建筑</Option>
+                      <Option :value="8">水利</Option>
+                      <Option :value="9">环保</Option>
+                      <Option :value="10">医疗卫生</Option>
+                      <Option :value="11">科技文教旅游</Option>
+                      <Option :value="12">出版印刷</Option>
+                      <Option :value="13">轻工纺织食品</Option>
+                      <Option :value="14">农林牧渔</Option>
+                      <Option :value="15">商业服务</Option>
+                      <Option :value="16">园林绿化</Option>
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span="12">
+                  <FormItem
+                    label="二级行业"
+                    prop="caegoryIds2"
+                    style="width: 100%"
+                  >
+                    <Select v-model="newModalForm.caegoryIds2">
+                      <Option
+                        v-for="item in newSecList"
+                        :value="item.id"
+                        :key="item.id"
+                        >{{ item.name }}</Option
+                      >
+                    </Select>
                   </FormItem>
                 </Col>
               </Row>
               <Row>
-                <Col span="19">
+                <Col span="24">
                   <FormItem label="关键词" style="width: 100%">
                     <Input
                       type="textarea"
                       v-model="newModalForm.keywords"
                     ></Input>
-                    <!-- <span>{{ newModalForm.keywords }}</span> -->
                   </FormItem>
                 </Col>
               </Row>
               <Row>
                 <Col>
                   <FormItem label="blockId" style="width: 100%">
-                    <!-- <Input
-                      type="text"
-                      v-model="newModalForm.keywords"
-                      readonly
-                    ></Input> -->
                     <span>{{ newBlockId }}</span>
                   </FormItem>
                 </Col>
@@ -434,7 +486,80 @@
               :label-width="95"
             >
               <Row>
-                <Col span="7">
+                <Col span="12">
+                  <FormItem
+                    label="queryType"
+                    prop="queryType"
+                    style="width: 100%"
+                  >
+                    <Select v-model="downloadModalForm.queryType">
+                      <Option :value="0">不匹配</Option>
+                      <Option :value="1">标题</Option>
+                      <Option :value="2">内容</Option>
+                      <Option :value="3">附件</Option>
+                      <Option :value="4">VIP</Option>
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span="12">
+                  <FormItem
+                    label="showType"
+                    prop="showType"
+                    style="width: 100%"
+                  >
+                    <Select v-model="downloadModalForm.showType">
+                      <Option :value="1">关键词</Option>
+                      <Option :value="2">进展</Option>
+                      <Option :value="3">了解更多</Option>
+                      <Option :value="4">附件下载</Option>
+                      <Option :value="5">立即咨询</Option>
+                    </Select>
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
+                  <FormItem label="与值" prop="andKey" style="width: 100%">
+                    <Input
+                      type="text"
+                      v-model="downloadModalForm.andKey"
+                      placeholder="关键词之间用空格隔开"
+                    ></Input>
+                  </FormItem>
+                </Col>
+                <Col span="12">
+                  <FormItem label="或值" prop="orKey" style="width: 100%">
+                    <Input
+                      type="text"
+                      v-model="downloadModalForm.orKey"
+                      placeholder="关键词之间用空格隔开"
+                    ></Input>
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
+                  <FormItem label="type" prop="type" style="width: 100%">
+                    <Select v-model="downloadModalForm.type">
+                      <Option :value="1">1</Option>
+                      <Option :value="2">2</Option>
+                    </Select>
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
+                  <FormItem>
+                    <Button
+                      type="primary"
+                      @click="getNewKeywords('downloadModalForm')"
+                      >生成关键词</Button
+                    >
+                  </FormItem>
+                </Col>
+              </Row>
+               <Row>
+                <Col span="12">
                   <FormItem
                     style="width: 100%"
                     label="title"
@@ -452,7 +577,7 @@
                     ></Input>
                   </FormItem>
                 </Col>
-                <Col span="7">
+                <Col span="12">
                   <FormItem
                     style="width: 100%"
                     label="defaultKey"
@@ -470,78 +595,57 @@
                     ></Input>
                   </FormItem>
                 </Col>
-                <Col span="5">
-                  <FormItem
-                    label="queryType"
-                    prop="queryType"
-                    style="width: 100%"
-                  >
-                    <Select v-model="downloadModalForm.queryType">
-                      <Option :value="0">不匹配</Option>
-                      <Option :value="1">标题</Option>
-                      <Option :value="2">内容</Option>
-                      <Option :value="3">附件</Option>
-                      <Option :value="4">VIP</Option>
-                    </Select>
-                  </FormItem>
-                </Col>
-                <Col span="5">
-                  <FormItem
-                    label="showType"
-                    prop="showType"
-                    style="width: 100%"
-                  >
-                    <Select v-model="downloadModalForm.showType">
-                      <Option :value="1">关键词</Option>
-                      <Option :value="2">进展</Option>
-                      <Option :value="3">了解更多</Option>
-                      <Option :value="4">附件下载</Option>
-                      <Option :value="5">立即咨询</Option>
-                    </Select>
-                  </FormItem>
-                </Col>
               </Row>
-              <Row>
-                <Col span="7">
-                  <FormItem label="与值" prop="andKey" style="width: 100%">
-                    <Input
-                      type="text"
-                      v-model="downloadModalForm.andKey"
-                      placeholder="关键词之间用空格隔开"
-                    ></Input>
-                  </FormItem>
-                </Col>
-                <Col span="7">
-                  <FormItem label="或值" prop="orKey" style="width: 100%">
-                    <Input
-                      type="text"
-                      v-model="downloadModalForm.orKey"
-                      placeholder="关键词之间用空格隔开"
-                    ></Input>
-                  </FormItem>
-                </Col>
-                <Col span="5">
-                  <FormItem label="type" prop="type" style="width: 100%">
-                    <Select v-model="downloadModalForm.type">
-                      <Option :value="1">1</Option>
-                      <Option :value="2">2</Option>
-                    </Select>
-                  </FormItem>
-                </Col>
-                <Col span="5">
-                  <FormItem>
-                    <Button
-                      type="primary"
-                      @click="getNewKeywords('downloadModalForm')"
-                      >生成关键词</Button
+              <Row v-if="downloadModalForm.queryType == 4">
+                <Col span="12">
+                  <FormItem
+                    label="一级行业"
+                    prop="categoryIds"
+                    style="width: 100%"
+                  >
+                    <Select
+                      v-model="downloadModalForm.categoryIds"
+                      @on-change="downloadCategoryChange"
                     >
+                      <Option :value="1">交通运输</Option>
+                      <Option :value="2">能源化工--电力</Option>
+                      <Option :value="3">能源化工--化工</Option>
+                      <Option :value="4">冶金矿产</Option>
+                      <Option :value="5">机械电子</Option>
+                      <Option :value="6">网络通讯计算机</Option>
+                      <Option :value="7">市政房地产建筑</Option>
+                      <Option :value="8">水利</Option>
+                      <Option :value="9">环保</Option>
+                      <Option :value="10">医疗卫生</Option>
+                      <Option :value="11">科技文教旅游</Option>
+                      <Option :value="12">出版印刷</Option>
+                      <Option :value="13">轻工纺织食品</Option>
+                      <Option :value="14">农林牧渔</Option>
+                      <Option :value="15">商业服务</Option>
+                      <Option :value="16">园林绿化</Option>
+                    </Select>
+                  </FormItem>
+                </Col>
+                <Col span="12">
+                  <FormItem
+                    label="二级行业"
+                    prop="caegoryIds2"
+                    style="width: 100%"
+                  >
+                    <Select v-model="downloadModalForm.caegoryIds2">
+                      <Option
+                        v-for="item in downloadSecList"
+                        :value="item.id"
+                        :key="item.id"
+                        >{{ item.name }}</Option
+                      >
+                    </Select>
                   </FormItem>
                 </Col>
               </Row>
               <Row>
-                <Col span="19">
+                <Col span="24">
                   <FormItem label="关键词" style="width: 100%">
-                    <!-- <span>{{downloadModalForm.keywords}}</span> -->
                     <Input
                       type="textarea"
                       v-model="downloadModalForm.keywords"
@@ -722,7 +826,69 @@
         :rules="ruleValidate"
       >
         <Row>
-          <Col span="7">
+          <Col span="12">
+            <FormItem label="queryType" prop="queryType" style="width: 100%">
+              <Select v-model="labelModalForm.queryType">
+                <Option :value="0">不匹配</Option>
+                <Option :value="1">标题</Option>
+                <Option :value="2">内容</Option>
+                <Option :value="3">附件</Option>
+                <Option :value="4">VIP</Option>
+              </Select>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="showType" prop="showType" style="width: 100%">
+              <Select v-model="labelModalForm.showType">
+                <Option :value="1">关键词</Option>
+                <Option :value="2">进展</Option>
+                <Option :value="3">了解更多</Option>
+                <Option :value="4">附件下载</Option>
+                <Option :value="5">立即咨询</Option>
+              </Select>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="与值" prop="andKey" style="width: 100%">
+              <Input
+                type="text"
+                v-model="labelModalForm.andKey"
+                placeholder="关键词之间用空格隔开"
+              ></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="或值" prop="orKey" style="width: 100%">
+              <Input
+                type="text"
+                v-model="labelModalForm.orKey"
+                placeholder="关键词之间用空格隔开"
+              ></Input>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="type" prop="type" style="width: 100%">
+              <Select v-model="labelModalForm.type">
+                <Option :value="1">1</Option>
+              </Select>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem>
+              <Button type="primary" @click="getNewKeywords('labelModalForm')"
+                >生成关键词</Button
+              >
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
             <FormItem
               style="width: 100%"
               label="title"
@@ -740,7 +906,7 @@
               ></Input>
             </FormItem>
           </Col>
-          <Col span="7">
+          <Col span="12">
             <FormItem
               style="width: 100%"
               label="defaultKey"
@@ -758,82 +924,49 @@
               ></Input>
             </FormItem>
           </Col>
-          <Col span="5">
-            <FormItem label="queryType" prop="queryType" style="width: 100%">
-              <Select v-model="labelModalForm.queryType">
-                <Option :value="0">不匹配</Option>
-                <Option :value="1">标题</Option>
-                <Option :value="2">内容</Option>
-                <Option :value="3">附件</Option>
-                <Option :value="4">VIP</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="5">
-            <FormItem label="showType" prop="showType" style="width: 100%">
-              <Select v-model="labelModalForm.showType">
-                <Option :value="1">关键词</Option>
-                <Option :value="2">进展</Option>
-                <Option :value="3">了解更多</Option>
-                <Option :value="4">附件下载</Option>
-                <Option :value="5">立即咨询</Option>
-              </Select>
-            </FormItem>
-          </Col>
         </Row>
-        <Row>
-          <Col span="7">
-            <FormItem label="与值" prop="andKey" style="width: 100%">
-              <Input
-                type="text"
-                v-model="labelModalForm.andKey"
-                placeholder="关键词之间用空格隔开"
-              ></Input>
-            </FormItem>
-          </Col>
-          <Col span="7">
-            <FormItem label="或值" prop="orKey" style="width: 100%">
-              <Input
-                type="text"
-                v-model="labelModalForm.orKey"
-                placeholder="关键词之间用空格隔开"
-              ></Input>
-            </FormItem>
-          </Col>
-          <Col span="5">
-            <FormItem label="type" prop="type" style="width: 100%">
-              <Select v-model="labelModalForm.type">
-                <Option :value="1">1</Option>
-                <Option :value="2">2</Option>
+        <Row v-if="labelModalForm.queryType == 4">
+          <Col span="12">
+            <FormItem label="一级行业" prop="categoryIds" style="width: 100%">
+              <Select
+                v-model="labelModalForm.categoryIds"
+                @on-change="labelCategoryChange"
+              >
+                <Option :value="1">交通运输</Option>
+                <Option :value="2">能源化工--电力</Option>
+                <Option :value="3">能源化工--化工</Option>
+                <Option :value="4">冶金矿产</Option>
+                <Option :value="5">机械电子</Option>
+                <Option :value="6">网络通讯计算机</Option>
+                <Option :value="7">市政房地产建筑</Option>
+                <Option :value="8">水利</Option>
+                <Option :value="9">环保</Option>
+                <Option :value="10">医疗卫生</Option>
+                <Option :value="11">科技文教旅游</Option>
+                <Option :value="12">出版印刷</Option>
+                <Option :value="13">轻工纺织食品</Option>
+                <Option :value="14">农林牧渔</Option>
+                <Option :value="15">商业服务</Option>
+                <Option :value="16">园林绿化</Option>
               </Select>
             </FormItem>
           </Col>
-          <Col span="5">
-            <FormItem>
-              <Button type="primary" @click="getNewKeywords('labelModalForm')"
-                >生成关键词</Button
-              >
+          <Col span="12">
+            <FormItem label="二级行业" prop="caegoryIds2" style="width: 100%">
+              <Select v-model="labelModalForm.caegoryIds2">
+                <Option
+                  v-for="item in labelSecList"
+                  :value="item.id"
+                  :key="item.id"
+                  >{{ item.name }}</Option
+                >
+              </Select>
             </FormItem>
           </Col>
-          <!-- <Col span="5">
-            <FormItem
-              label="排序值"
-              prop="sortNo"
-              style="width: 100%"
-            >
-              <InputNumber
-                :max="1000"
-                :step="1"
-                :min="1"
-                v-model="labelModalForm.sortNo"
-              ></InputNumber>
-            </FormItem>
-          </Col> -->
         </Row>
         <Row>
           <FormItem label="关键词" prop="keywords" style="width: 100%">
             <Input type="textarea" v-model="labelModalForm.keywords"></Input>
-            <!-- <span>{{labelModalForm.keywords}}</span> -->
           </FormItem>
         </Row>
       </Form>
@@ -861,7 +994,70 @@
         :label-width="95"
       >
         <Row>
-          <Col span="7">
+          <Col span="12">
+            <FormItem label="queryType" prop="queryType" style="width: 100%">
+              <Select v-model="contentModalForm.queryType">
+                <Option :value="0">不匹配</Option>
+                <Option :value="1">标题</Option>
+                <Option :value="2">内容</Option>
+                <Option :value="3">附件</Option>
+                <Option :value="4">VIP</Option>
+              </Select>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="showType" prop="showType" style="width: 100%">
+              <Select v-model="contentModalForm.showType">
+                <Option :value="1">关键词</Option>
+                <Option :value="2">进展</Option>
+                <Option :value="3">了解更多</Option>
+                <Option :value="4">附件下载</Option>
+                <Option :value="5">立即咨询</Option>
+              </Select>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="与值" prop="andKey" style="width: 100%">
+              <Input
+                type="text"
+                v-model="contentModalForm.andKey"
+                placeholder="关键词之间用空格隔开"
+              ></Input>
+            </FormItem>
+          </Col>
+          <Col span="12">
+            <FormItem label="或值" prop="orKey" style="width: 100%">
+              <Input
+                type="text"
+                v-model="contentModalForm.orKey"
+                placeholder="关键词之间用空格隔开"
+              ></Input>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem label="type" prop="type" style="width: 100%">
+              <Select v-model="contentModalForm.type">
+                <Option :value="1">1</Option>
+                <Option :value="2">2</Option>
+              </Select>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="12">
+            <FormItem>
+              <Button type="primary" @click="getNewKeywords('contentModalForm')"
+                >生成关键词</Button
+              >
+            </FormItem>
+          </Col>
+        </Row>
+         <Row>
+          <Col span="12">
             <FormItem
               style="width: 100%"
               label="title"
@@ -879,7 +1075,7 @@
               ></Input>
             </FormItem>
           </Col>
-          <Col span="7">
+          <Col span="12">
             <FormItem
               style="width: 100%"
               label="defaultKey"
@@ -899,98 +1095,49 @@
               ></Input>
             </FormItem>
           </Col>
-          <Col span="5">
-            <FormItem label="queryType" prop="queryType" style="width: 100%">
-              <Select v-model="contentModalForm.queryType">
-                <Option :value="0">不匹配</Option>
-                <Option :value="1">标题</Option>
-                <Option :value="2">内容</Option>
-                <Option :value="3">附件</Option>
-                <Option :value="4">VIP</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="5">
-            <FormItem label="showType" prop="showType" style="width: 100%">
-              <Select v-model="contentModalForm.showType">
-                <Option :value="1">关键词</Option>
-                <Option :value="2">进展</Option>
-                <Option :value="3">了解更多</Option>
-                <Option :value="4">附件下载</Option>
-                <Option :value="5">立即咨询</Option>
-              </Select>
-            </FormItem>
-          </Col>
         </Row>
-        <Row>
-          <Col span="7">
-            <FormItem label="与值" prop="andKey" style="width: 100%">
-              <Input
-                type="text"
-                v-model="contentModalForm.andKey"
-                placeholder="关键词之间用空格隔开"
-              ></Input>
-            </FormItem>
-          </Col>
-          <Col span="7">
-            <FormItem label="或值" prop="orKey" style="width: 100%">
-              <Input
-                type="text"
-                v-model="contentModalForm.orKey"
-                placeholder="关键词之间用空格隔开"
-              ></Input>
-            </FormItem>
-          </Col>
-          <Col span="5">
-            <FormItem label="type" prop="type" style="width: 100%">
-              <Select v-model="contentModalForm.type">
-                <Option :value="1">1</Option>
-                <Option :value="2">2</Option>
+        <Row v-if="contentModalForm.queryType == 4">
+          <Col span="12">
+            <FormItem label="一级行业" prop="categoryIds" style="width: 100%">
+              <Select
+                v-model="contentModalForm.categoryIds"
+                @on-change="contentCategoryChange"
+              >
+                <Option :value="1">交通运输</Option>
+                <Option :value="2">能源化工--电力</Option>
+                <Option :value="3">能源化工--化工</Option>
+                <Option :value="4">冶金矿产</Option>
+                <Option :value="5">机械电子</Option>
+                <Option :value="6">网络通讯计算机</Option>
+                <Option :value="7">市政房地产建筑</Option>
+                <Option :value="8">水利</Option>
+                <Option :value="9">环保</Option>
+                <Option :value="10">医疗卫生</Option>
+                <Option :value="11">科技文教旅游</Option>
+                <Option :value="12">出版印刷</Option>
+                <Option :value="13">轻工纺织食品</Option>
+                <Option :value="14">农林牧渔</Option>
+                <Option :value="15">商业服务</Option>
+                <Option :value="16">园林绿化</Option>
               </Select>
             </FormItem>
           </Col>
-          <Col span="5">
-            <FormItem>
-              <Button type="primary" @click="getNewKeywords('contentModalForm')"
-                >生成关键词</Button
-              >
+          <Col span="12">
+            <FormItem label="二级行业" prop="caegoryIds2" style="width: 100%">
+              <Select v-model="contentModalForm.caegoryIds2">
+                <Option
+                  v-for="item in contentSecList"
+                  :value="item.id"
+                  :key="item.id"
+                  >{{ item.name }}</Option
+                >
+              </Select>
             </FormItem>
           </Col>
-          <!-- <Col span="5">
-            <FormItem
-              label="排序值"
-              prop="sortNo"
-              style="width: 100%"
-              :rules="[
-                {
-                  required: true,
-                  type:'number',
-                  message: '排序值不能为空',
-                  trigger: 'blur',
-                },
-                { validator: validateSort, trigger: 'blur' },
-              ]"
-            >
-              <Tooltip
-                trigger="hover"
-                placement="right"
-                content="值越小越靠前，不支持小数"
-                style="width: 100%"
-              >
-              <InputNumber
-                :max="1000"
-                :step="1"
-                :min="1"
-                v-model="contentModalForm.sortNo"
-              ></InputNumber>
-              </Tooltip>
-            </FormItem>
-          </Col> -->
         </Row>
         <Row>
           <FormItem label="关键词" prop="keywords" style="width: 100%">
             <Input type="textarea" v-model="contentModalForm.keywords"></Input>
-            <!-- <span>{{ contentModalForm.keywords }}</span> -->
           </FormItem>
         </Row>
       </Form>
@@ -1136,6 +1283,89 @@ export default {
   name: "blocksManage",
   data() {
     return {
+      // 二级行业列表
+      secondList: [
+        [
+          { name: "高速公路、道路", id: 101 },
+          { name: "桥梁、立交桥", id: 102 },
+          { name: "机场", id: 103 },
+          { name: "铁路、轨道交通", id: 104 },
+          { name: "航道、水利枢纽", id: 105 },
+          { name: "港口、码头、泊位、渔港", id: 106 },
+          { name: "客运站、交通枢纽", id: 107 },
+          { name: "隧道", id: 108 },
+          { name: "物流", id: 109 },
+        ],
+        [
+          { name: "火电", id: 201 },
+          { name: "核电", id: 202 },
+          { name: "水电", id: 203 },
+          { name: "风电", id: 204 },
+          { name: "电网建设", id: 205 },
+          { name: "太阳能、光伏发电", id: 206 },
+          { name: "垃圾焚烧发电及其他新能源发电", id: 207 },
+          { name: "水泥余热发电", id: 208 },
+        ],
+        [
+          { name: "天然气、输气管道", id: 301 },
+          { name: "石油、石化", id: 302 },
+          { name: "有机化学", id: 303 },
+          { name: "无机化学", id: 304 },
+          { name: "煤化工", id: 305 },
+        ],
+        [
+          { name: "选煤厂、煤矿、尾矿", id: 401 },
+          { name: "矿山、矿产、矿石", id: 402 },
+          { name: "水泥生产线、混凝土", id: 403 },
+          { name: "金属冶炼", id: 404 },
+          { name: "钢厂、钢结构", id: 405 },
+          { name: "玻璃及其他", id: 406 },
+        ],
+        [
+          { name: "机械产品、厂房、生产车间", id: 501 },
+          { name: "医疗器械、电子产品、电器产品", id: 502 },
+          { name: "造船、造车", id: 503 },
+        ],
+        [{ name: "网络通讯计算机", id: 601 }],
+        [
+          { name: "房地产建筑", id: 701 },
+          { name: "供热", id: 702 },
+          { name: "排水", id: 704 },
+          { name: "土地治理", id: 705 },
+        ],
+        [
+          { name: "水厂、供水", id: 801 },
+          { name: "灌溉", id: 802 },
+          { name: "围海造地", id: 803 },
+          { name: "水库、引水", id: 804 },
+          { name: "防护堤、防洪堤", id: 805 },
+        ],
+        [
+          { name: "垃圾", id: 901 },
+          { name: "水处理", id: 902 },
+          { name: "废弃物处理", id: 903 },
+          { name: "脱硫脱硝、除尘除渣", id: 904 },
+          { name: "污泥治理", id: 905 },
+        ],
+        [
+          { name: "医院", id: 1001 },
+          { name: "制药制剂", id: 1002 },
+        ],
+        [{ name: "科技文教旅游", id: 1105 }],
+        [{ name: "出版印刷", id: 1205 }],
+        [
+          { name: "纺织", id: 1301 },
+          { name: "食品生产", id: 1302 },
+          { name: "肉类加工、屠宰", id: 1303 },
+          { name: "造纸", id: 1304 },
+          { name: "粮食储备", id: 1305 },
+          { name: "卷烟物流", id: 1306 },
+          { name: "其他", id: 1307 },
+        ],
+        [{ name: "农林牧渔", id: 1405 }],
+        [{ name: "商业服务", id: 1505 }],
+        [{ name: "园林绿化", id: 1605 }],
+      ],
       menuViewVisible: false,
       menuViewTree: [],
       themeColor: "#000000",
@@ -1198,6 +1428,7 @@ export default {
         ],
       },
       // 数据展示模块
+      labelSecList: [],
       labelBlockId: "",
       labelSortNo: 0,
       labelVisible: false,
@@ -1211,8 +1442,9 @@ export default {
         queryType: 2,
         showType: 1,
         defaultKey: "",
-        // sortNo: 1,
         keywords: "",
+        categoryIds: '',
+        caegoryIds2: ''
       },
       labelData: [],
       labelColumns: [
@@ -1275,6 +1507,7 @@ export default {
         },
       ],
       // 新模块
+      newSecList: [],
       newBlockId: "",
       newModalForm: {
         andKey: "",
@@ -1285,8 +1518,11 @@ export default {
         showType: 3,
         defaultKey: "",
         keywords: "",
+        categoryIds: '',
+        caegoryIds2: ''
       },
       // 下载模块
+      downloadSecList: [],
       downloadBlockId: "",
       downloadModalForm: {
         andKey: "",
@@ -1297,8 +1533,11 @@ export default {
         showType: 4,
         defaultKey: "",
         keywords: "",
+        categoryIds: '',
+        caegoryIds2: ''
       },
       // 中间模块
+      contentSecList: [],
       contentBlockId: "",
       contentSortNo: 0,
       contentVisible: false,
@@ -1312,6 +1551,8 @@ export default {
         defaultKey: "",
         // sortNo: 1,
         keywords: "",
+        categoryIds: '',
+        caegoryIds2: ''
       },
       modalContentText: "添加中间模块数据",
       contentData: [],
@@ -1655,10 +1896,16 @@ export default {
                 },
               ],
               render: (h, { root, node, data }) => {
-                return h('span', {style: {
-                  'font-weight': 'bold'
-                }}, data.title)
-              }
+                return h(
+                  "span",
+                  {
+                    style: {
+                      "font-weight": "bold",
+                    },
+                  },
+                  data.title
+                );
+              },
             };
             item.content[0].hotlist.forEach((listItem, listIndex) => {
               listItem.render = (h, { root, node, data }) => {
@@ -1678,19 +1925,6 @@ export default {
             });
             data[index].children[0].children = item.content[0].hottxt;
             data[index].children[1].children = item.content[0].hotlist;
-            /* data[index].children[0] = item.content[0].hotlist.forEach(
-              (listItem, listIndex) => {
-                data[index].children[0][listIndex] = {
-                  ...listItem,
-                  render: (h, { root, node, data }) => {
-                    return h("div", {}, [
-                      h("p", {}, data.txt1),
-                      h("p", {}, data.txt_a),
-                    ]);
-                  },
-                };
-              }
-            ); */
           });
           console.log(data);
           this.menuViewTree = data;
@@ -1782,6 +2016,11 @@ export default {
       });
     },
     handleLabelSubmit() {
+      if(this.labelModalForm.queryType == 4){
+        if(!this.labelModalForm.keywords && !this.labelModalForm.categoryIds){
+          return this.$Message.error("关键词和一级行业不能同时为空");
+        }
+      }
       this.$refs.labelModalForm.validate((valid) => {
         if (valid) {
           if (this.modalType === 1) {
@@ -1791,6 +2030,8 @@ export default {
               queryType: this.labelModalForm.queryType,
               showType: this.labelModalForm.showType,
               sphinxQuery: this.labelModalForm.keywords,
+              categoryIds: this.labelModalForm.categoryIds,
+              caegoryIds2: this.labelModalForm.caegoryIds2,
               channelId: this.channelId,
               componentId: 4,
               sortNo: this.labelSortNo + 1,
@@ -1809,6 +2050,8 @@ export default {
               queryType: this.labelModalForm.queryType,
               showType: this.labelModalForm.showType,
               sphinxQuery: this.labelModalForm.keywords,
+              categoryIds: this.labelModalForm.categoryIds,
+              caegoryIds2: this.labelModalForm.caegoryIds2,
               channelId: this.channelId,
               blockId: this.labelBlockId,
               componentId: 4,
@@ -1823,6 +2066,9 @@ export default {
           }
         }
       });
+    },
+    labelCategoryChange(v) {
+      this.labelSecList = this.secondList[v - 1];
     },
     // 新模块
     getNewKeywords(model) {
@@ -1842,6 +2088,11 @@ export default {
       });
     },
     newModalSubmit() {
+      if(this.newModalForm.queryType == 4){
+        if(!this.newModalForm.keywords && !this.newModalForm.categoryIds){
+          return this.$Message.error("关键词和一级行业不能同时为空");
+        }
+      }
       this.$refs.newModalForm.validate((valid) => {
         if (valid) {
           let data;
@@ -1852,6 +2103,8 @@ export default {
               queryType: this.newModalForm.queryType,
               showType: this.newModalForm.showType,
               sphinxQuery: this.newModalForm.keywords,
+              categoryIds: this.newModalForm.categoryIds,
+              caegoryIds2: this.newModalForm.caegoryIds2,
               channelId: this.channelId,
               blockId: this.newBlockId,
               componentId: 5,
@@ -1863,6 +2116,8 @@ export default {
               queryType: this.newModalForm.queryType,
               showType: this.newModalForm.showType,
               sphinxQuery: this.newModalForm.keywords,
+              categoryIds: this.newModalForm.categoryIds,
+              caegoryIds2: this.newModalForm.caegoryIds2,
               channelId: this.channelId,
               componentId: 5,
             };
@@ -1876,8 +2131,16 @@ export default {
         }
       });
     },
+    newCategoryChange(v) {
+      this.newSecList = this.secondList[v - 1];
+    },
     // 附件下载
     downloadModalSubmit() {
+      if(this.downloadModalForm.queryType == 4){
+        if(!this.downloadModalForm.keywords && !this.downloadModalForm.categoryIds){
+          return this.$Message.error("关键词和一级行业不能同时为空");
+        }
+      }
       this.$refs.downloadModalForm.validate((valid) => {
         if (valid) {
           let data;
@@ -1888,6 +2151,8 @@ export default {
               queryType: this.downloadModalForm.queryType,
               showType: this.downloadModalForm.showType,
               sphinxQuery: this.downloadModalForm.keywords,
+              categoryIds: this.downloadModalForm.categoryIds,
+              caegoryIds2: this.downloadModalForm.caegoryIds2,
               channelId: this.channelId,
               blockId: this.downloadBlockId,
             };
@@ -1898,6 +2163,8 @@ export default {
               queryType: this.downloadModalForm.queryType,
               showType: this.downloadModalForm.showType,
               sphinxQuery: this.downloadModalForm.keywords,
+              categoryIds: this.downloadModalForm.categoryIds,
+              caegoryIds2: this.downloadModalForm.caegoryIds2,
               channelId: this.channelId,
             };
           }
@@ -1914,6 +2181,9 @@ export default {
           });
         }
       });
+    },
+    downloadCategoryChange(v) {
+      this.downloadSecList = this.secondList[v-1];
     },
     // 中间模块
     contentModalSubmit() {
@@ -1962,6 +2232,11 @@ export default {
       });
     },
     handleContentSubmit() {
+      if(this.contentModalForm.queryType == 4){
+        if(!this.contentModalForm.keywords && !this.contentModalForm.categoryIds){
+          return this.$Message.error("关键词和一级行业不能同时为空");
+        }
+      }
       this.$refs.contentModalForm.validate((valid) => {
         if (valid) {
           if (this.modalType === 1) {
@@ -1971,6 +2246,8 @@ export default {
               queryType: this.contentModalForm.queryType,
               showType: this.contentModalForm.showType,
               sphinxQuery: this.contentModalForm.keywords,
+              categoryIds: this.contentModalForm.categoryIds,
+              caegoryIds2: this.contentModalForm.caegoryIds2,
               channelId: this.channelId,
               componentId: 8,
               sortNo: this.contentSortNo + 1,
@@ -1989,6 +2266,8 @@ export default {
               queryType: this.contentModalForm.queryType,
               showType: this.contentModalForm.showType,
               sphinxQuery: this.contentModalForm.keywords,
+              categoryIds: this.contentModalForm.categoryIds,
+              caegoryIds2: this.contentModalForm.caegoryIds2,
               channelId: this.channelId,
               blockId: this.contentBlockId,
               componentId: 8,
@@ -2004,7 +2283,9 @@ export default {
         }
       });
     },
-
+    contentCategoryChange(v) {
+      this.contentSecList = this.secondList[v - 1];
+    },
     // 编辑彩色模块
     colorfulEdit(v) {
       this.colorfulVisible = true;
