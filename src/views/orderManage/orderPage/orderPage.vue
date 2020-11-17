@@ -1,13 +1,13 @@
 <style lang="less">
 @import "../../../styles/table-common.less";
-@import "./orderList.less";
+// @import "./orderList.less";
 </style>
 <template>
   <div class="search">
     <Card>
       <Row>
         <Form ref="searchForm" :model="searchForm" inline :label-width="90" label-position="left">
-          <Form-item label="关键词：" prop="search">
+          <Form-item label="关键词：" prop="search" >
             <Input
               type="text"
               v-model="searchForm.search"

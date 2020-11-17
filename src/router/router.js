@@ -135,6 +135,8 @@ export const otherRouter = {
         { path: 'subjectManage/channelPreview', title: '频道预览', name: 'channelPreview', component: () => import('@/views/subjectManage/channelPreview/channelPreview.vue') },
         {path: 'adAllList', title: '业主广告列表', name: 'adAllList-index', component: () => import("@/views/adManage/userList/adAllList.vue")},
         {path: 'preSale/preSaleDetail', title: '报告详情', name: 'preSaleDetail', component: () => import("@/views/preSale/preSaleDetail/preSaleDetail.vue")},
+        {path: 'subjectManage/keywordsList', title: '关键词列表', name: 'keywordsList', component: () => import("@/views/subjectManage/keywordsList/keywordsList.vue")},
+        {path: 'preSale/keywordsList', title: '关键词列表', name: 'keyList', component: () => import("@/views/preSale/keywordsList/keyList.vue")},
         // { path: 'subjectManage/channelManage', title: '频道管理', name: 'channelManage', component: () => import('@/views/subjectManage/channelManage/channelManage.vue') },
     ]
 };

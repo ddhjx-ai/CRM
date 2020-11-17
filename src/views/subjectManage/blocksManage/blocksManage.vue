@@ -270,7 +270,7 @@
               border
               :columns="labelColumns"
               :data="labelData"
-              ref="table"
+              ref="labelTable"
               @on-selection-change="changeSelect"
               style="padding-bootom: 10px"
             ></Table>
@@ -288,7 +288,6 @@
               inline
               :label-width="95"
             >
-              
               <Row>
                 <Col span="12">
                   <FormItem
@@ -359,6 +358,7 @@
                       @click="getNewKeywords('newModalForm')"
                       >生成关键词</Button
                     >
+                    <Button type="info" @click="toKeywordsList(newBlockId)" :disabled="!newBlockId">查看关键词</Button>
                   </FormItem>
                 </Col>
               </Row>
@@ -468,6 +468,7 @@
                 <FormItem>
                   <Button type="primary" @click="newModalSubmit">保存</Button>
                   <Button @click="ModalReset('newModalForm')">重置</Button>
+                  
                 </FormItem>
               </Row>
             </Form>
@@ -555,10 +556,16 @@
                       @click="getNewKeywords('downloadModalForm')"
                       >生成关键词</Button
                     >
+                    <Button
+                      type="info"
+                      @click="toKeywordsList(downloadBlockId)"
+                      :disabled="!downloadBlockId"
+                      >查看关键词</Button
+                    >
                   </FormItem>
                 </Col>
               </Row>
-               <Row>
+              <Row>
                 <Col span="12">
                   <FormItem
                     style="width: 100%"
@@ -676,7 +683,7 @@
           </Row>
         </Col>
       </Row>
-      <!-- 彩色模块 -->
+      <!-- 中间数据模块 -->
       <Row class="rowModal">
         <Col :span="24">
           <h3 style="margin-bottom: 10px">添加中间数据模块</h3>
@@ -692,7 +699,7 @@
               border
               :columns="contentColumns"
               :data="contentData"
-              ref="table"
+              ref="contentTable"
               @on-selection-change="changeSelect"
               style="padding-bootom: 10px"
             ></Table>
@@ -752,15 +759,6 @@
                       ></Input>
                     </FormItem>
                   </Col>
-                  <!-- <Col span="3">
-                    <FormItem
-                      style="width: 100%"
-                      class="leftBtnForm"
-                    >
-                      <Button type="primary" @click="showInput(item)">添加URL</Button
-                    >
-                    </FormItem>
-                  </Col> -->
                   <Col span="8">
                     <FormItem
                       style="width: 100%"
@@ -1056,7 +1054,7 @@
             </FormItem>
           </Col>
         </Row>
-         <Row>
+        <Row>
           <Col span="12">
             <FormItem
               style="width: 100%"
@@ -1156,69 +1154,108 @@
       title="编辑彩色数据模块"
       v-model="colorfulVisible"
       :mask-closable="false"
-      :width="650"
+      :width="800"
     >
       <Form
         ref="colorfulModalForm"
         :model="colorfulModalForm"
         :label-width="80"
       >
-        <FormItem
-          prop="nameStr"
-          :rules="{
-            required: true,
-            message: '内容不能为空',
-            trigger: 'blur',
-          }"
-          label="数据内容"
+        <Row
+          v-for="(item, index) in colorfulModalForm.colorfulList"
+          :key="index"
+          :gutter="10"
         >
-          <Input
-            type="text"
-            v-model="colorfulModalForm.nameStr"
-            placeholder="请输入彩色模块数据,数据之间使用空格隔开,如:水泥 石材 混凝土"
-          ></Input>
-        </FormItem>
-        <!-- <FormItem
-          prop="url"
-          :rules="{
-            required: true,
-            message: '访问路径不能为空',
-            trigger: 'blur',
-          }"
-          label="内容地址"
-        >
-          <Input
-            type="text"
-            v-model="colorfulModalForm.url"
-            placeholder="请输入内容访问地址"
-          ></Input>
-        </FormItem> -->
-        <FormItem
-          prop="imgurl"
-          :rules="{
-            required: true,
-            message: '图片路径不能为空',
-            trigger: 'blur',
-          }"
-          label="图片路径"
-        >
-          <Input
-            type="text"
-            v-model="colorfulModalForm.imgurl"
-            placeholder="请输入图片路径"
-          ></Input>
-        </FormItem>
-        <FormItem
-          prop="color"
-          :rules="{
-            required: true,
-            message: '颜色不能为空',
-            trigger: 'change',
-          }"
-          label="颜色"
-        >
-          <ColorPicker v-model="colorfulModalForm.color" />
-        </FormItem>
+          <Col span="8">
+            <FormItem
+              style="width: 100%"
+              :label="'数据' + (index + 1)"
+              :prop="'colorfulList.' + index + '.name'"
+              :rules="{
+                required: true,
+                message: '内容不能为空',
+                trigger: 'blur',
+              }"
+            >
+              <Input
+                type="text"
+                v-model="item.name"
+                placeholder="请输入"
+              ></Input>
+            </FormItem>
+          </Col>
+          <Col span="8">
+            <FormItem
+              style="width: 100%"
+              :prop="'colorfulList.' + index + '.search'"
+              class="leftBtnForm"
+            >
+              <Input
+                type="text"
+                v-model="item.search"
+                placeholder="选填，多个关键词使用空格隔开"
+              ></Input>
+            </FormItem>
+          </Col>
+          <Col span="4">
+            <FormItem
+              style="width: 100%"
+              :prop="'colorfulList.' + index + '.type'"
+              class="leftBtnForm"
+            >
+              <Select v-model="item.type">
+                <Option :value="1">内容</Option>
+                <Option :value="2">标题</Option>
+              </Select>
+            </FormItem>
+          </Col>
+          <Col span="3" style="margin-left: 10px">
+            <Button @click="handlecolorfulRemove(index)">删除</Button>
+          </Col>
+        </Row>
+        <Row>
+          <FormItem>
+            <Col span="12">
+              <Button
+                type="dashed"
+                long
+                @click="handlecolorfulAdd"
+                icon="md-add"
+                >添加</Button
+              >
+            </Col>
+          </FormItem>
+        </Row>
+        <Row>
+          <FormItem
+            prop="imgurl"
+            :rules="{
+              required: true,
+              message: '图片路径不能为空',
+              trigger: 'blur',
+            }"
+            label="图片路径"
+          >
+            <Input
+              type="text"
+              v-model="colorfulModalForm.imgurl"
+              placeholder="请输入图片路径"
+            ></Input>
+          </FormItem>
+        </Row>
+        <Row>
+          <FormItem
+            prop="color"
+            :rules="{
+              required: true,
+              message: '颜色不能为空',
+              trigger: 'change',
+            }"
+            label="颜色"
+          >
+            <ColorPicker v-model="colorfulModalForm.color" />
+          </FormItem>
+        </Row>
       </Form>
       <div slot="footer">
         <Button type="text" @click="handleColorfulCancel">取消</Button>
@@ -1240,10 +1277,50 @@
     >
       <Tree :data="menuViewTree"></Tree>
       <div slot="footer">
-        <!-- <Button type="text" @click="handleColorfulCancel">取消</Button> -->
         <Button type="primary" @click="menuViewVisible = false">确认</Button>
       </div>
     </Modal>
+
+    <!-- label数据展示模块关键词 -->
+    <!-- <Modal
+      title="关键词列表"
+      v-model="labelKeywordsVisible"
+      :mask-closable="false"
+      :width="800"
+    >
+      <Row class="operation" style="margin-bottom: 10px">
+        <Button type="primary" icon="md-add" @click="keywordsAdd">添加</Button>
+      </Row>
+      <Row>
+        <Table
+          class="mygrid labelTable"
+          :loading="loading"
+          border
+          :columns="labelKeywordsColumns"
+          :data="labelKeywordsData"
+          ref="labelKeywordsTable"
+          @on-selection-change="changeSelect"
+          style="padding-bootom: 10px"
+        ></Table>
+      </Row>
+      <Row type="flex" justify="end" class="page">
+        <Page
+          :current="keywordsForm.page"
+          :total="keywordsTotal"
+          :page-size="keywordsForm.size"
+          @on-change="changePage"
+          @on-page-size-change="changesize"
+          :page-size-opts="[10, 20, 50]"
+          size="small"
+          show-total
+          show-elevator
+          show-sizer
+        ></Page>
+      </Row>
+      <div slot="footer">
+        <Button type="primary" @click="labelKeywordsVisible = false">确认</Button>
+      </div>
+    </Modal> -->
   </div>
 </template>
 
@@ -1443,8 +1520,8 @@ export default {
         showType: 1,
         defaultKey: "",
         keywords: "",
-        categoryIds: '',
-        caegoryIds2: ''
+        categoryIds: "",
+        caegoryIds2: "",
       },
       labelData: [],
       labelColumns: [
@@ -1494,9 +1571,92 @@ export default {
                     type: "error",
                     size: "small",
                   },
+                  style: {
+                    marginRight: "5px",
+                  },
                   on: {
                     click: () => {
                       this.labelRemove(params.row);
+                    },
+                  },
+                },
+                "删除"
+              ),
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "info",
+                    size: "small",
+                  },
+                  style: {
+                    marginRight: "5px",
+                  },
+                  on: {
+                    click: () => {
+                      this.toKeywordsList(params.row.blocks_id);
+                    },
+                  },
+                },
+                "查看关键词"
+              ),
+            ]);
+          },
+        },
+      ],
+      labelKeywordsColumns: [
+        {
+          type: "index",
+          title: "序号",
+          align: "center",
+        },
+        {
+          title: "关键词",
+          key: "keywords",
+          align: "center",
+        },
+        {
+          title: "数量",
+          key: "count",
+          align: "center",
+        },
+        {
+          title: "操作",
+          key: "action",
+          align: "center",
+          render: (h, params) => {
+            return h("div", [
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "primary",
+                    size: "small",
+                  },
+                  style: {
+                    marginRight: "5px",
+                  },
+                  on: {
+                    click: () => {
+                      this.keywordsEdit(params.row);
+                    },
+                  },
+                },
+                "编辑"
+              ),
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "error",
+                    size: "small",
+                  },
+                  style: {
+                    marginRight: "5px",
+                  },
+                  on: {
+                    click: () => {
+                      this.keywordsRemove(params.row);
                     },
                   },
                 },
@@ -1506,6 +1666,8 @@ export default {
           },
         },
       ],
+      labelKeywordsVisible: false,
+      labelKeywordsData: [],
       // 新模块
       newSecList: [],
       newBlockId: "",
@@ -1518,8 +1680,8 @@ export default {
         showType: 3,
         defaultKey: "",
         keywords: "",
-        categoryIds: '',
-        caegoryIds2: ''
+        categoryIds: "",
+        caegoryIds2: "",
       },
       // 下载模块
       downloadSecList: [],
@@ -1533,8 +1695,8 @@ export default {
         showType: 4,
         defaultKey: "",
         keywords: "",
-        categoryIds: '',
-        caegoryIds2: ''
+        categoryIds: "",
+        caegoryIds2: "",
       },
       // 中间模块
       contentSecList: [],
@@ -1551,8 +1713,8 @@ export default {
         defaultKey: "",
         // sortNo: 1,
         keywords: "",
-        categoryIds: '',
-        caegoryIds2: ''
+        categoryIds: "",
+        caegoryIds2: "",
       },
       modalContentText: "添加中间模块数据",
       contentData: [],
@@ -1617,7 +1779,7 @@ export default {
                 "Button",
                 {
                   props: {
-                    type: "info",
+                    type: "success",
                     size: "small",
                   },
                   style: {
@@ -1638,6 +1800,9 @@ export default {
                     type: "error",
                     size: "small",
                   },
+                  style: {
+                    marginRight: "5px",
+                  },
                   on: {
                     click: () => {
                       this.contentRemove(params.row);
@@ -1645,6 +1810,21 @@ export default {
                   },
                 },
                 "删除"
+              ),
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "info",
+                    size: "small",
+                  },
+                  on: {
+                    click: () => {
+                      this.toKeywordsList(params.row.content_block_id);
+                    },
+                  },
+                },
+                "查看关键词"
               ),
             ]);
           },
@@ -1654,9 +1834,16 @@ export default {
       colorfulVisible: false,
       colorfulBlockId: "",
       colorfulModalForm: {
-        nameStr: "",
+        // nameStr: "",
         imgurl: "",
         color: "",
+        colorfulList: [
+          {
+            name: "",
+            search: "",
+            type: 1,
+          },
+        ],
       },
       // 右边数据模块
       asideBlockId: "",
@@ -2016,8 +2203,8 @@ export default {
       });
     },
     handleLabelSubmit() {
-      if(this.labelModalForm.queryType == 4){
-        if(!this.labelModalForm.keywords && !this.labelModalForm.categoryIds){
+      if (this.labelModalForm.queryType == 4) {
+        if (!this.labelModalForm.keywords && !this.labelModalForm.categoryIds) {
           return this.$Message.error("关键词和一级行业不能同时为空");
         }
       }
@@ -2070,6 +2257,15 @@ export default {
     labelCategoryChange(v) {
       this.labelSecList = this.secondList[v - 1];
     },
+    toKeywordsList(id) {
+      console.log(id)
+      this.$router.push({
+        name: 'keywordsList',
+        query: {
+          id: id
+        }
+      })
+    },
     // 新模块
     getNewKeywords(model) {
       let data = {
@@ -2088,8 +2284,8 @@ export default {
       });
     },
     newModalSubmit() {
-      if(this.newModalForm.queryType == 4){
-        if(!this.newModalForm.keywords && !this.newModalForm.categoryIds){
+      if (this.newModalForm.queryType == 4) {
+        if (!this.newModalForm.keywords && !this.newModalForm.categoryIds) {
           return this.$Message.error("关键词和一级行业不能同时为空");
         }
       }
@@ -2136,8 +2332,11 @@ export default {
     },
     // 附件下载
     downloadModalSubmit() {
-      if(this.downloadModalForm.queryType == 4){
-        if(!this.downloadModalForm.keywords && !this.downloadModalForm.categoryIds){
+      if (this.downloadModalForm.queryType == 4) {
+        if (
+          !this.downloadModalForm.keywords &&
+          !this.downloadModalForm.categoryIds
+        ) {
           return this.$Message.error("关键词和一级行业不能同时为空");
         }
       }
@@ -2183,7 +2382,7 @@ export default {
       });
     },
     downloadCategoryChange(v) {
-      this.downloadSecList = this.secondList[v-1];
+      this.downloadSecList = this.secondList[v - 1];
     },
     // 中间模块
     contentModalSubmit() {
@@ -2232,8 +2431,11 @@ export default {
       });
     },
     handleContentSubmit() {
-      if(this.contentModalForm.queryType == 4){
-        if(!this.contentModalForm.keywords && !this.contentModalForm.categoryIds){
+      if (this.contentModalForm.queryType == 4) {
+        if (
+          !this.contentModalForm.keywords &&
+          !this.contentModalForm.categoryIds
+        ) {
           return this.$Message.error("关键词和一级行业不能同时为空");
         }
       }
@@ -2291,22 +2493,51 @@ export default {
       this.colorfulVisible = true;
       this.colorfulBlockId = v.color_block_id;
       this.$refs.colorfulModalForm.resetFields();
+      this.colorfulModalForm.colorfulList = [
+        {
+          name: "",
+          search: "",
+          type: 1,
+        },
+      ];
       colorfulDetail(v.color_block_id).then((res) => {
-        if (res.name) {
-          this.colorfulModalForm.nameStr = res.name;
+        if (res.color) {
           this.colorfulModalForm.imgurl = res.img_url;
           this.colorfulModalForm.color = res.color;
+          if (res.data.length === 0) {
+            this.colorfulModalForm.colorfulList = [
+              {
+                name: "",
+                search: "",
+                type: 1,
+              },
+            ];
+          } else {
+            res.data = res.data.map((item) => {
+              item.search = item.search.replace(/,+/g, " ");
+              return item;
+            });
+            this.colorfulModalForm.colorfulList = res.data;
+          }
         }
       });
     },
     handleColorfulSubmit() {
       this.$refs.colorfulModalForm.validate((valid) => {
         if (valid) {
+          let list = this.colorfulModalForm.colorfulList.map((item) => {
+            if (item.search.length !== 0) {
+              item.search = item.search.trim().replace(/ +/g, ",");
+            }
+            return item;
+          });
           let data = {
-            ...this.colorfulModalForm,
+            list: list,
+            imgurl: this.colorfulModalForm.imgurl,
+            color: this.colorfulModalForm.color,
             blockId: this.colorfulBlockId,
           };
-          saveColorData(qs.stringify(data)).then((res) => {
+          saveColorData(data).then((res) => {
             this.$Message.success("编辑彩色模块成功");
             this.colorfulVisible = false;
             this.getDetail();
@@ -2316,6 +2547,16 @@ export default {
     },
     handleColorfulCancel() {
       this.colorfulVisible = false;
+    },
+    handlecolorfulRemove(index) {
+      this.colorfulModalForm.colorfulList.splice(index, 1);
+    },
+    handlecolorfulAdd() {
+      this.colorfulModalForm.colorfulList.push({
+        name: "",
+        search: "",
+        type: 1,
+      });
     },
     // 右边数据模块
     handleasideRemove(index) {

@@ -18,47 +18,52 @@
         >
       </div>
       <div class="container">
-        <div class="item">
-          <!-- <p class="itemTitle">
-              1 在<span style="color: #2e5ae7">上海</span>，与<span
-                style="color: #2e5ae7"
-                >窗帘</span
-              >相关的最新信息如下所示：
-            </p>
-            <ul class="itemInfo">
-              <li>
-                【<span style="color: #d53d01">招标</span
-                >】园区运营部2021年电动遮阳窗帘及防蚊纱窗维修零配件更换货物项目比选公告
-              </li>
-              <li>
-                【<span style="color: #d53d01">招标</span
-                >】园区运营部2021年电动遮阳窗帘及防蚊纱窗维修零配件更换货物项目比选公告
-              </li>
-            </ul> -->
-        </div>
-        <div class="item">
-          <!-- <p class="itemTitle">
-            1 在<span style="color: #2e5ae7">上海</span>，与<span
-              style="color: #2e5ae7"
-              >窗帘</span
+        <div class="item" v-for="(item, index) in areaList" :key="index">
+          <p class="itemTitle">
+            {{ index + 1 }} 在<span style="color: #2e5ae7">{{
+              item.areas.join('、')
+            }}</span
+            >，与<span style="color: #2e5ae7">{{ item.keyword }}</span
             >相关的最新信息如下所示：
           </p>
-          <ul class="itemInfo">
-            <li>
-              【<span style="color: #d53d01">招标</span
-              >】园区运营部2021年电动遮阳窗帘及防蚊纱窗维修零配件更换货物项目比选公告
+          <ul class="itemInfo" v-if="item.data.length > 0">
+            <li v-for="data in item.data" :key="data.title">
+              <span v-if="data.infoType == 1010"
+                >【<span style="color: #d53d01">招标</span>】</span
+              >
+              <span v-else-if="data.infoType >= 2000 && data.infoType < 3000"
+                >【<span style="color: #d53d01">采购</span>】</span
+              >
+              <span v-else>【<span style="color: #d53d01">项目</span>】</span>
+              {{ data.title }}
             </li>
-            <li>
-                【<span style="color: #d53d01">招标</span
-                >】园区运营部2021年电动遮阳窗帘及防蚊纱窗维修零配件更换货物项目比选公告
-              </li>
-          </ul> -->
+          </ul>
+          <ul v-else class="itemInfo">
+            <li>暂无数据</li>
+          </ul>
+        </div>
+        <div class="item" v-for="(item, index) in companyList" :key="index">
+          <p class="itemTitle">
+            {{ index + 1 + areaList.length }}
+            <span style="color: #2e5ae7">{{ item.companyName }}</span
+            >，近一年内参与项目如下所示：
+          </p>
+          <ul class="itemInfo" v-if="item.data.length > 0">
+            <li v-for="data in item.data" :key="data.title">
+              {{ data.title }}
+            </li>
+          </ul>
+          <ul v-else class="itemInfo">
+            <li>暂无数据</li>
+          </ul>
         </div>
       </div>
       <div class="footer">
         <img src="../../../assets/preSale/phone.png" alt="" />
         <div>
-          <p>拨打<span style="color: #ff1515">18701536736</span></p>
+          <p>
+            拨打<span style="color: #ff1515">{{ phone }}</span>
+          </p>
           <p>联系专属客服，可为您关注的项目进行免费信息订阅</p>
         </div>
       </div>
@@ -83,8 +88,16 @@ export default {
       areaList: [],
       companyList: [],
       loading: true,
-      isShow: false
+      isShow: false,
+      id: "",
+      phone: "",
     };
+  },
+  created() {
+    this.id = this.$route.query.id;
+  },
+  mounted() {
+    this.getDetail();
   },
   // 表格动态列 计算属性
   methods: {
@@ -96,6 +109,7 @@ export default {
         this.fileDownload(imgData);
       });
     },
+    // 下载
     fileDownload(downloadUrl) {
       let aLink = document.createElement("a");
       aLink.style.display = "none";
@@ -106,17 +120,52 @@ export default {
       aLink.click();
       document.body.removeChild(aLink);
     },
+    // 获取详情
+    getDetail() {
+      this.isShow = true;
+      getCrmRequest("/presale/detail/" + this.id).then((res) => {
+        if (res.success) {
+          this.isShow = false;
+          this.phone = res.result.contact;
+          res.result.list.forEach((item) => {
+            if (item.keyword) {
+              this.areaList.push(item);
+            } else if (item.companyName) {
+              this.companyList.push(item);
+            }
+          });
+          this.areaList.forEach((item) => {
+            item.data = item.data.flat(Infinity)
+            item.data = item.data
+              .sort((e, f) => {
+                return f.publishDate - e.publishDate;
+              })
+              .slice(0, 10);
+          });
+          this.companyList.forEach((item) => {
+            item.data = item.data.flat(Infinity)
+            item.data = item.data
+              .sort((e, f) => {
+                return f.publishDate - e.publishDate;
+              })
+              .slice(0, 10);
+          });
+        }
+      });
+    },
   },
-  mounted() {},
+  
 };
 </script>
 
 <style lang="less" escoped>
-.main .single-page-con .single-page{
+.main .single-page-con .single-page {
   margin: 0;
   height: 100%;
+  min-height: 720px;
+  // min-width: 1160px;
 }
-.search{
+.search {
   position: relative;
   height: 100%;
 }

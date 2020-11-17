@@ -387,3 +387,51 @@ export const getMenuTree = (id) => {
     }
   })
 }
+
+// 获取关键词列表
+export const getKeywordsList = (id, params) => {
+  return axios({
+    method: 'get',
+    url: `/osc/block/channel/keywords/${id}`,
+    headers: {
+      'accessToken': accessToken
+    },
+    params: params
+  })
+}
+
+// 添加关键词
+export const addKeywords = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/keywords/add`,
+    headers: {
+      'accessToken': accessToken
+    },
+    data: data
+  })
+}
+
+// 编辑关键词
+export const editKeywords = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/keywords/update`,
+    headers: {
+      'accessToken': accessToken
+    },
+    data: data
+  })
+}
+
+// 删除关键词
+export const removeKeywords = (data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/keywords/delete`,
+    headers: {
+      'accessToken': accessToken
+    },
+    data: data
+  })
+}
