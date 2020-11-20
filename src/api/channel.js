@@ -435,3 +435,15 @@ export const removeKeywords = (data) => {
     data: data
   })
 }
+
+// 改变频道状态
+export const changeStatus = (id,data) => {
+  return axios({
+    method: 'post',
+    url: `/osc/block/channel/channel_status/${id}`,
+    headers: {
+      'accessToken': accessToken
+    },
+    data: data
+  })
+}

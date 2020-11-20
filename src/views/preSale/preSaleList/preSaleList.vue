@@ -26,7 +26,7 @@
           </Form-item>
         </Form>
         <Button @click="handleQrcode" type="primary" icon="md-qr-scanner"
-          >查看二维码</Button
+          >我的二维码</Button
         >
       </Row>
       <Row>
@@ -519,7 +519,7 @@ export default {
       this.$refs.qrCodeUrl.innerHTML = "";
       var qrcode = new QRCode(this.$refs.qrCodeUrl, {
         // text: `http://127.0.0.1:8888/osc/presale/form?contact=${phone}`, // 需要转换为二维码的内容
-        text: `http://192.168.0.44:8888/osc/presale/form?contact=${phone}`,
+        text: `http://192.168.0.12:8888/osc/presale/form?contact=${phone}`,
         width: 150,
         height: 150,
         colorDark: "#000000",

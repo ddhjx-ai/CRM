@@ -39,7 +39,15 @@
           :data="data"
           ref="table"
           @on-selection-change="changeSelect"
-        ></Table>
+        >
+          <template slot-scope="{ row }" slot="isDeleted">
+            <RadioGroup v-model="row.isDeleted" type="button" @on-change="handleStatus(row)">
+              <Radio :label="1" class="noUse">禁用</Radio>
+              <Radio :label="2" class="testUse">测试</Radio>
+              <Radio :label="0" class="isUse">启用</Radio>
+          </RadioGroup>
+          </template>
+        </Table>
       </Row>
       <Row type="flex" justify="end" class="page">
         <Page
@@ -71,9 +79,9 @@
           />
         </FormItem>
         <FormItem label="描述" prop="description">
-          <Input v-model="form.description" />
+          <Input v-model="form.description" placeholder="输入当前操作人"/>
         </FormItem>
-        <FormItem label="是否禁用" prop="isDeleted">
+        <!-- <FormItem label="是否禁用" prop="isDeleted">
           <i-switch
             size="large"
             v-model="form.isDeleted"
@@ -83,7 +91,7 @@
             <span slot="open">启用</span>
             <span slot="close">禁用</span>
           </i-switch>
-        </FormItem>
+        </FormItem> -->
       </Form>
       <div slot="footer">
         <Button type="text" @click="handleCancel">取消</Button>
@@ -101,7 +109,8 @@ import {
   channelNameAdd,
   channelUpdate,
   // themeBlockId,
-  delChannel 
+  delChannel,
+  changeStatus
 } from "@/api/channel.js";
 import qs from "qs";
 export default {
@@ -165,9 +174,10 @@ export default {
         {
           title: "状态",
           key: "isDeleted",
+          slot: 'isDeleted',
           align: "center",
-          width: 100,
-          render: (h, params) => {
+          width: 300,
+          /* render: (h, params) => {
             return h(
               "Tag",
               {
@@ -177,7 +187,7 @@ export default {
               },
               params.row.isDeleted ? "禁用" : "启用"
             );
-          },
+          }, */
         },
         {
           title: "操作",
@@ -251,7 +261,6 @@ export default {
       form: {
         // 添加或编辑表单对象初始化数据
         channelName: "",
-        isDeleted: 1,
         description: "",
       },
       formValidate: {
@@ -353,7 +362,6 @@ export default {
             let data = {
               channelName: this.form.channelName,
               description: this.form.description,
-              isDeleted: this.form.isDeleted,
             };
             channelUpdate(this.updateId, qs.stringify(data)).then((res) => {
               this.submitLoading = false;
@@ -409,7 +417,47 @@ export default {
           id: v.id
         }
       })
+    },
+    // 改变状态
+    handleStatus(v) {
+      console.log(v)
+      this.$Modal.confirm({
+        title: "确认",
+        content: "您确认要改变当前状态？",
+        loading: true,
+        onOk: () => {
+          changeStatus(v.id, qs.stringify({isDeleted: v.isDeleted})).then((res) => {
+            this.$Modal.remove();
+            if (res.success) {
+              this.$Message.success("操作成功");
+              this.getDataList();
+            }
+          });
+        },
+        onCancel: () => {
+          this.$Message.info("操作取消");
+          this.getDataList();
+        },
+      });
     }
   },
 };
 </script>
+
+<style lang="less" scoped>
+.ivu-radio-group-button .ivu-radio-wrapper-checked.noUse{
+  background: #ed4014;
+  border-color: #ed4014;
+  color: #fff;
+}
+.ivu-radio-group-button .ivu-radio-wrapper-checked.isUse{
+  background: #19be6b;
+  border-color: #19be6b;
+  color: #fff;
+}
+.ivu-radio-group-button .ivu-radio-wrapper-checked.testUse{
+  background:#2d8cf0;
+  border-color:#2d8cf0;
+  color: #fff;
+}
+</style>

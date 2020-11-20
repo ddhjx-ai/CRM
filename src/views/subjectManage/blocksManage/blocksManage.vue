@@ -295,7 +295,10 @@
                     prop="queryType"
                     style="width: 100%"
                   >
-                    <Select v-model="newModalForm.queryType">
+                    <Select
+                      v-model="newModalForm.queryType"
+                      @on-change="newQuerySele"
+                    >
                       <Option :value="0">不匹配</Option>
                       <Option :value="1">标题</Option>
                       <Option :value="2">内容</Option>
@@ -358,7 +361,12 @@
                       @click="getNewKeywords('newModalForm')"
                       >生成关键词</Button
                     >
-                    <Button type="info" @click="toKeywordsList(newBlockId)" :disabled="!newBlockId">查看关键词</Button>
+                    <Button
+                      type="info"
+                      @click="toKeywordsList(newBlockId)"
+                      :disabled="!newBlockId"
+                      >查看关键词</Button
+                    >
                   </FormItem>
                 </Col>
               </Row>
@@ -401,49 +409,47 @@
                 </Col>
               </Row>
               <Row v-if="newModalForm.queryType == 4">
-                <Col span="12">
+                <Col span="24">
                   <FormItem
                     label="一级行业"
                     prop="categoryIds"
                     style="width: 100%"
                   >
-                    <Select
-                      v-model="newModalForm.categoryIds"
-                      @on-change="newCategoryChange"
-                    >
-                      <Option :value="1">交通运输</Option>
-                      <Option :value="2">能源化工--电力</Option>
-                      <Option :value="3">能源化工--化工</Option>
-                      <Option :value="4">冶金矿产</Option>
-                      <Option :value="5">机械电子</Option>
-                      <Option :value="6">网络通讯计算机</Option>
-                      <Option :value="7">市政房地产建筑</Option>
-                      <Option :value="8">水利</Option>
-                      <Option :value="9">环保</Option>
-                      <Option :value="10">医疗卫生</Option>
-                      <Option :value="11">科技文教旅游</Option>
-                      <Option :value="12">出版印刷</Option>
-                      <Option :value="13">轻工纺织食品</Option>
-                      <Option :value="14">农林牧渔</Option>
-                      <Option :value="15">商业服务</Option>
-                      <Option :value="16">园林绿化</Option>
-                    </Select>
-                  </FormItem>
-                </Col>
-                <Col span="12">
-                  <FormItem
-                    label="二级行业"
-                    prop="caegoryIds2"
-                    style="width: 100%"
-                  >
-                    <Select v-model="newModalForm.caegoryIds2">
+                    <Select v-model="newModalForm.categoryIds" multiple>
                       <Option
-                        v-for="item in newSecList"
-                        :value="item.id"
+                        v-for="item in firstList"
                         :key="item.id"
+                        :value="item.id"
                         >{{ item.name }}</Option
                       >
                     </Select>
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="24">
+                  <FormItem
+                    label="搜索范围"
+                    prop="caegoryIds2"
+                    style="width: 100%"
+                  >
+                    <RadioGroup v-model="newModalForm.caegoryIds2">
+                      <Radio label="1" :disabled="newModalForm.queryType == 4" border
+                        >招标采购信息搜索</Radio
+                      >
+                      <Radio label="2" :disabled="newModalForm.queryType == 4" border
+                        >项目信息搜索</Radio
+                      >
+                      <Radio label="3" :disabled="newModalForm.queryType != 4" border
+                        >VIP信息搜索</Radio
+                      >
+                      <Radio label="4" :disabled="newModalForm.queryType == 4" border
+                        >招标信息搜索</Radio
+                      >
+                      <Radio label="5" :disabled="newModalForm.queryType == 4" border
+                        >采购信息搜索</Radio
+                      >
+                    </RadioGroup>
                   </FormItem>
                 </Col>
               </Row>
@@ -468,7 +474,6 @@
                 <FormItem>
                   <Button type="primary" @click="newModalSubmit">保存</Button>
                   <Button @click="ModalReset('newModalForm')">重置</Button>
-                  
                 </FormItem>
               </Row>
             </Form>
@@ -493,7 +498,10 @@
                     prop="queryType"
                     style="width: 100%"
                   >
-                    <Select v-model="downloadModalForm.queryType">
+                    <Select
+                      v-model="downloadModalForm.queryType"
+                      @on-change="downloadQuerySele"
+                    >
                       <Option :value="0">不匹配</Option>
                       <Option :value="1">标题</Option>
                       <Option :value="2">内容</Option>
@@ -604,49 +612,57 @@
                 </Col>
               </Row>
               <Row v-if="downloadModalForm.queryType == 4">
-                <Col span="12">
+                <Col span="24">
                   <FormItem
                     label="一级行业"
                     prop="categoryIds"
                     style="width: 100%"
                   >
-                    <Select
-                      v-model="downloadModalForm.categoryIds"
-                      @on-change="downloadCategoryChange"
-                    >
-                      <Option :value="1">交通运输</Option>
-                      <Option :value="2">能源化工--电力</Option>
-                      <Option :value="3">能源化工--化工</Option>
-                      <Option :value="4">冶金矿产</Option>
-                      <Option :value="5">机械电子</Option>
-                      <Option :value="6">网络通讯计算机</Option>
-                      <Option :value="7">市政房地产建筑</Option>
-                      <Option :value="8">水利</Option>
-                      <Option :value="9">环保</Option>
-                      <Option :value="10">医疗卫生</Option>
-                      <Option :value="11">科技文教旅游</Option>
-                      <Option :value="12">出版印刷</Option>
-                      <Option :value="13">轻工纺织食品</Option>
-                      <Option :value="14">农林牧渔</Option>
-                      <Option :value="15">商业服务</Option>
-                      <Option :value="16">园林绿化</Option>
-                    </Select>
-                  </FormItem>
-                </Col>
-                <Col span="12">
-                  <FormItem
-                    label="二级行业"
-                    prop="caegoryIds2"
-                    style="width: 100%"
-                  >
-                    <Select v-model="downloadModalForm.caegoryIds2">
+                    <Select v-model="downloadModalForm.categoryIds" multiple>
                       <Option
-                        v-for="item in downloadSecList"
-                        :value="item.id"
+                        v-for="item in firstList"
                         :key="item.id"
+                        :value="item.id"
                         >{{ item.name }}</Option
                       >
                     </Select>
+                  </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="24">
+                  <FormItem
+                    label="搜索范围"
+                    prop="caegoryIds2"
+                    style="width: 100%"
+                  >
+                    <RadioGroup v-model="downloadModalForm.caegoryIds2">
+                      <Radio
+                        label="1"
+                        :disabled="downloadModalForm.queryType == 4" border
+                        >招标采购信息搜索</Radio
+                      >
+                      <Radio
+                        label="2"
+                        :disabled="downloadModalForm.queryType == 4" border
+                        >项目信息搜索</Radio
+                      >
+                      <Radio
+                        label="3"
+                        :disabled="downloadModalForm.queryType != 4" border
+                        >VIP信息搜索</Radio
+                      >
+                      <Radio
+                        label="4"
+                        :disabled="downloadModalForm.queryType == 4" border
+                        >招标信息搜索</Radio
+                      >
+                      <Radio
+                        label="5"
+                        :disabled="downloadModalForm.queryType == 4" border
+                        >采购信息搜索</Radio
+                      >
+                    </RadioGroup>
                   </FormItem>
                 </Col>
               </Row>
@@ -826,7 +842,10 @@
         <Row>
           <Col span="12">
             <FormItem label="queryType" prop="queryType" style="width: 100%">
-              <Select v-model="labelModalForm.queryType">
+              <Select
+                v-model="labelModalForm.queryType"
+                @on-change="labelQuerySele"
+              >
                 <Option :value="0">不匹配</Option>
                 <Option :value="1">标题</Option>
                 <Option :value="2">内容</Option>
@@ -924,41 +943,39 @@
           </Col>
         </Row>
         <Row v-if="labelModalForm.queryType == 4">
-          <Col span="12">
+          <Col span="24">
             <FormItem label="一级行业" prop="categoryIds" style="width: 100%">
-              <Select
-                v-model="labelModalForm.categoryIds"
-                @on-change="labelCategoryChange"
-              >
-                <Option :value="1">交通运输</Option>
-                <Option :value="2">能源化工--电力</Option>
-                <Option :value="3">能源化工--化工</Option>
-                <Option :value="4">冶金矿产</Option>
-                <Option :value="5">机械电子</Option>
-                <Option :value="6">网络通讯计算机</Option>
-                <Option :value="7">市政房地产建筑</Option>
-                <Option :value="8">水利</Option>
-                <Option :value="9">环保</Option>
-                <Option :value="10">医疗卫生</Option>
-                <Option :value="11">科技文教旅游</Option>
-                <Option :value="12">出版印刷</Option>
-                <Option :value="13">轻工纺织食品</Option>
-                <Option :value="14">农林牧渔</Option>
-                <Option :value="15">商业服务</Option>
-                <Option :value="16">园林绿化</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="二级行业" prop="caegoryIds2" style="width: 100%">
-              <Select v-model="labelModalForm.caegoryIds2">
+              <Select v-model="labelModalForm.categoryIds" multiple>
                 <Option
-                  v-for="item in labelSecList"
-                  :value="item.id"
+                  v-for="item in firstList"
                   :key="item.id"
+                  :value="item.id"
                   >{{ item.name }}</Option
                 >
               </Select>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="24">
+            <FormItem label="搜索范围" prop="caegoryIds2" style="width: 100%">
+              <RadioGroup v-model="labelModalForm.caegoryIds2">
+                <Radio label="1" :disabled="labelModalForm.queryType == 4" border
+                  >招标采购信息搜索</Radio
+                >
+                <Radio label="2" :disabled="labelModalForm.queryType == 4" border
+                  >项目信息搜索</Radio
+                >
+                <Radio label="3" :disabled="labelModalForm.queryType != 4" border
+                  >VIP信息搜索</Radio
+                >
+                <Radio label="4" :disabled="labelModalForm.queryType == 4" border
+                  >招标信息搜索</Radio
+                >
+                <Radio label="5" :disabled="labelModalForm.queryType == 4" border
+                  >采购信息搜索</Radio
+                >
+              </RadioGroup>
             </FormItem>
           </Col>
         </Row>
@@ -994,7 +1011,10 @@
         <Row>
           <Col span="12">
             <FormItem label="queryType" prop="queryType" style="width: 100%">
-              <Select v-model="contentModalForm.queryType">
+              <Select
+                v-model="contentModalForm.queryType"
+                @on-change="contentQuerySele"
+              >
                 <Option :value="0">不匹配</Option>
                 <Option :value="1">标题</Option>
                 <Option :value="2">内容</Option>
@@ -1095,41 +1115,39 @@
           </Col>
         </Row>
         <Row v-if="contentModalForm.queryType == 4">
-          <Col span="12">
+          <Col span="24">
             <FormItem label="一级行业" prop="categoryIds" style="width: 100%">
-              <Select
-                v-model="contentModalForm.categoryIds"
-                @on-change="contentCategoryChange"
-              >
-                <Option :value="1">交通运输</Option>
-                <Option :value="2">能源化工--电力</Option>
-                <Option :value="3">能源化工--化工</Option>
-                <Option :value="4">冶金矿产</Option>
-                <Option :value="5">机械电子</Option>
-                <Option :value="6">网络通讯计算机</Option>
-                <Option :value="7">市政房地产建筑</Option>
-                <Option :value="8">水利</Option>
-                <Option :value="9">环保</Option>
-                <Option :value="10">医疗卫生</Option>
-                <Option :value="11">科技文教旅游</Option>
-                <Option :value="12">出版印刷</Option>
-                <Option :value="13">轻工纺织食品</Option>
-                <Option :value="14">农林牧渔</Option>
-                <Option :value="15">商业服务</Option>
-                <Option :value="16">园林绿化</Option>
-              </Select>
-            </FormItem>
-          </Col>
-          <Col span="12">
-            <FormItem label="二级行业" prop="caegoryIds2" style="width: 100%">
-              <Select v-model="contentModalForm.caegoryIds2">
+              <Select v-model="contentModalForm.categoryIds" multiple>
                 <Option
-                  v-for="item in contentSecList"
-                  :value="item.id"
+                  v-for="item in firstList"
                   :key="item.id"
+                  :value="item.id"
                   >{{ item.name }}</Option
                 >
               </Select>
+            </FormItem>
+          </Col>
+        </Row>
+        <Row>
+          <Col span="24">
+            <FormItem label="搜索范围" prop="caegoryIds2" style="width: 100%">
+              <RadioGroup v-model="contentModalForm.caegoryIds2">
+                <Radio label="1" :disabled="contentModalForm.queryType == 4" border
+                  >招标采购信息搜索</Radio
+                >
+                <Radio label="2" :disabled="contentModalForm.queryType == 4" border
+                  >项目信息搜索</Radio
+                >
+                <Radio label="3" :disabled="contentModalForm.queryType != 4" border
+                  >VIP信息搜索</Radio
+                >
+                <Radio label="4" :disabled="contentModalForm.queryType == 4" border
+                  >招标信息搜索</Radio
+                >
+                <Radio label="5" :disabled="contentModalForm.queryType == 4" border
+                  >采购信息搜索</Radio
+                >
+              </RadioGroup>
             </FormItem>
           </Col>
         </Row>
@@ -1280,47 +1298,6 @@
         <Button type="primary" @click="menuViewVisible = false">确认</Button>
       </div>
     </Modal>
-
-    <!-- label数据展示模块关键词 -->
-    <!-- <Modal
-      title="关键词列表"
-      v-model="labelKeywordsVisible"
-      :mask-closable="false"
-      :width="800"
-    >
-      <Row class="operation" style="margin-bottom: 10px">
-        <Button type="primary" icon="md-add" @click="keywordsAdd">添加</Button>
-      </Row>
-      <Row>
-        <Table
-          class="mygrid labelTable"
-          :loading="loading"
-          border
-          :columns="labelKeywordsColumns"
-          :data="labelKeywordsData"
-          ref="labelKeywordsTable"
-          @on-selection-change="changeSelect"
-          style="padding-bootom: 10px"
-        ></Table>
-      </Row>
-      <Row type="flex" justify="end" class="page">
-        <Page
-          :current="keywordsForm.page"
-          :total="keywordsTotal"
-          :page-size="keywordsForm.size"
-          @on-change="changePage"
-          @on-page-size-change="changesize"
-          :page-size-opts="[10, 20, 50]"
-          size="small"
-          show-total
-          show-elevator
-          show-sizer
-        ></Page>
-      </Row>
-      <div slot="footer">
-        <Button type="primary" @click="labelKeywordsVisible = false">确认</Button>
-      </div>
-    </Modal> -->
   </div>
 </template>
 
@@ -1328,15 +1305,6 @@
 import {
   getAllThemeList, // 获取主题列表接口
   themeAddModal, // 添加主题模块接口
-  // addModal,
-  // themeBlockId,
-  // importExcel,
-  // addManualData,
-  // saveshowdataBlock,
-  // saveNewData,
-  // saveDownloadData,
-  // saveContentData,
-  // saveRightData,
   removeLabelBlock,
   saveColorData,
   delContentData,
@@ -1360,6 +1328,26 @@ export default {
   name: "blocksManage",
   data() {
     return {
+      // 一级行业列表
+      firstList: [
+        { name: "交通运输", id: "1" },
+        { name: "市政房地产建筑", id: "3" },
+        { name: "水利桥梁", id: "4" },
+        { name: "能源", id: "17" },
+        { name: "化工", id: "18" },
+        { name: "环保", id: "6" },
+        { name: "冶金矿产原材料", id: "10" },
+        { name: "机械电子电器", id: "5" },
+        { name: "网络通讯计算机", id: "2" },
+        { name: "医疗卫生", id: "8" },
+        { name: "园林绿化", id: "16" },
+        { name: "商业服务", id: "14" },
+        { name: "出版印刷", id: "11" },
+        { name: "轻工纺织食品", id: "12" },
+        { name: "农林牧渔", id: "13" },
+        { name: "科技文教旅游", id: "9" },
+        { name: "其它", id: "15" },
+      ],
       // 二级行业列表
       secondList: [
         [
@@ -1520,8 +1508,8 @@ export default {
         showType: 1,
         defaultKey: "",
         keywords: "",
-        categoryIds: "",
-        caegoryIds2: "",
+        categoryIds: [],
+        caegoryIds2: "1",
       },
       labelData: [],
       labelColumns: [
@@ -1680,8 +1668,8 @@ export default {
         showType: 3,
         defaultKey: "",
         keywords: "",
-        categoryIds: "",
-        caegoryIds2: "",
+        categoryIds: [],
+        caegoryIds2: "3",
       },
       // 下载模块
       downloadSecList: [],
@@ -1695,8 +1683,8 @@ export default {
         showType: 4,
         defaultKey: "",
         keywords: "",
-        categoryIds: "",
-        caegoryIds2: "",
+        categoryIds: [],
+        caegoryIds2: "1",
       },
       // 中间模块
       contentSecList: [],
@@ -1713,8 +1701,8 @@ export default {
         defaultKey: "",
         // sortNo: 1,
         keywords: "",
-        categoryIds: "",
-        caegoryIds2: "",
+        categoryIds: [],
+        caegoryIds2: "1",
       },
       modalContentText: "添加中间模块数据",
       contentData: [],
@@ -1918,7 +1906,18 @@ export default {
           this.newModalForm.defaultKey = data.new_data_block.default_key;
           this.newModalForm.queryType = data.new_data_block.query_type;
           this.newModalForm.showType = data.new_data_block.show_type * 1;
-          this.newModalForm.keywords = data.new_data_block.sphinx_query;
+          this.newModalForm.keywords = data.new_data_block.sphinx_query || "";
+          if (data.new_data_block.category_ids) {
+            this.newModalForm.categoryIds = data.new_data_block.category_ids.split(
+              ","
+            );
+          };
+          /* if(data.new_data_block.caegory_ids2) {
+            this.newModalForm.caegoryIds2 = data.new_data_block.caegory_ids2
+          }else {
+            data.new_data_block.query_type == 4 ? this.newModalForm.caegoryIds2 = '3' : this.newModalForm.caegoryIds2 = '1';
+          } */
+          this.newModalForm.caegoryIds2 = data.new_data_block.caegory_ids2 ? data.new_data_block.caegory_ids2 : '';
         }
         if (data.download_block) {
           this.downloadBlockId = data.download_block.download_block_id;
@@ -1926,7 +1925,19 @@ export default {
           this.downloadModalForm.defaultKey = data.download_block.default_key;
           this.downloadModalForm.queryType = data.download_block.query_type;
           this.downloadModalForm.showType = data.download_block.show_type * 1;
-          this.downloadModalForm.keywords = data.download_block.sphinx_query;
+          this.downloadModalForm.keywords =
+            data.download_block.sphinx_query || "";
+          if (data.download_block.category_ids) {
+            this.downloadModalForm.categoryIds = data.download_block.category_ids.split(
+              ","
+            );
+          };
+          this.downloadModalForm.caegoryIds2 = data.download_block.caegory_ids2 ? data.download_block.caegory_ids2 : '';
+          /* if(data.download_block.caegory_ids2) {
+            this.downloadModalForm.caegoryIds2 = data.download_block.caegory_ids2
+          }else {
+            data.download_block.query_type == 4 ? this.downloadModalForm.caegoryIds2 = '3' : this.downloadModalForm.caegoryIds2 = '1';
+          } */
         }
         if (data.content_block.length > 0) {
           this.contentSortNo =
@@ -2017,7 +2028,6 @@ export default {
       this.$refs.excelFile.click();
     },
     getExcelFile() {
-      // console.log(this.$refs.excelFile.files[0])
       if (!this.$refs.excelFile.files[0]) return;
       let file = this.$refs.excelFile.files[0];
       this.uploadfile = file;
@@ -2113,9 +2123,7 @@ export default {
             data[index].children[0].children = item.content[0].hottxt;
             data[index].children[1].children = item.content[0].hotlist;
           });
-          console.log(data);
           this.menuViewTree = data;
-          console.log(this.menuViewTree);
         }
       });
     },
@@ -2175,7 +2183,18 @@ export default {
           this.labelModalForm.showType = res.show_type * 1;
           this.labelModalForm.sortNo = res.sort_no;
           this.labelModalForm.defaultKey = res.default_key;
-          this.labelModalForm.keywords = res.sphinx_query;
+          this.labelModalForm.keywords = res.sphinx_query || "";
+          if (res.category_ids) {
+            this.labelModalForm.categoryIds = res.category_ids.split(",");
+          } else {
+            this.labelModalForm.categoryIds = [];
+          }
+          this.labelModalForm.caegoryIds2 = res.caegory_ids2 ? res.caegory_ids2 : '';
+          /* if(res.caegory_ids2){
+            this.labelModalForm.caegoryIds2 = res.caegory_ids2 
+          }else {
+            res.query_type == 4 ? this.labelModalForm.caegoryIds2 = '3' : this.labelModalForm.caegoryIds2  = '1';
+          } */
         }
       });
       this.modalType = 2;
@@ -2204,7 +2223,10 @@ export default {
     },
     handleLabelSubmit() {
       if (this.labelModalForm.queryType == 4) {
-        if (!this.labelModalForm.keywords && !this.labelModalForm.categoryIds) {
+        if (
+          !this.labelModalForm.keywords &&
+          this.labelModalForm.categoryIds.length === 0
+        ) {
           return this.$Message.error("关键词和一级行业不能同时为空");
         }
       }
@@ -2217,7 +2239,10 @@ export default {
               queryType: this.labelModalForm.queryType,
               showType: this.labelModalForm.showType,
               sphinxQuery: this.labelModalForm.keywords,
-              categoryIds: this.labelModalForm.categoryIds,
+              categoryIds:
+                this.labelModalForm.queryType == 4
+                  ? this.labelModalForm.categoryIds.join(",")
+                  : "",
               caegoryIds2: this.labelModalForm.caegoryIds2,
               channelId: this.channelId,
               componentId: 4,
@@ -2237,7 +2262,10 @@ export default {
               queryType: this.labelModalForm.queryType,
               showType: this.labelModalForm.showType,
               sphinxQuery: this.labelModalForm.keywords,
-              categoryIds: this.labelModalForm.categoryIds,
+              categoryIds:
+                this.labelModalForm.queryType == 4
+                  ? this.labelModalForm.categoryIds.join(",")
+                  : "",
               caegoryIds2: this.labelModalForm.caegoryIds2,
               channelId: this.channelId,
               blockId: this.labelBlockId,
@@ -2254,17 +2282,20 @@ export default {
         }
       });
     },
-    labelCategoryChange(v) {
-      this.labelSecList = this.secondList[v - 1];
-    },
     toKeywordsList(id) {
-      console.log(id)
       this.$router.push({
-        name: 'keywordsList',
+        name: "keywordsList",
         query: {
-          id: id
-        }
-      })
+          id: id,
+        },
+      });
+    },
+    labelQuerySele(v) {
+      if (v == 4) {
+        this.labelModalForm.caegoryIds2 = "3";
+      } else {
+        this.labelModalForm.caegoryIds2 = "1";
+      }
     },
     // 新模块
     getNewKeywords(model) {
@@ -2285,7 +2316,10 @@ export default {
     },
     newModalSubmit() {
       if (this.newModalForm.queryType == 4) {
-        if (!this.newModalForm.keywords && !this.newModalForm.categoryIds) {
+        if (
+          !this.newModalForm.keywords &&
+          this.newModalForm.categoryIds.length == 0
+        ) {
           return this.$Message.error("关键词和一级行业不能同时为空");
         }
       }
@@ -2299,7 +2333,10 @@ export default {
               queryType: this.newModalForm.queryType,
               showType: this.newModalForm.showType,
               sphinxQuery: this.newModalForm.keywords,
-              categoryIds: this.newModalForm.categoryIds,
+              categoryIds:
+                this.newModalForm.queryType == 4
+                  ? this.newModalForm.categoryIds.join(",")
+                  : "",
               caegoryIds2: this.newModalForm.caegoryIds2,
               channelId: this.channelId,
               blockId: this.newBlockId,
@@ -2312,7 +2349,10 @@ export default {
               queryType: this.newModalForm.queryType,
               showType: this.newModalForm.showType,
               sphinxQuery: this.newModalForm.keywords,
-              categoryIds: this.newModalForm.categoryIds,
+              categoryIds:
+                this.newModalForm.queryType == 4
+                  ? this.newModalForm.categoryIds.join(",")
+                  : "",
               caegoryIds2: this.newModalForm.caegoryIds2,
               channelId: this.channelId,
               componentId: 5,
@@ -2327,15 +2367,19 @@ export default {
         }
       });
     },
-    newCategoryChange(v) {
-      this.newSecList = this.secondList[v - 1];
+    newQuerySele(v) {
+      if (v == 4) {
+        this.newModalForm.caegoryIds2 = "3";
+      } else {
+        this.newModalForm.caegoryIds2 = "1";
+      }
     },
     // 附件下载
     downloadModalSubmit() {
       if (this.downloadModalForm.queryType == 4) {
         if (
           !this.downloadModalForm.keywords &&
-          !this.downloadModalForm.categoryIds
+          this.downloadModalForm.categoryIds.length === 0
         ) {
           return this.$Message.error("关键词和一级行业不能同时为空");
         }
@@ -2350,7 +2394,10 @@ export default {
               queryType: this.downloadModalForm.queryType,
               showType: this.downloadModalForm.showType,
               sphinxQuery: this.downloadModalForm.keywords,
-              categoryIds: this.downloadModalForm.categoryIds,
+              categoryIds:
+                this.downloadModalForm.queryType == 4
+                  ? this.downloadModalForm.categoryIds.join(",")
+                  : "",
               caegoryIds2: this.downloadModalForm.caegoryIds2,
               channelId: this.channelId,
               blockId: this.downloadBlockId,
@@ -2362,7 +2409,10 @@ export default {
               queryType: this.downloadModalForm.queryType,
               showType: this.downloadModalForm.showType,
               sphinxQuery: this.downloadModalForm.keywords,
-              categoryIds: this.downloadModalForm.categoryIds,
+              categoryIds:
+                this.downloadModalForm.queryType == 4
+                  ? this.downloadModalForm.categoryIds.join(",")
+                  : "",
               caegoryIds2: this.downloadModalForm.caegoryIds2,
               channelId: this.channelId,
             };
@@ -2372,7 +2422,7 @@ export default {
           } else {
             data.componentId = 15;
           }
-          addData(qs.stringify(data)).then((res) => {
+          addData(qs.stringify(data, { arrayFormat: "repeat" })).then((res) => {
             if (res.success) {
               this.$Message.success("操作成功");
               this.getDetail();
@@ -2381,8 +2431,12 @@ export default {
         }
       });
     },
-    downloadCategoryChange(v) {
-      this.downloadSecList = this.secondList[v - 1];
+    downloadQuerySele(v) {
+      if (v == 4) {
+        this.downloadModalForm.caegoryIds2 = "3";
+      } else {
+        this.downloadModalForm.caegoryIds2 = "1";
+      }
     },
     // 中间模块
     contentModalSubmit() {
@@ -2401,7 +2455,22 @@ export default {
           this.contentModalForm.queryType = res.query_type;
           this.contentModalForm.showType = res.show_type * 1;
           this.contentModalForm.sortNo = res.sort_no;
-          this.contentModalForm.keywords = res.sphinx_query;
+          this.contentModalForm.keywords = res.sphinx_query || "";
+          if (res.category_ids) {
+            this.contentModalForm.categoryIds = res.category_ids.split(",");
+          } else {
+            this.contentModalForm.categoryIds = [];
+          }
+          this.contentModalForm.caegoryIds2 = res.caegory_ids2 ? res.caegory_ids2 : '';
+          /* if(res.caegory_ids2) {
+            this.contentModalForm.caegoryIds2 = res.caegory_ids2
+          }else {
+            if(res.query_type == 4) {
+              this.contentModalForm.caegoryIds2 = '3'
+            }else {
+              this.contentModalForm.caegoryIds2 = '1'
+            }
+          } */
         }
       });
       this.modalType = 2;
@@ -2434,7 +2503,7 @@ export default {
       if (this.contentModalForm.queryType == 4) {
         if (
           !this.contentModalForm.keywords &&
-          !this.contentModalForm.categoryIds
+          this.contentModalForm.categoryIds.length === 0
         ) {
           return this.$Message.error("关键词和一级行业不能同时为空");
         }
@@ -2448,7 +2517,7 @@ export default {
               queryType: this.contentModalForm.queryType,
               showType: this.contentModalForm.showType,
               sphinxQuery: this.contentModalForm.keywords,
-              categoryIds: this.contentModalForm.categoryIds,
+              categoryIds: this.contentModalForm.queryType == 4 ? this.contentModalForm.categoryIds.join(",") : '',
               caegoryIds2: this.contentModalForm.caegoryIds2,
               channelId: this.channelId,
               componentId: 8,
@@ -2468,7 +2537,7 @@ export default {
               queryType: this.contentModalForm.queryType,
               showType: this.contentModalForm.showType,
               sphinxQuery: this.contentModalForm.keywords,
-              categoryIds: this.contentModalForm.categoryIds,
+              categoryIds: this.contentModalForm.queryType == 4 ? this.contentModalForm.categoryIds.join(",") : '',
               caegoryIds2: this.contentModalForm.caegoryIds2,
               channelId: this.channelId,
               blockId: this.contentBlockId,
@@ -2485,8 +2554,12 @@ export default {
         }
       });
     },
-    contentCategoryChange(v) {
-      this.contentSecList = this.secondList[v - 1];
+    contentQuerySele(v) {
+      if (v == 4) {
+        this.contentModalForm.caegoryIds2 = "3";
+      } else {
+        this.contentModalForm.caegoryIds2 = "1";
+      }
     },
     // 编辑彩色模块
     colorfulEdit(v) {
@@ -2605,9 +2678,6 @@ export default {
           });
         }
       });
-    },
-    showInput(i) {
-      console.log(i);
     },
     // 重置
     ModalReset(name) {

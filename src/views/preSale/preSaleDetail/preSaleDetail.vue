@@ -21,7 +21,7 @@
         <div class="item" v-for="(item, index) in areaList" :key="index">
           <p class="itemTitle">
             {{ index + 1 }} 在<span style="color: #2e5ae7">{{
-              item.areas.join('、')
+              item.areas.length > 0 ? item.areas.join('、') : '全国'
             }}</span
             >，与<span style="color: #2e5ae7">{{ item.keyword }}</span
             >相关的最新信息如下所示：

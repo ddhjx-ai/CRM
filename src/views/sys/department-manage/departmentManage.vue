@@ -356,7 +356,6 @@ export default {
           };
           res.result.unshift(first);
           this.dataEdit = res.result;
-          console.log(this.dataEdit)
         }
       });
     },
