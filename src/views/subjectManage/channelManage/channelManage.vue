@@ -41,11 +41,25 @@
           @on-selection-change="changeSelect"
         >
           <template slot-scope="{ row }" slot="isDeleted">
-            <RadioGroup v-model="row.isDeleted" type="button" @on-change="handleStatus(row)">
+            <RadioGroup
+              v-model="row.isDeleted"
+              type="button"
+              @on-change="handleStatus(row)"
+              v-if="row.id !== 17"
+            >
               <Radio :label="1" class="noUse">禁用</Radio>
               <Radio :label="2" class="testUse">测试</Radio>
               <Radio :label="0" class="isUse">启用</Radio>
-          </RadioGroup>
+            </RadioGroup>
+            <RadioGroup
+              v-model="row.isDeleted"
+              type="button"
+              @on-change="handleStatus(row)"
+              v-else
+            >
+              <Radio :label="1" class="noUse">禁用</Radio>
+              <Radio :label="3" class="testUse">汇总</Radio>
+            </RadioGroup>
           </template>
         </Table>
       </Row>
@@ -79,7 +93,7 @@
           />
         </FormItem>
         <FormItem label="描述" prop="description">
-          <Input v-model="form.description" placeholder="输入当前操作人"/>
+          <Input v-model="form.description" placeholder="输入当前操作人" />
         </FormItem>
         <!-- <FormItem label="是否禁用" prop="isDeleted">
           <i-switch
@@ -110,7 +124,7 @@ import {
   channelUpdate,
   // themeBlockId,
   delChannel,
-  changeStatus
+  changeStatus,
 } from "@/api/channel.js";
 import qs from "qs";
 export default {
@@ -129,7 +143,7 @@ export default {
         {
           title: "频道ID",
           width: 80,
-          key: 'id',
+          key: "id",
           align: "center",
         },
         {
@@ -174,20 +188,9 @@ export default {
         {
           title: "状态",
           key: "isDeleted",
-          slot: 'isDeleted',
+          slot: "isDeleted",
           align: "center",
           width: 300,
-          /* render: (h, params) => {
-            return h(
-              "Tag",
-              {
-                props: {
-                  color: params.row.isDeleted ? "error" : "success",
-                },
-              },
-              params.row.isDeleted ? "禁用" : "启用"
-            );
-          }, */
         },
         {
           title: "操作",
@@ -195,59 +198,64 @@ export default {
           align: "center",
           width: 180,
           render: (h, params) => {
-            return h("div", [
-              h(
-                "Button",
-                {
-                  props: {
-                    type: "primary",
-                    size: "small",
-                  },
-                  style: {
-                    marginRight: "5px",
-                  },
-                  on: {
-                    click: () => {
-                      this.edit(params.row);
+            if (this.$route.meta.permTypes.includes("delete")) {
+              return h("div", [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "primary",
+                      size: "small",
+                    },
+                    style: {
+                      marginRight: "5px",
+                    },
+                    on: {
+                      click: () => {
+                        this.edit(params.row);
+                      },
                     },
                   },
-                },
-                "编辑"
-              ),
-              /* h(
-                "Button",
-                {
-                  props: {
-                    type: "info",
-                    size: "small",
-                  },
-                  style: {
-                    marginRight: "5px",
-                  },
-                  on: {
-                    click: () => {
-                      this.preview(params.row);
+                  "编辑"
+                ),
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "error",
+                      size: "small",
+                    },
+                    on: {
+                      click: () => {
+                        this.remove(params.row);
+                      },
                     },
                   },
-                },
-                "预览"
-              ), */
-              /* h(
-                "Button",
-                {
-                  props: {
-                    type: "error",
-                    size: "small",
-                  },
-                  on: {
-                    click: () => {
-                      this.remove(params.row);
+                  "删除"
+                ),
+              ]);
+            } else {
+              return h("div", [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "primary",
+                      size: "small",
+                    },
+                    style: {
+                      marginRight: "5px",
+                    },
+                    on: {
+                      click: () => {
+                        this.edit(params.row);
+                      },
                     },
                   },
-                },
-                "删除"
-              ), */
-            ]);
+                  "编辑"
+                ),
+              ]);
+            }
           },
         },
       ],
@@ -410,54 +418,56 @@ export default {
       this.getDataList();
     },
     // 预览
-    preview (v) {
+    preview(v) {
       this.$router.push({
-        name: 'channelPreview',
+        name: "channelPreview",
         query: {
-          id: v.id
-        }
-      })
+          id: v.id,
+        },
+      });
     },
     // 改变状态
     handleStatus(v) {
-      console.log(v)
+      console.log(v);
       this.$Modal.confirm({
         title: "确认",
         content: "您确认要改变当前状态？",
         loading: true,
         onOk: () => {
-          changeStatus(v.id, qs.stringify({isDeleted: v.isDeleted})).then((res) => {
-            this.$Modal.remove();
-            if (res.success) {
-              this.$Message.success("操作成功");
-              this.getDataList();
+          changeStatus(v.id, qs.stringify({ isDeleted: v.isDeleted })).then(
+            (res) => {
+              this.$Modal.remove();
+              if (res.success) {
+                this.$Message.success("操作成功");
+                this.getDataList();
+              }
             }
-          });
+          );
         },
         onCancel: () => {
           this.$Message.info("操作取消");
           this.getDataList();
         },
       });
-    }
+    },
   },
 };
 </script>
 
 <style lang="less" scoped>
-.ivu-radio-group-button .ivu-radio-wrapper-checked.noUse{
+.ivu-radio-group-button .ivu-radio-wrapper-checked.noUse {
   background: #ed4014;
   border-color: #ed4014;
   color: #fff;
 }
-.ivu-radio-group-button .ivu-radio-wrapper-checked.isUse{
+.ivu-radio-group-button .ivu-radio-wrapper-checked.isUse {
   background: #19be6b;
   border-color: #19be6b;
   color: #fff;
 }
-.ivu-radio-group-button .ivu-radio-wrapper-checked.testUse{
-  background:#2d8cf0;
-  border-color:#2d8cf0;
+.ivu-radio-group-button .ivu-radio-wrapper-checked.testUse {
+  background: #2d8cf0;
+  border-color: #2d8cf0;
   color: #fff;
 }
 </style>

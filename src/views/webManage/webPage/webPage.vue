@@ -275,7 +275,7 @@ export default {
           this.submitLoading = true;
           if (this.modalType == 0) {
             // 添加 避免编辑后传入id等数据 记得删除
-            postCrmRequest("/website/pages/add", qs.stringify(data)).then(res => {
+            postCrmRequest("/website/pages/add", qs.stringify(data, { arrayFormat: 'repeat' })).then(res => {
               this.submitLoading = false;
               if (res.success) {
                 this.$Message.success("操作成功");

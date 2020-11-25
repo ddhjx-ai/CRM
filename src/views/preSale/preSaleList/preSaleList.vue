@@ -393,7 +393,7 @@ export default {
           title: "员工姓名",
           key: "employName",
           align: "center",
-          width: 120,
+          minWidth: 120,
         },
         {
           title: "所在部门",

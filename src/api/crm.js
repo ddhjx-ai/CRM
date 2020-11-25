@@ -68,3 +68,16 @@ export const deleteReport = (url, ids) => {
     params: ids
   })
 }
+
+// 导出excel方法
+export const exportExcel = (url, data) => {
+  return axios({
+    method: 'get',
+    url: url,
+    headers: {
+      'accessToken': accessToken
+    },
+    params: data,
+    responseType: 'blob'
+  })
+}

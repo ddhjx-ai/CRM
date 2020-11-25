@@ -33,11 +33,13 @@ export default {
           signature: str1, // 必填，签名，见 附录-JS-SDK使用权限签名算法
           jsApiList: ["openDefaultBrowser"], // 必填，需要使用的JS接口列表，凡是要调用的接口都需要传进来
         });
+        let redirect_uri = encodeURI('http://osc.chinabidding.cn/osc/qywechatlogin?flag=1');
         this.wx.ready(() => {
           this.wx.invoke(
             "openDefaultBrowser",
             {
-              url: url, // 在默认浏览器打开redirect_uri，并附加code参数；也可以直接指定要打开的url，此时不会附带上code参数。
+              // url: url, // 在默认浏览器打开redirect_uri，并附加code参数；也可以直接指定要打开的url，此时不会附带上code参数。
+              url: 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=ww0c31d7c2891ce172&redirect_uri=' + redirect_uri + '&response_type=code&scope=snsapi_base&state=1#wechat_redirect'
             },
             function (res) {
               if (res.errMsg == "openDefaultBrowser:ok") {

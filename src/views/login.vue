@@ -181,7 +181,7 @@
       </Col>
       <LangSwitch />
     </Row>
-    <div class="selectCity" v-if="!isWeiXin">
+    <div class="selectCity" v-if="true">
       <div id="qrcode"></div>
       <div>
         请选择公司所在地区：
@@ -246,7 +246,6 @@ export default {
   },
   data() {
     return {
-      isWeiXin: false,
       primary: true,
       captchaId: "",
       captchaImg: "",

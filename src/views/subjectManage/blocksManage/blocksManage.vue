@@ -299,10 +299,10 @@
                       v-model="newModalForm.queryType"
                       @on-change="newQuerySele"
                     >
-                      <Option :value="0">不匹配</Option>
+                      <!-- <Option :value="0">不匹配</Option> -->
                       <Option :value="1">标题</Option>
                       <Option :value="2">内容</Option>
-                      <Option :value="3">附件</Option>
+                      <!-- <Option :value="3">附件</Option> -->
                       <Option :value="4">VIP</Option>
                     </Select>
                   </FormItem>
@@ -502,10 +502,10 @@
                       v-model="downloadModalForm.queryType"
                       @on-change="downloadQuerySele"
                     >
-                      <Option :value="0">不匹配</Option>
+                      <!-- <Option :value="0">不匹配</Option> -->
                       <Option :value="1">标题</Option>
                       <Option :value="2">内容</Option>
-                      <Option :value="3">附件</Option>
+                      <!-- <Option :value="3">附件</Option> -->
                       <Option :value="4">VIP</Option>
                     </Select>
                   </FormItem>
@@ -846,10 +846,10 @@
                 v-model="labelModalForm.queryType"
                 @on-change="labelQuerySele"
               >
-                <Option :value="0">不匹配</Option>
+                <!-- <Option :value="0">不匹配</Option> -->
                 <Option :value="1">标题</Option>
                 <Option :value="2">内容</Option>
-                <Option :value="3">附件</Option>
+                <!-- <Option :value="3">附件</Option> -->
                 <Option :value="4">VIP</Option>
               </Select>
             </FormItem>
@@ -891,6 +891,7 @@
             <FormItem label="type" prop="type" style="width: 100%">
               <Select v-model="labelModalForm.type">
                 <Option :value="1">1</Option>
+                <Option :value="1">2</Option>
               </Select>
             </FormItem>
           </Col>
@@ -1015,10 +1016,10 @@
                 v-model="contentModalForm.queryType"
                 @on-change="contentQuerySele"
               >
-                <Option :value="0">不匹配</Option>
+                <!-- <Option :value="0">不匹配</Option> -->
                 <Option :value="1">标题</Option>
                 <Option :value="2">内容</Option>
-                <Option :value="3">附件</Option>
+                <!-- <Option :value="3">附件</Option> -->
                 <Option :value="4">VIP</Option>
               </Select>
             </FormItem>
@@ -1679,7 +1680,7 @@ export default {
         orKey: "",
         type: 1,
         name: "附件下载",
-        queryType: 3,
+        queryType: 2,
         showType: 4,
         defaultKey: "",
         keywords: "",
@@ -1696,7 +1697,7 @@ export default {
         orKey: "",
         type: 1,
         name: "",
-        queryType: 0,
+        queryType: 2,
         showType: 1,
         defaultKey: "",
         // sortNo: 1,
