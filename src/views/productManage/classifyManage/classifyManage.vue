@@ -1,4 +1,4 @@
-<style lang="less" escoped>
+<style lang="less" scoped>
 @import "../../../styles/tree-common.less";
 @import "./classifyManage.less";
 </style>

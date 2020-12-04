@@ -131,11 +131,11 @@ export const otherRouter = {
         { path: 'leave', title: '请假申请', name: 'leave', component: () => import('@/views/activiti/business/leave.vue') },
         { path: 'historic-detail', title: '流程进度历史详情', name: 'historic_detail', component: () => import('@/views/activiti/historic-detail/historicDetail.vue') },
 
-        { path: 'subjectManage/blocksManage', title: '模块管理', name: 'blocksManage', component: () => import('@/views/subjectManage/blocksManage/blocksManage.vue') },
-        { path: 'subjectManage/channelPreview', title: '频道预览', name: 'channelPreview', component: () => import('@/views/subjectManage/channelPreview/channelPreview.vue') },
-        {path: 'adAllList', title: '业主广告列表', name: 'adAllList-index', component: () => import("@/views/adManage/userList/adAllList.vue")},
-        {path: 'preSale/preSaleDetail', title: '报告详情', name: 'preSaleDetail', component: () => import("@/views/preSale/preSaleDetail/preSaleDetail.vue")},
-        {path: 'subjectManage/keywordsList', title: '关键词列表', name: 'keywordsList', component: () => import("@/views/subjectManage/keywordsList/keywordsList.vue")},
+        { path: 'subjectManage/blocksManage', title: '模块管理', name: 'blocksManage',meta: { permTypes: []}, component: () => import('@/views/subjectManage/blocksManage/blocksManage.vue') },
+        // { path: 'subjectManage/channelPreview', title: '频道预览', name: 'channelPreview', component: () => import('@/views/subjectManage/channelPreview/channelPreview.vue') },
+        {path: 'adManage/adAllList', title: '业主广告列表', name: 'adAllList-index',meta: { permTypes: []}, component: () => import("@/views/adManage/userList/adAllList.vue")},
+        {path: 'preSale/preSaleDetail', title: '报告详情', name: 'preSaleDetail',meta: { permTypes: []}, component: () => import("@/views/preSale/preSaleDetail/preSaleDetail.vue")},
+        {path: 'subjectManage/keywordsList', title: '关键词列表', name: 'keywordsList',meta: { permTypes: []}, component: () => import("@/views/subjectManage/keywordsList/keywordsList.vue")},
         // { path: 'subjectManage/channelManage', title: '频道管理', name: 'channelManage', component: () => import('@/views/subjectManage/channelManage/channelManage.vue') },
     ]
 };

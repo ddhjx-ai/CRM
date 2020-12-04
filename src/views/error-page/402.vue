@@ -21,9 +21,9 @@
 export default {
     name: 'Error402',
     methods: {
-        backPage () {
+        /* backPage () {
             this.$router.push({name: 'channelManage'})
-        },
+        }, */
         goHome () {
             this.$router.push({
                 name: 'home_index'

@@ -148,6 +148,7 @@ export default {
         },
         {
           title: "频道名",
+          minWidth: 100,
           key: "channelName",
           align: "center",
           render: (h, params) => {
@@ -171,18 +172,21 @@ export default {
           title: "描述",
           key: "description",
           align: "center",
+          minWidth: 100,
         },
         {
           title: "主题",
           key: "themeName",
           align: "center",
+          width: 100,
         },
         {
           title: "创建时间",
           key: "inTime",
+          width: 180,
           align: "center",
           render: (h, params) => {
-            return h("div", {}, this.formateDate(params.row.inTime));
+            return h("div", {}, this.format(new Date(params.row.inTime), "yyyy-MM-dd HH:mm:ss"));
           },
         },
         {
@@ -428,7 +432,6 @@ export default {
     },
     // 改变状态
     handleStatus(v) {
-      console.log(v);
       this.$Modal.confirm({
         title: "确认",
         content: "您确认要改变当前状态？",

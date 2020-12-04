@@ -178,9 +178,10 @@
     </div>
     <div class="single-page-con" :style="{ left: shrink ? '60px' : '230px' }">
       <div class="single-page">
-        <!-- <keep-alive :include="cachePage"> -->
-        <router-view></router-view>
-        <!-- </keep-alive> -->
+        <!-- <router-view></router-view> -->
+        <keep-alive :include="cachePage" exclude="blocksManage">
+          <router-view></router-view>
+        </keep-alive>
       </div>
     </div>
     <!-- 全局加载动画 -->

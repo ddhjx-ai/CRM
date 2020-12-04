@@ -2,12 +2,15 @@
 <template>
   <div class="search">
     <Card>
-      <Row style="margin-bottom: 10px">
+      <Row style="margin-bottom: 10px;">
         <Button
           type="primary"
-          icon="md-add-circle"
+          icon="md-add"
           @click="handleAddKeywords"
           >添加产品词</Button
+        >
+        <Button @click="handleDel" type="primary" icon="md-trash" style="margin-left:10px;float:right"
+          >删除</Button
         >
       </Row>
       <Row>
@@ -18,6 +21,7 @@
           :data="data"
           ref="table"
           @on-selection-change="changeSelect"
+          class="keywordsTabel"
         ></Table>
       </Row>
       <Row type="flex" justify="end" class="page">
@@ -101,19 +105,16 @@ export default {
         size: 10, // 页面大小
       },
       columns: [
-        // 表头
         {
-          type: "index",
-          width: 100,
+          type: "selection",
+          width: 60,
           align: "center",
-          title: "序号",
         },
-        
         {
           title: "行业名称",
           key: "categoryId",
           align: "center",
-          minWidth: 120,
+          width: 260,
           render: (h, params) => {
             return h('span', {} ,"电力行业")
           }
@@ -159,6 +160,8 @@ export default {
       ],
       data: [], // 表单数据
       total: 0, // 表单数据总数
+      selectCount: 0,
+      selectList: [],
     };
   },
   // 表格动态列 计算属性
@@ -167,10 +170,12 @@ export default {
       this.keywordsVisible = true;
       this.$refs.form.resetFields();
     },
-    // 提交
+    // 添加产品词提交
     handleKeywordsSubmit() {
-      console.log(this.form.keywords.split(/[(\r\n)\r\n]+/))
-      let words = this.form.keywords.split(/[(\r\n)\r\n]+/)
+      let words = this.form.keywords.split(/[(\r\n)\r\n]+/).map(item => item.trim()).filter(item => item !== "") || [];
+      if(words.length === 0) {
+        return this.$Message.error("产品词不能为空");
+      }
       this.$refs.form.validate((valid) => {
         if (valid) {
           postCrmRequest('/project_summary/add_product_keywords', qs.stringify({pkwords: words, categoryId: 1},{ arrayFormat: 'repeat' })).then(res => {
@@ -178,7 +183,7 @@ export default {
               this.$Message.success("添加成功");
               this.keywordsVisible = false;
             }else {
-              this.$Message.error("添加失败");
+              this.$Message.error(res.message);
               this.keywordsVisible = false;
             }
             this.getDataList()
@@ -189,6 +194,9 @@ export default {
     init() {
       this.getDataList();
     },
+    clearSelectAll() {
+      this.$refs.table.selectAll(false);
+    },
     changePage(v) {
       this.searchForm.page = v;
       this.getDataList();
@@ -197,6 +205,11 @@ export default {
       this.searchForm.size = v;
       this.getDataList();
     },
+    changeSelect(e) {
+      this.selectList = e;
+      this.selectCount = e.length;
+    },
+    // 获取产品词列表
     getDataList() {
       this.loading = true;
       // 请求后端获取表单数据 请自行修改接口
@@ -204,16 +217,51 @@ export default {
         this.loading = false;
         if (res.success) {
           if (!res.result) return;
-          this.data = res.result.list;
+          this.data = res.result.content;
+          this.total = res.result.totalElements;
+          this.clearSelectAll();
+          /* this.data = res.result.list;
           this.total = res.result.total;
+          this.clearSelectAll() */
         }
       });
     },
+    // 批量删除产品词
+    handleDel() {
+      if (this.selectCount <= 0) {
+        this.$Message.warning("请选择要删除的数据");
+        return;
+      }
+      let ids = this.selectList.map((item) => {
+        return item.id;
+      });
+      this.$Modal.confirm({
+        title: "确认删除",
+        content: "您确认要删除所选的 " + this.selectCount + " 条数据?",
+        loading: true,
+        onOk: () => {
+          // 批量删除
+          postCrmRequest('/project_summary/delete',
+            qs.stringify({ ids: ids }, { arrayFormat: "repeat" })
+          ).then((res) => {
+            this.$Modal.remove();
+            if (res.success) {
+              this.$Message.success("删除成功");
+              this.clearSelectAll();
+              this.getDataList();
+            }
+          });
+        },
+      });
+    }
   },
   mounted() {
     this.init();
   },
 };
 </script>
-<style lang="less" escoped>
+<style lang="less" scoped>
+.keywordsTabel /deep/.ivu-table-header thead tr th .ivu-checkbox{
+  display: none;
+}
 </style>

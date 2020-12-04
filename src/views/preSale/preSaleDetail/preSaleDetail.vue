@@ -93,12 +93,18 @@ export default {
       phone: "",
     };
   },
-  created() {
+  activated() {
+    this.id = this.$route.query.id;
+    this.areaList = [];
+    this.companyList = [];
+    this.getDetail();
+  },
+  /* created() {
     this.id = this.$route.query.id;
   },
   mounted() {
     this.getDetail();
-  },
+  }, */
   // 表格动态列 计算属性
   methods: {
     toImage() {
@@ -158,7 +164,7 @@ export default {
 };
 </script>
 
-<style lang="less" escoped>
+<style lang="less" scoped>
 .main .single-page-con .single-page {
   margin: 0;
   height: 100%;
@@ -170,16 +176,21 @@ export default {
   height: 100%;
 }
 .loading {
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 1000;
-  display: flex;
+  /* display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center; */
+  button{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+  }
 }
 .container {
   width: 1160px;

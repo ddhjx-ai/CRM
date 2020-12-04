@@ -524,7 +524,6 @@ export default {
           id,
         },
       });
-      console.log(id);
     },
     clearSelectAll() {
       this.$refs.table.selectAll(false);

@@ -3,7 +3,9 @@
     <Card>
       <Row class="operation" style="margin-bottom: 10px">
         <Button type="primary" icon="md-add" @click="keywordsAdd">添加</Button>
-        <Button @click="handleDel" type="primary" icon="md-trash">批量删除</Button>
+        <Button @click="handleDel" type="primary" icon="md-trash"
+          >批量删除</Button
+        >
       </Row>
       <Row>
         <Table
@@ -41,7 +43,15 @@
       :width="600"
     >
       <Form ref="addForm" :model="addForm" :label-width="120" :rules="rules">
-        <FormItem prop="keywords" label="关键词">
+        <FormItem
+          prop="keywords"
+          label="关键词"
+          :rules="{
+            required: true,
+            message: '关键词不能为空',
+            trigger: 'blur',
+          }"
+        >
           <Input
             type="text"
             v-model="addForm.keywords"
@@ -199,16 +209,19 @@ export default {
         times: "",
       },
       selectCount: 0,
-      selectList: []
+      selectList: [],
     };
   },
-
-  created() {
+  activated() {
+    this.blocksId = this.$route.query.id;
+    this.getDataList();
+  },
+  /* created() {
     this.blocksId = this.$route.query.id;
   },
   mounted() {
     this.getDataList();
-  },
+  }, */
   methods: {
     getDataList() {
       this.loading = true;
@@ -244,7 +257,9 @@ export default {
         onOk: () => {
           // 删除
           // qs.stringify({ids:[v.id]},{arrayFormat: 'brackets'})
-          removeKeywords(qs.stringify({ids:[v.id]},{arrayFormat: 'repeat'})).then((res) => {
+          removeKeywords(
+            qs.stringify({ ids: [v.id] }, { arrayFormat: "repeat" })
+          ).then((res) => {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("删除成功");
@@ -282,11 +297,15 @@ export default {
           ...this.addForm,
           blocksId: this.blocksId,
         };
-        addKeywords(data).then((res) => {
-          if (res.success) {
-            this.$Message.success("添加成功");
-            this.getDataList();
-            this.addVisible = false;
+        this.$refs.addForm.validate((valid) => {
+          if (valid) {
+            addKeywords(data).then((res) => {
+              if (res.success) {
+                this.$Message.success("添加成功");
+                this.getDataList();
+                this.addVisible = false;
+              }
+            });
           }
         });
       } else {
@@ -298,11 +317,15 @@ export default {
           blocksId: this.blocksId,
           id: this.addForm.id,
         };
-        editKeywords(data).then((res) => {
-          if (res.success) {
-            this.$Message.success("编辑成功");
-            this.getDataList();
-            this.addVisible = false;
+        this.$refs.addForm.validate((valid) => {
+          if (valid) {
+            editKeywords(data).then((res) => {
+              if (res.success) {
+                this.$Message.success("编辑成功");
+                this.getDataList();
+                this.addVisible = false;
+              }
+            });
           }
         });
       }
@@ -313,16 +336,18 @@ export default {
         this.$Message.warning("请选择要删除的数据");
         return;
       }
-      let ids = this.selectList.map(item => {
-        return item.id
-      })
+      let ids = this.selectList.map((item) => {
+        return item.id;
+      });
       this.$Modal.confirm({
         title: "确认删除",
         content: "您确认要删除所选的 " + this.selectCount + " 条数据?",
         loading: true,
         onOk: () => {
           // 批量删除
-          removeKeywords(qs.stringify({ids:ids},{arrayFormat: 'repeat'})).then((res) => {
+          removeKeywords(
+            qs.stringify({ ids: ids }, { arrayFormat: "repeat" })
+          ).then((res) => {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("删除成功");

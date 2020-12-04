@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div class="maskLoading" v-if="isShow">
+      <Button :loading="maskLoading">加载中...</Button>
+    </div>
     <Card>
       <!-- 主题模块 -->
       <Row class="rowModal">
@@ -433,25 +436,44 @@
                     prop="caegoryIds2"
                     style="width: 100%"
                   >
-                    <RadioGroup v-model="newModalForm.caegoryIds2">
-                      <Radio label="1" :disabled="newModalForm.queryType == 4" border
+                    <search-checkbox :searchValue.sync="newModalForm.caegoryIds2"></search-checkbox>
+                    <!-- <RadioGroup v-model="newModalForm.caegoryIds2">
+                      <Radio
+                        label="1"
+                        :disabled="newModalForm.queryType == 4"
+                        border
                         >招标采购信息搜索</Radio
                       >
-                      <Radio label="2" :disabled="newModalForm.queryType == 4" border
+                      <Radio
+                        label="2"
+                        :disabled="newModalForm.queryType == 4"
+                        border
                         >项目信息搜索</Radio
                       >
-                      <Radio label="3" :disabled="newModalForm.queryType != 4" border
+                      <Radio
+                        label="3"
+                        :disabled="newModalForm.queryType != 4"
+                        border
                         >VIP信息搜索</Radio
                       >
-                      <Radio label="4" :disabled="newModalForm.queryType == 4" border
+                      <Radio
+                        label="4"
+                        :disabled="newModalForm.queryType == 4"
+                        border
                         >招标信息搜索</Radio
                       >
-                      <Radio label="5" :disabled="newModalForm.queryType == 4" border
+                      <Radio
+                        label="5"
+                        :disabled="newModalForm.queryType == 4"
+                        border
                         >采购信息搜索</Radio
                       >
-                    </RadioGroup>
+                    </RadioGroup> -->
                   </FormItem>
                 </Col>
+                <Col span="24" style="margin-left:95px;margin-top:-30px;color:#ed4014">
+            <p>提示：招标采购类和项目类不可同时选择!</p>
+          </Col>
               </Row>
               <Row>
                 <Col span="24">
@@ -636,35 +658,44 @@
                     prop="caegoryIds2"
                     style="width: 100%"
                   >
-                    <RadioGroup v-model="downloadModalForm.caegoryIds2">
+                    <search-checkbox :searchValue.sync="downloadModalForm.caegoryIds2"></search-checkbox>
+                    <!-- <RadioGroup v-model="downloadModalForm.caegoryIds2">
                       <Radio
                         label="1"
-                        :disabled="downloadModalForm.queryType == 4" border
+                        :disabled="downloadModalForm.queryType == 4"
+                        border
                         >招标采购信息搜索</Radio
                       >
                       <Radio
                         label="2"
-                        :disabled="downloadModalForm.queryType == 4" border
+                        :disabled="downloadModalForm.queryType == 4"
+                        border
                         >项目信息搜索</Radio
                       >
                       <Radio
                         label="3"
-                        :disabled="downloadModalForm.queryType != 4" border
+                        :disabled="downloadModalForm.queryType != 4"
+                        border
                         >VIP信息搜索</Radio
                       >
                       <Radio
                         label="4"
-                        :disabled="downloadModalForm.queryType == 4" border
+                        :disabled="downloadModalForm.queryType == 4"
+                        border
                         >招标信息搜索</Radio
                       >
                       <Radio
                         label="5"
-                        :disabled="downloadModalForm.queryType == 4" border
+                        :disabled="downloadModalForm.queryType == 4"
+                        border
                         >采购信息搜索</Radio
                       >
-                    </RadioGroup>
+                    </RadioGroup> -->
                   </FormItem>
                 </Col>
+                <Col span="24" style="margin-left:95px;margin-top:-30px;color:#ed4014">
+            <p>提示：招标采购类和项目类不可同时选择!</p>
+          </Col>
               </Row>
               <Row>
                 <Col span="24">
@@ -960,24 +991,43 @@
         <Row>
           <Col span="24">
             <FormItem label="搜索范围" prop="caegoryIds2" style="width: 100%">
-              <RadioGroup v-model="labelModalForm.caegoryIds2">
-                <Radio label="1" :disabled="labelModalForm.queryType == 4" border
+              <search-checkbox :searchValue.sync="labelModalForm.caegoryIds2"></search-checkbox>
+              <!-- <RadioGroup v-model="labelModalForm.caegoryIds2">
+                <Radio
+                  label="1"
+                  :disabled="labelModalForm.queryType == 4"
+                  border
                   >招标采购信息搜索</Radio
                 >
-                <Radio label="2" :disabled="labelModalForm.queryType == 4" border
+                <Radio
+                  label="2"
+                  :disabled="labelModalForm.queryType == 4"
+                  border
                   >项目信息搜索</Radio
                 >
-                <Radio label="3" :disabled="labelModalForm.queryType != 4" border
+                <Radio
+                  label="3"
+                  :disabled="labelModalForm.queryType != 4"
+                  border
                   >VIP信息搜索</Radio
                 >
-                <Radio label="4" :disabled="labelModalForm.queryType == 4" border
+                <Radio
+                  label="4"
+                  :disabled="labelModalForm.queryType == 4"
+                  border
                   >招标信息搜索</Radio
                 >
-                <Radio label="5" :disabled="labelModalForm.queryType == 4" border
+                <Radio
+                  label="5"
+                  :disabled="labelModalForm.queryType == 4"
+                  border
                   >采购信息搜索</Radio
                 >
-              </RadioGroup>
+              </RadioGroup> -->
             </FormItem>
+          </Col>
+          <Col span="24" style="margin-left:95px;margin-top:-30px;color:#ed4014">
+            <p>提示：招标采购类和项目类不可同时选择!</p>
           </Col>
         </Row>
         <Row>
@@ -1132,24 +1182,43 @@
         <Row>
           <Col span="24">
             <FormItem label="搜索范围" prop="caegoryIds2" style="width: 100%">
-              <RadioGroup v-model="contentModalForm.caegoryIds2">
-                <Radio label="1" :disabled="contentModalForm.queryType == 4" border
+              <search-checkbox :searchValue.sync="contentModalForm.caegoryIds2"></search-checkbox>
+              <!-- <RadioGroup v-model="contentModalForm.caegoryIds2">
+                <Radio
+                  label="1"
+                  :disabled="contentModalForm.queryType == 4"
+                  border
                   >招标采购信息搜索</Radio
                 >
-                <Radio label="2" :disabled="contentModalForm.queryType == 4" border
+                <Radio
+                  label="2"
+                  :disabled="contentModalForm.queryType == 4"
+                  border
                   >项目信息搜索</Radio
                 >
-                <Radio label="3" :disabled="contentModalForm.queryType != 4" border
+                <Radio
+                  label="3"
+                  :disabled="contentModalForm.queryType != 4"
+                  border
                   >VIP信息搜索</Radio
                 >
-                <Radio label="4" :disabled="contentModalForm.queryType == 4" border
+                <Radio
+                  label="4"
+                  :disabled="contentModalForm.queryType == 4"
+                  border
                   >招标信息搜索</Radio
                 >
-                <Radio label="5" :disabled="contentModalForm.queryType == 4" border
+                <Radio
+                  label="5"
+                  :disabled="contentModalForm.queryType == 4"
+                  border
                   >采购信息搜索</Radio
                 >
-              </RadioGroup>
+              </RadioGroup> -->
             </FormItem>
+          </Col>
+          <Col span="24" style="margin-left:95px;margin-top:-30px;color:#ed4014">
+            <p>提示：招标采购类和项目类不可同时选择!</p>
           </Col>
         </Row>
         <Row>
@@ -1325,10 +1394,14 @@ import qs from "qs";
 // excel转换工具类
 import excel from "@/libs/excel";
 import { validateSort } from "@/libs/validate";
+import searchCheckbox from "../../my-components/osc-components/searchCheckbox";
+import SearchCheckbox from '../../my-components/osc-components/searchCheckbox.vue';
 export default {
   name: "blocksManage",
   data() {
     return {
+      maskLoading: true,
+      isShow: true,
       // 一级行业列表
       firstList: [
         { name: "交通运输", id: "1" },
@@ -1348,89 +1421,6 @@ export default {
         { name: "农林牧渔", id: "13" },
         { name: "科技文教旅游", id: "9" },
         { name: "其它", id: "15" },
-      ],
-      // 二级行业列表
-      secondList: [
-        [
-          { name: "高速公路、道路", id: 101 },
-          { name: "桥梁、立交桥", id: 102 },
-          { name: "机场", id: 103 },
-          { name: "铁路、轨道交通", id: 104 },
-          { name: "航道、水利枢纽", id: 105 },
-          { name: "港口、码头、泊位、渔港", id: 106 },
-          { name: "客运站、交通枢纽", id: 107 },
-          { name: "隧道", id: 108 },
-          { name: "物流", id: 109 },
-        ],
-        [
-          { name: "火电", id: 201 },
-          { name: "核电", id: 202 },
-          { name: "水电", id: 203 },
-          { name: "风电", id: 204 },
-          { name: "电网建设", id: 205 },
-          { name: "太阳能、光伏发电", id: 206 },
-          { name: "垃圾焚烧发电及其他新能源发电", id: 207 },
-          { name: "水泥余热发电", id: 208 },
-        ],
-        [
-          { name: "天然气、输气管道", id: 301 },
-          { name: "石油、石化", id: 302 },
-          { name: "有机化学", id: 303 },
-          { name: "无机化学", id: 304 },
-          { name: "煤化工", id: 305 },
-        ],
-        [
-          { name: "选煤厂、煤矿、尾矿", id: 401 },
-          { name: "矿山、矿产、矿石", id: 402 },
-          { name: "水泥生产线、混凝土", id: 403 },
-          { name: "金属冶炼", id: 404 },
-          { name: "钢厂、钢结构", id: 405 },
-          { name: "玻璃及其他", id: 406 },
-        ],
-        [
-          { name: "机械产品、厂房、生产车间", id: 501 },
-          { name: "医疗器械、电子产品、电器产品", id: 502 },
-          { name: "造船、造车", id: 503 },
-        ],
-        [{ name: "网络通讯计算机", id: 601 }],
-        [
-          { name: "房地产建筑", id: 701 },
-          { name: "供热", id: 702 },
-          { name: "排水", id: 704 },
-          { name: "土地治理", id: 705 },
-        ],
-        [
-          { name: "水厂、供水", id: 801 },
-          { name: "灌溉", id: 802 },
-          { name: "围海造地", id: 803 },
-          { name: "水库、引水", id: 804 },
-          { name: "防护堤、防洪堤", id: 805 },
-        ],
-        [
-          { name: "垃圾", id: 901 },
-          { name: "水处理", id: 902 },
-          { name: "废弃物处理", id: 903 },
-          { name: "脱硫脱硝、除尘除渣", id: 904 },
-          { name: "污泥治理", id: 905 },
-        ],
-        [
-          { name: "医院", id: 1001 },
-          { name: "制药制剂", id: 1002 },
-        ],
-        [{ name: "科技文教旅游", id: 1105 }],
-        [{ name: "出版印刷", id: 1205 }],
-        [
-          { name: "纺织", id: 1301 },
-          { name: "食品生产", id: 1302 },
-          { name: "肉类加工、屠宰", id: 1303 },
-          { name: "造纸", id: 1304 },
-          { name: "粮食储备", id: 1305 },
-          { name: "卷烟物流", id: 1306 },
-          { name: "其他", id: 1307 },
-        ],
-        [{ name: "农林牧渔", id: 1405 }],
-        [{ name: "商业服务", id: 1505 }],
-        [{ name: "园林绿化", id: 1605 }],
       ],
       menuViewVisible: false,
       menuViewTree: [],
@@ -1510,7 +1500,7 @@ export default {
         defaultKey: "",
         keywords: "",
         categoryIds: [],
-        caegoryIds2: "1",
+        caegoryIds2: [],
       },
       labelData: [],
       labelColumns: [
@@ -1670,7 +1660,7 @@ export default {
         defaultKey: "",
         keywords: "",
         categoryIds: [],
-        caegoryIds2: "3",
+        caegoryIds2: [],
       },
       // 下载模块
       downloadSecList: [],
@@ -1685,7 +1675,7 @@ export default {
         defaultKey: "",
         keywords: "",
         categoryIds: [],
-        caegoryIds2: "1",
+        caegoryIds2: [],
       },
       // 中间模块
       contentSecList: [],
@@ -1703,7 +1693,7 @@ export default {
         // sortNo: 1,
         keywords: "",
         categoryIds: [],
-        caegoryIds2: "1",
+        caegoryIds2: [],
       },
       modalContentText: "添加中间模块数据",
       contentData: [],
@@ -1848,8 +1838,12 @@ export default {
       },
     };
   },
+  components: {
+    searchCheckbox
+  },
   mounted() {
     this.channelId = this.$route.query.id;
+    this.isShow = true;
     this.getThemeList();
     this.getDetail();
   },
@@ -1860,12 +1854,13 @@ export default {
         if (!res) {
           this.$router.push({ name: "error-402" });
         }
-        let data;
+        let data = [];
         if (res[0]) {
           data = res[0];
         } else {
           return;
         }
+        this.isShow = false;
         if (data.AchannelName) {
           this.channelName = data.AchannelName;
         }
@@ -1896,9 +1891,11 @@ export default {
             };
           });
         }
-        if (data.show_data_block.length > 0) {
-          this.labelSortNo =
-            data.show_data_block[data.show_data_block.length - 1].sort_no;
+        if (data.show_data_block) {
+          if (data.show_data_block.length > 0) {
+            this.labelSortNo =
+              data.show_data_block[data.show_data_block.length - 1].sort_no;
+          }
           this.labelData = [...data.show_data_block];
         }
         if (data.new_data_block) {
@@ -1912,13 +1909,10 @@ export default {
             this.newModalForm.categoryIds = data.new_data_block.category_ids.split(
               ","
             );
-          };
-          /* if(data.new_data_block.caegory_ids2) {
-            this.newModalForm.caegoryIds2 = data.new_data_block.caegory_ids2
-          }else {
-            data.new_data_block.query_type == 4 ? this.newModalForm.caegoryIds2 = '3' : this.newModalForm.caegoryIds2 = '1';
-          } */
-          this.newModalForm.caegoryIds2 = data.new_data_block.caegory_ids2 ? data.new_data_block.caegory_ids2 : '';
+          }
+          this.newModalForm.caegoryIds2 = data.new_data_block.caegory_ids2
+            ? data.new_data_block.caegory_ids2.split(',')
+            : [];
         }
         if (data.download_block) {
           this.downloadBlockId = data.download_block.download_block_id;
@@ -1932,17 +1926,16 @@ export default {
             this.downloadModalForm.categoryIds = data.download_block.category_ids.split(
               ","
             );
-          };
-          this.downloadModalForm.caegoryIds2 = data.download_block.caegory_ids2 ? data.download_block.caegory_ids2 : '';
-          /* if(data.download_block.caegory_ids2) {
-            this.downloadModalForm.caegoryIds2 = data.download_block.caegory_ids2
-          }else {
-            data.download_block.query_type == 4 ? this.downloadModalForm.caegoryIds2 = '3' : this.downloadModalForm.caegoryIds2 = '1';
-          } */
+          }
+          this.downloadModalForm.caegoryIds2 = data.download_block.caegory_ids2
+            ? data.download_block.caegory_ids2.split(",")
+            : [];
         }
-        if (data.content_block.length > 0) {
-          this.contentSortNo =
-            data.content_block[data.content_block.length - 1].sort_no;
+        if (data.content_block) {
+          if (data.content_block.length > 0) {
+            this.contentSortNo =
+              data.content_block[data.content_block.length - 1].sort_no;
+          }
           this.contentData = [...data.content_block];
         }
         if (data.right_block.length > 0) {
@@ -2190,12 +2183,9 @@ export default {
           } else {
             this.labelModalForm.categoryIds = [];
           }
-          this.labelModalForm.caegoryIds2 = res.caegory_ids2 ? res.caegory_ids2 : '';
-          /* if(res.caegory_ids2){
-            this.labelModalForm.caegoryIds2 = res.caegory_ids2 
-          }else {
-            res.query_type == 4 ? this.labelModalForm.caegoryIds2 = '3' : this.labelModalForm.caegoryIds2  = '1';
-          } */
+          this.labelModalForm.caegoryIds2 = res.caegory_ids2
+            ? res.caegory_ids2.split(",")
+            : "";
         }
       });
       this.modalType = 2;
@@ -2244,7 +2234,7 @@ export default {
                 this.labelModalForm.queryType == 4
                   ? this.labelModalForm.categoryIds.join(",")
                   : "",
-              caegoryIds2: this.labelModalForm.caegoryIds2,
+              caegoryIds2: this.labelModalForm.caegoryIds2.join(","),
               channelId: this.channelId,
               componentId: 4,
               sortNo: this.labelSortNo + 1,
@@ -2267,7 +2257,7 @@ export default {
                 this.labelModalForm.queryType == 4
                   ? this.labelModalForm.categoryIds.join(",")
                   : "",
-              caegoryIds2: this.labelModalForm.caegoryIds2,
+              caegoryIds2: this.labelModalForm.caegoryIds2.join(","),
               channelId: this.channelId,
               blockId: this.labelBlockId,
               componentId: 4,
@@ -2292,11 +2282,11 @@ export default {
       });
     },
     labelQuerySele(v) {
-      if (v == 4) {
+      /* if (v == 4) {
         this.labelModalForm.caegoryIds2 = "3";
       } else {
         this.labelModalForm.caegoryIds2 = "1";
-      }
+      } */
     },
     // 新模块
     getNewKeywords(model) {
@@ -2338,7 +2328,7 @@ export default {
                 this.newModalForm.queryType == 4
                   ? this.newModalForm.categoryIds.join(",")
                   : "",
-              caegoryIds2: this.newModalForm.caegoryIds2,
+              caegoryIds2: this.newModalForm.caegoryIds2.join(","),
               channelId: this.channelId,
               blockId: this.newBlockId,
               componentId: 5,
@@ -2354,11 +2344,13 @@ export default {
                 this.newModalForm.queryType == 4
                   ? this.newModalForm.categoryIds.join(",")
                   : "",
-              caegoryIds2: this.newModalForm.caegoryIds2,
+              caegoryIds2: this.newModalForm.caegoryIds2.join(","),
               channelId: this.channelId,
               componentId: 5,
             };
           }
+          /* console.log("newModalForm.caegoryIds2",data)
+          return */
           addData(qs.stringify(data)).then((res) => {
             if (res.success) {
               this.$Message.success("操作成功");
@@ -2369,11 +2361,11 @@ export default {
       });
     },
     newQuerySele(v) {
-      if (v == 4) {
+      /* if (v == 4) {
         this.newModalForm.caegoryIds2 = "3";
       } else {
         this.newModalForm.caegoryIds2 = "1";
-      }
+      } */
     },
     // 附件下载
     downloadModalSubmit() {
@@ -2399,7 +2391,7 @@ export default {
                 this.downloadModalForm.queryType == 4
                   ? this.downloadModalForm.categoryIds.join(",")
                   : "",
-              caegoryIds2: this.downloadModalForm.caegoryIds2,
+              caegoryIds2: this.downloadModalForm.caegoryIds2.join(","),
               channelId: this.channelId,
               blockId: this.downloadBlockId,
             };
@@ -2414,7 +2406,7 @@ export default {
                 this.downloadModalForm.queryType == 4
                   ? this.downloadModalForm.categoryIds.join(",")
                   : "",
-              caegoryIds2: this.downloadModalForm.caegoryIds2,
+              caegoryIds2: this.downloadModalForm.caegoryIds2.join(","),
               channelId: this.channelId,
             };
           }
@@ -2433,11 +2425,11 @@ export default {
       });
     },
     downloadQuerySele(v) {
-      if (v == 4) {
+      /* if (v == 4) {
         this.downloadModalForm.caegoryIds2 = "3";
       } else {
         this.downloadModalForm.caegoryIds2 = "1";
-      }
+      } */
     },
     // 中间模块
     contentModalSubmit() {
@@ -2462,16 +2454,9 @@ export default {
           } else {
             this.contentModalForm.categoryIds = [];
           }
-          this.contentModalForm.caegoryIds2 = res.caegory_ids2 ? res.caegory_ids2 : '';
-          /* if(res.caegory_ids2) {
-            this.contentModalForm.caegoryIds2 = res.caegory_ids2
-          }else {
-            if(res.query_type == 4) {
-              this.contentModalForm.caegoryIds2 = '3'
-            }else {
-              this.contentModalForm.caegoryIds2 = '1'
-            }
-          } */
+          this.contentModalForm.caegoryIds2 = res.caegory_ids2
+            ? res.caegory_ids2.split(",")
+            : "";
         }
       });
       this.modalType = 2;
@@ -2518,8 +2503,11 @@ export default {
               queryType: this.contentModalForm.queryType,
               showType: this.contentModalForm.showType,
               sphinxQuery: this.contentModalForm.keywords,
-              categoryIds: this.contentModalForm.queryType == 4 ? this.contentModalForm.categoryIds.join(",") : '',
-              caegoryIds2: this.contentModalForm.caegoryIds2,
+              categoryIds:
+                this.contentModalForm.queryType == 4
+                  ? this.contentModalForm.categoryIds.join(",")
+                  : "",
+              caegoryIds2: this.contentModalForm.caegoryIds2.join(","),
               channelId: this.channelId,
               componentId: 8,
               sortNo: this.contentSortNo + 1,
@@ -2538,8 +2526,11 @@ export default {
               queryType: this.contentModalForm.queryType,
               showType: this.contentModalForm.showType,
               sphinxQuery: this.contentModalForm.keywords,
-              categoryIds: this.contentModalForm.queryType == 4 ? this.contentModalForm.categoryIds.join(",") : '',
-              caegoryIds2: this.contentModalForm.caegoryIds2,
+              categoryIds:
+                this.contentModalForm.queryType == 4
+                  ? this.contentModalForm.categoryIds.join(",")
+                  : "",
+              caegoryIds2: this.contentModalForm.caegoryIds2.join(","),
               channelId: this.channelId,
               blockId: this.contentBlockId,
               componentId: 8,
@@ -2556,11 +2547,11 @@ export default {
       });
     },
     contentQuerySele(v) {
-      if (v == 4) {
+      /* if (v == 4) {
         this.contentModalForm.caegoryIds2 = "3";
       } else {
         this.contentModalForm.caegoryIds2 = "1";
-      }
+      } */
     },
     // 编辑彩色模块
     colorfulEdit(v) {
@@ -2708,6 +2699,26 @@ export default {
       };
       this.$refs[name].resetFields();
     },
+    // 
+    searchChange(v) {
+      console.log(v)
+      if(v.length === 1){
+        let status = this.searchList.filter(item => item.value === v[0])[0].status
+        console.log(status)
+        this.searchList = this.searchList.map(item => {
+          if(item.status !== status){
+            item.flag = true
+          }
+          return item;
+        })
+      }
+      if(v.length === 0) {
+        this.searchList = this.searchList.map(item => {
+          item.flag = false;
+          return item;
+        })
+      }
+    }
   },
 };
 </script>

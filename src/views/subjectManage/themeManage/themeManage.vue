@@ -92,7 +92,7 @@
         <FormItem label="商务室图标" prop="busroomImg">
           <Input v-model="form.busroomImg" placeholder="请输入图标路径" />
         </FormItem>
-        <FormItem label="彩钻商城图标" prop="mallImg">
+        <FormItem label="采钻商城图标" prop="mallImg">
           <Input v-model="form.mallImg" placeholder="请输入图标路径" />
         </FormItem>
       </Form>
@@ -198,7 +198,7 @@ export default {
           minWidth: 120,
         },
         {
-          title: "彩钻商城图标",
+          title: "采钻商城图标",
           key: "mallImg",
           align: "center",
           minWidth: 120,
@@ -435,8 +435,6 @@ export default {
     },
     // 提交
     handleSubmit() {
-      let data = {};
-      console.log(data);
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.submitLoading = true;

@@ -74,7 +74,7 @@ export default {
 };
 </script>
 
-<style lang="less" escoped>
+<style lang="less" scoped>
 .main .single-page-con .single-page {
   height: calc(100% - 20px);
 }

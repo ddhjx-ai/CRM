@@ -43,6 +43,7 @@ export default {
   name: "collectList",
   data() {
     return {
+      downLoading: [],
       loading: false, // 表单加载状态
       searchForm: {
         // 搜索框对应data对象
@@ -61,13 +62,13 @@ export default {
           title: "栏目名称",
           key: "name",
           align: "center",
-          minWidth: 120,
+          width: 260,
         },
         {
           title: "栏目关键词",
           key: "keyword",
           align: "center",
-          minWidth: 120,
+          minWidth: 300,
         },
         {
           title: "操作",
@@ -81,14 +82,13 @@ export default {
                   props: {
                     type: "primary",
                     size: "small",
-                    // icon: "md-trash",
+                    loading: this.downLoading[params.index]
                   },
                   style: {
-                    // marginRight: "5px",
                   },
                   on: {
                     click: () => {
-                      this.handleDown(params.row);
+                      this.handleDown(params);
                     },
                   },
                 },
@@ -117,7 +117,6 @@ export default {
     },
     getDataList() {
       this.loading = true;
-      console.log(new Blob());
       // 请求后端获取表单数据 请自行修改接口
       getCrmRequest(
         "/project_summary/block_keywords_list",
@@ -128,6 +127,7 @@ export default {
           if (!res.result) return;
           this.data = res.result.list;
           this.total = res.result.total;
+          this.downLoading = res.result.list.map(item => false)
         }
       });
     },
@@ -139,12 +139,15 @@ export default {
     },
     // 下载
     handleDown(v) {
+      this.downLoading.splice(v.index,1,true)
       exportExcel("/osc/project_summary/download", {
-        blocksId: v.blocksId,
+        blocksId: v.row.blocksId,
       }).then((res) => {
+        this.downLoading.splice(v.index,1,false);
         const link = document.createElement("a");
         // let blob = new Blob([res],  {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8'})
         let blob = new Blob([res], { type: "application/vnd.ms-excel" });
+        // console.log(blob)
         link.style.display = "none";
         link.href = URL.createObjectURL(blob);
 
@@ -161,5 +164,11 @@ export default {
   },
 };
 </script>
-<style lang="less" escoped>
+<style lang="less" scoped>
+/* .spanDom{
+  overflow: hidden;
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+} */
 </style>
