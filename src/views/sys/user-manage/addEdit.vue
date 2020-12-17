@@ -306,12 +306,8 @@ export default {
         let data = this.data;
         // 地址
         if (data.address) {
-          /* try {
-            data.addressArray = JSON.parse(data.address);
-          } catch (error) {
-            
-          } */
-          data.addressArray = JSON.parse(data.address);
+          // data.addressArray = JSON.parse(data.address);
+          data.addressArray = data.address;
         } else {
           data.addressArray = [];
         }

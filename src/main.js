@@ -71,7 +71,12 @@ new Vue({
     },
     mounted() {
         // 初始化菜单
-        util.initRouter(this);
+        if(window.location.href.indexOf('related') === -1 || window.location.href.indexOf('JWTKey') === -1){
+            util.initRouter(this); 
+        }
+        /* if(!this.$route.query.related) {
+            util.initRouter(this); 
+        } */
         // 初始化全局数据字典
         dictUtil.initDictData(this);
         this.currentPageName = this.$route.name;

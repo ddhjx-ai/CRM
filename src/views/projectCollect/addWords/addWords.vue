@@ -2,6 +2,22 @@
 <template>
   <div class="search">
     <Card>
+      <Row>
+        <Form ref="searchForm" :model="searchForm" inline :label-width="80" label-position="left">
+          <Form-item label="产品词：" prop="pKeywords" >
+            <Input
+              type="text"
+              v-model="searchForm.pKeywords"
+              placeholder="请输入产品词"
+              style="width: 200px;"
+            />
+          </Form-item>
+          <Form-item style="margin-left:-35px;" class="br">
+            <Button @click="handleSearch" type="primary" icon="ios-search">搜索</Button>
+            <Button @click="handleReset">重置</Button>
+          </Form-item>
+        </Form>
+      </Row>
       <Row style="margin-bottom: 10px;">
         <Button
           type="primary"
@@ -87,6 +103,7 @@ export default {
   name: "addWords",
   data() {
     return {
+      isSearch: false,
       keywordsVisible: false,
       form: {
         keywords: "",
@@ -103,6 +120,7 @@ export default {
         // 搜索框对应data对象
         page: 1, // 当前页数
         size: 10, // 页面大小
+        pKeywords: ''
       },
       columns: [
         {
@@ -199,11 +217,29 @@ export default {
     },
     changePage(v) {
       this.searchForm.page = v;
-      this.getDataList();
+      if(this.isSearch) {
+        let data = {
+          pageNumber: this.searchForm.page,
+          pageSize: this.searchForm.size,
+          pKeywords: this.searchForm.pKeywords,
+        }
+        this.getSearchList(data);
+      }else {
+        this.getDataList();
+      }
     },
     changesize(v) {
       this.searchForm.size = v;
-      this.getDataList();
+      if(this.isSearch) {
+        let data = {
+          pageNumber: this.searchForm.page,
+          pageSize: this.searchForm.size,
+          pKeywords: this.searchForm.pKeywords,
+        }
+        this.getSearchList(data);
+      }else {
+        this.getDataList();
+      }
     },
     changeSelect(e) {
       this.selectList = e;
@@ -213,7 +249,7 @@ export default {
     getDataList() {
       this.loading = true;
       // 请求后端获取表单数据 请自行修改接口
-      getCrmRequest("/project_summary/product_keywords_list", this.searchForm).then((res) => {
+      getCrmRequest("/project_summary/product_keywords_list", {page:this.searchForm.page, size:this.searchForm.size}).then((res) => {
         this.loading = false;
         if (res.success) {
           if (!res.result) return;
@@ -248,10 +284,55 @@ export default {
             if (res.success) {
               this.$Message.success("删除成功");
               this.clearSelectAll();
-              this.getDataList();
+              if(this.isSearch) {
+                let data = {
+                  pageNumber: this.searchForm.page,
+                  pageSize: this.searchForm.size,
+                  pKeywords: this.searchForm.pKeywords,
+                }
+                this.getSearchList(data);
+              }else {
+                this.getDataList();
+              }
             }
           });
         },
+      });
+    },
+    // 重置
+    handleReset() {
+      this.isSearch = false;
+      this.$refs.searchForm.resetFields();
+      this.searchForm.page = 1;
+      this.searchForm.size = 10;
+      // 重新加载数据
+      this.getDataList();
+    },
+    // 搜索
+    handleSearch() {
+      if(this.searchForm.pKeywords.trim() === '') {
+        this.isSearch = false;
+        this.searchForm.page = 1;
+        this.getDataList();
+      }else {
+        this.isSearch = true;
+        let data = {
+          pageNumber: this.searchForm.page,
+          pageSize: this.searchForm.size,
+          pKeywords: this.searchForm.pKeywords,
+        }
+        this.getSearchList(data);
+      }
+    },
+    getSearchList(data) {
+      this.loading = true;
+      getCrmRequest('/productKeywords/getByCondition',data).then((res) => {
+        this.loading = false;
+        if (res.success) {
+          this.data = res.result.content;
+          this.total = res.result.totalElements;
+          this.clearSelectAll();
+        }
       });
     }
   },

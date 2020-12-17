@@ -1841,6 +1841,12 @@ export default {
   components: {
     searchCheckbox
   },
+  created() {
+    let id = this.$route.query.id;
+    if(id == 17) {
+      this.labelModalForm.caegoryIds2 = ['1','2','3','4','6','7']
+    }
+  },
   mounted() {
     this.channelId = this.$route.query.id;
     this.isShow = true;

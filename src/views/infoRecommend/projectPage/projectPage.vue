@@ -9,7 +9,3 @@ export default {
     name: 'projectPage'
 }
 </script>
-
-<style>
-
-</style>

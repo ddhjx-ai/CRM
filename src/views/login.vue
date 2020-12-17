@@ -562,8 +562,8 @@ export default {
         appid: appid,
         agentid: agentid,
         redirect_uri: encodeURI(
+          // "//osc.chinabidding.cn/osc/qywechatlogin?flag=" + query
           "http://osc.chinabidding.cn/osc/qywechatlogin?flag=" + query
-          // "http://ru3kus.natappfree.cc/osc/qywechatlogin?flag=" + query
         ),
         connect_redirect: 1,
         state: new Date().getTime(),

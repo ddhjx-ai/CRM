@@ -28,67 +28,67 @@ export default {
       searchList: [
         {
           name: '工程招标',
-          value: '001',
+          value: '1',
           flag: false,
           status: 1
         },
         {
           name: '货物招标',
-          value: '002',
+          value: '2',
           flag: false,
           status: 1
         },
         {
           name: '服务招标',
-          value: '003',
+          value: '3',
           flag: false,
           status: 1
         },
         {
           name: '招标预告',
-          value: 'ZBYG',
+          value: '4',
           flag: false,
           status: 1
         },
         {
           name: '中标公示',
-          value: 'ZBGS',
+          value: '5',
           flag: false,
           status: 1
         },
         {
           name: '政府采购',
-          value: 'ZFCG',
+          value: '6',
           flag: false,
           status: 1
         },
         {
           name: '企业采购',
-          value: 'QYCG',
+          value: '7',
           flag: false,
           status: 1
         },
         {
           name: 'VIP项目',
-          value: 'VIP',
+          value: '8',
           flag: false,
           status: 2
         },
         {
           name: '项目核准批复',
-          value: 'XMHZPF',
-          flag: false,
-          status: 2
-        },
-        {
-          name: '项目动态',
-          value: 'XMDT',
+          value: '9',
           flag: false,
           status: 2
         },
         {
           name: '项目跟踪',
-          value: 'XMGZ',
+          value: '10',
+          flag: false,
+          status: 2
+        },
+        {
+          name: '项目动态',
+          value: '11',
           flag: false,
           status: 2
         },
@@ -96,10 +96,7 @@ export default {
     };
   },
   mounted() {
-    /* this.$nextTick(()=> {
-      console.log(this.searchValue)
-      this.searchChange(this.searchValue)
-    }) */
+    this.searchChange(this.searchValue)
   },
   watch: {
     searchValue(newVal) {

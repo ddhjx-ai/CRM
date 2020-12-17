@@ -5,6 +5,7 @@ import VueRouter from 'vue-router';
 import Cookies from 'js-cookie';
 import { routers, otherRouter } from './router';
 import store from '../store';
+import { getStore, setStore } from '../libs/storage';
 
 Vue.use(VueRouter);
 
@@ -45,14 +46,20 @@ router.beforeEach((to, from, next) => {
             next({
                 name: 'login'
             });
-        } else if (Cookies.get('userInfo') && name == 'login') {
-            // 判断是否已经登录且前往的是登录页
-            Util.title();
-            next({
-                name: 'home_index'
-            });
+            /* } else if (Cookies.get('userInfo') && name == 'login') {
+                // 判断是否已经登录且前往的是登录页
+                Util.title();
+                next({
+                    name: 'home_index'
+                }); */
         } else {
-            Util.toDefaultPage([...routers], name, router, next);
+            /*Util.toDefaultPage([...routers], name, router, next); */
+            /* if (Cookies.get('userInfo') && name == 'login') {
+                Cookies.set('userInfo', '');
+                setStore('accessToken', '');
+                location.reload();
+            } */
+            next();
         }
     }
 });

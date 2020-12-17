@@ -1,4 +1,3 @@
-
 <template>
   <div class="search">
     <Card>
@@ -164,11 +163,3 @@ export default {
   },
 };
 </script>
-<style lang="less" scoped>
-/* .spanDom{
-  overflow: hidden;
-  width: 100%;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-} */
-</style>

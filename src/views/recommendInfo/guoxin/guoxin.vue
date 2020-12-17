@@ -1,5 +1,4 @@
-<style lang="less">
-</style>
+
 <template>
   <div class="search">
     <Card>

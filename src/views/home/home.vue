@@ -4,7 +4,7 @@
 </style>
 
 <template>
-  <div>
+  <div v-show="false">
     <div v-show="currNav=='xboot'" class="home">
       <Row :gutter="10">
         <Col :lg="24" :xl="8">

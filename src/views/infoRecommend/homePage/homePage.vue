@@ -9,7 +9,3 @@ export default {
     name:'homePage'
 }
 </script>
-
-<style>
-
-</style>
