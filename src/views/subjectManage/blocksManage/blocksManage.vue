@@ -2191,7 +2191,7 @@ export default {
           }
           this.labelModalForm.caegoryIds2 = res.caegory_ids2
             ? res.caegory_ids2.split(",")
-            : "";
+            : [];
         }
       });
       this.modalType = 2;
@@ -2462,7 +2462,7 @@ export default {
           }
           this.contentModalForm.caegoryIds2 = res.caegory_ids2
             ? res.caegory_ids2.split(",")
-            : "";
+            : [];
         }
       });
       this.modalType = 2;

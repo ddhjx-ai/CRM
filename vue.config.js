@@ -1,23 +1,26 @@
 const CompressionPlugin = require('compression-webpack-plugin');
+
+// let url = 'http://192.168.0.33:8888';
+// let url = 'http://127.0.0.1:8888';
 module.exports = {
-    publicPath : "./",
+    // publicPath : "./",
     devServer: {
         host: '0.0.0.0',
         port: 7777,
         proxy:
         {
             '/xboot': {
-                // target: 'http://192.168.0.33:8888',
+                // target: 'http://192.168.0.35:8888',
                 target: 'http://127.0.0.1:8888',
                 ws: true,
             },
             '/osc': {
-                // target: 'http://192.168.0.33:8888',
+                // target: 'http://192.168.0.35:8888',
                 target: 'http://127.0.0.1:8888',
                 ws: true,
             },
             '/xmallend': {
-                // target: 'http://192.168.0.33:8888',
+                // target: 'http://192.168.0.35:8888',
                 target: 'http://127.0.0.1:8888',
                 ws: true,
             },

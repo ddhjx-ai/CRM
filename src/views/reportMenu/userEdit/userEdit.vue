@@ -310,3 +310,10 @@ export default {
   },
 };
 </script>
+
+<style lang="less">
+/deep/ .ivu-page-item-jump-next:after,
+.ivu-page-item-jump-prev:after {
+  content: "\2022\2022\2022" !important;
+}
+</style>

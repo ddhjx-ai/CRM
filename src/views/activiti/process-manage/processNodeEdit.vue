@@ -1,7 +1,6 @@
 <style lang="less">
 @import "../../../styles/tree-common.less";
 @import "../../../styles/single-common.less";
-@import "./processManage.less";
 </style>
 <template>
   <div class="search">

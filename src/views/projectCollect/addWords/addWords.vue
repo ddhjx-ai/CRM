@@ -217,6 +217,7 @@ export default {
     },
     changePage(v) {
       this.searchForm.page = v;
+      this.clearSelectAll();
       if(this.isSearch) {
         let data = {
           pageNumber: this.searchForm.page,
@@ -310,9 +311,10 @@ export default {
     },
     // 搜索
     handleSearch() {
+      this.searchForm.page = 1;
+      this.searchForm.size = 10;
       if(this.searchForm.pKeywords.trim() === '') {
         this.isSearch = false;
-        this.searchForm.page = 1;
         this.getDataList();
       }else {
         this.isSearch = true;
