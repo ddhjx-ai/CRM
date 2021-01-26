@@ -50,7 +50,13 @@
           <Button type="primary">邮件—搜标</Button>
         </Form-item>
       </Form>
-      <Form ref="form" inline :model="form" :label-width="80" :rules="formValidate">
+      <Form
+        ref="form"
+        inline
+        :model="form"
+        :label-width="80"
+        :rules="formValidate"
+      >
         <FormItem label="IP:" prop="ip">
           <Input v-model="form.ip" />
         </FormItem>
@@ -65,21 +71,21 @@
         </FormItem>
       </Form>
       <Row>
-          <Col>
-            <div style="margin-bottom:10px">
-                全部数量：0 本月数量：0 本日数量：0 昨日数量：0
-            </div>
-          </Col>
-          <Col>
-            <Table
+        <Col>
+          <div style="margin-bottom: 10px">
+            全部数量：0 本月数量：0 本日数量：0 昨日数量：0
+          </div>
+        </Col>
+        <Col>
+          <Table
             :loading="loading"
             border
             :columns="columns"
             :data="data"
             ref="table"
             @on-selection-change="changeSelect"
-            ></Table>
-          </Col>
+          ></Table>
+        </Col>
       </Row>
     </Card>
   </div>
@@ -89,31 +95,19 @@
 export default {
   name: "searchLog",
   data() {
-      return{
-          form: {
-              ip:'',
-              JSession: '',
-              Member_id: ''
-          },
-          columns:[],
-          data: [],
-          loading: false,
-      }
+    return {
+      form: {
+        ip: "",
+        JSession: "",
+        Member_id: "",
+      },
+      columns: [],
+      data: [],
+      loading: false,
+    };
   },
   methods: {
-      changeSelect() {
-
-      }
-  }
+    changeSelect() {},
+  },
 };
 </script>
-
-<style scoped lang="less">
-.app_container {
-  height: calc(100vh - 120px);
-  iframe {
-    width: 100%;
-    height: 100%;
-  }
-}
-</style>

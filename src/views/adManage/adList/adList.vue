@@ -480,9 +480,6 @@ export default {
   },
   // 表格动态列 计算属性
   computed: {},
-  activated(){
-    this.init();
-  },
   mounted() {
     this.init();
   },

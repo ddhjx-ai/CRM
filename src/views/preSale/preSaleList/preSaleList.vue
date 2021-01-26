@@ -24,6 +24,15 @@
             >
             <Button @click="handleReset">重置</Button>
           </Form-item>
+          <Form-item class="operation">
+            <Button
+              @click="handlegroup"
+              v-has="'add'"
+              type="primary"
+              icon="md-redo"
+              >客户转让</Button
+            >
+          </Form-item>
         </Form>
         <Button @click="handleQrcode" type="primary" icon="md-qr-scanner"
           >我的二维码</Button
@@ -39,7 +48,7 @@
           @on-selection-change="changeSelect"
         ></Table>
       </Row>
-      <Row type="flex" justify="end" class="page">
+      <Row type="flex" justify="end" class="page" style="margin-top:10px;">
         <Page
           :current="searchForm.page"
           :total="total"
@@ -62,7 +71,7 @@
       :width="500"
       class="qrcodeVisible"
     >
-      <Form
+      <!-- <Form
         ref="qrcodeForm"
         :model="qrcodeForm"
         inline
@@ -80,17 +89,17 @@
         <Form-item class="operation leftMargin">
           <Button @click="getQrcode" type="primary">生成二维码</Button>
         </Form-item>
-      </Form>
+      </Form> -->
       <Alert
         type="warning"
         show-icon
         style="width: 400px; display: inline-block"
         v-if="warnIsShow"
-        >当前用户未绑定手机号，请输入手机号获取二维码</Alert
+        >当前用户未绑定手机号</Alert
       >
       <div class="qrcode" ref="qrCodeUrl"></div>
-      <div slot="footer">
-        <Button type="primary" @click="qrcodeVisible = false">确认</Button>
+      <div slot="footer" style="text-align:center">
+        <Button type="primary" @click="qrcodeVisible = false" >确认</Button>
       </div>
     </Modal>
 
@@ -172,6 +181,63 @@
         <Button type="primary" @click="keywordsSubmit">提交</Button>
       </div>
     </Modal>
+
+    <Modal
+      title="客户转让"
+      v-model="groupVisible"
+      :mask-closable="false"
+      :width="500"
+    >
+      <Form
+        ref="groupForm"
+        :model="groupForm"
+        :label-width="80"
+        label-position="right"
+      >
+        <Form-item
+          label="转让人"
+          prop="fromUser"
+          :rules="{
+            required: true,
+            message: '请选择转让人',
+            trigger: 'change',
+            type: 'array',
+          }"
+        >
+          <Select
+            v-model="groupForm.fromUser"
+            filterable
+            multiple
+            @on-change="handleFormChange"
+          >
+            <Option v-for="item in fromList" :value="item" :key="item">{{
+              item
+            }}</Option>
+          </Select>
+        </Form-item>
+        <Form-item
+          label="接收人"
+          prop="toUser"
+          :rules="{
+            required: true,
+            message: '请选择接收人',
+            trigger: 'change',
+          }"
+        >
+          <Select v-model="groupForm.toUser" @on-change="handleToChange">
+            <Option v-for="item in toList" :value="item" :key="item">{{
+              item
+            }}</Option>
+          </Select>
+        </Form-item>
+      </Form>
+      <div slot="footer">
+        <Button type="text" @click="groupVisible = false">取消</Button>
+        <Button type="primary" @click="groupSubmit" :loading="groupLoading"
+          >提交</Button
+        >
+      </div>
+    </Modal>
   </div>
 </template>
 
@@ -190,6 +256,15 @@ export default {
   name: "preSaleList",
   data() {
     return {
+      groupLoading: false,
+      groupVisible: false,
+      fromList: [],
+      userList: [],
+      toList: [],
+      groupForm: {
+        fromUser: [],
+        toUser: "",
+      },
       keywordsVisible: false,
       keywordsForm: {
         list: [
@@ -504,7 +579,7 @@ export default {
     },
     // 查看二维码
     handleQrcode() {
-      this.$refs.qrcodeForm.resetFields();
+      // this.$refs.qrcodeForm.resetFields();
       this.userPhone = JSON.parse(getStore("userInfo")).mobile;
       if (this.userPhone) {
         this.creatQrCode(this.userPhone);
@@ -515,11 +590,12 @@ export default {
       this.qrcodeVisible = true;
     },
     creatQrCode(phone) {
+      let url = location.href;
+      let str = url.slice(0,url.indexOf('#'));
       this.warnIsShow = false;
       this.$refs.qrCodeUrl.innerHTML = "";
       var qrcode = new QRCode(this.$refs.qrCodeUrl, {
-        // text: `http://127.0.0.1:8888/osc/presale/form?contact=${phone}`, // 需要转换为二维码的内容
-        text: `http://192.168.0.12:8888/osc/presale/form?contact=${phone}`,
+        text: `${str}osc/presale/form?contact=${phone}`, // 需要转换为二维码的内容
         width: 150,
         height: 150,
         colorDark: "#000000",
@@ -608,9 +684,50 @@ export default {
         }
       });
     },
+    // 获取所有组员
+    getAllGroup() {
+      getCrmRequest("/presale/get_users").then((res) => {
+        if (res.success) {
+          this.fromList = res.result;
+          this.userList = res.result;
+          this.toList = res.result;
+        }
+      });
+    },
+    // 客户转让
+    groupSubmit() {
+      this.$refs.groupForm.validate((valid) => {
+        if (valid) {
+          this.groupLoading = true;
+          postCrmRequest("/presale/refer", {
+            from: this.groupForm.fromUser,
+            to: this.groupForm.toUser,
+          }).then((res) => {
+            if (res.success) {
+              this.$Message.success("转让成功！");
+              this.groupVisible = false;
+            } else {
+              this.$Message.error("转让失败！");
+            }
+            this.groupLoading = false;
+          });
+        }
+      });
+    },
+    handlegroup() {
+      this.groupVisible = true;
+      this.$refs.groupForm.resetFields();
+    },
+    handleFormChange(v) {
+      this.groupForm.toUser = "";
+      this.toList = this.userList.filter((item) => {
+        return !v.includes(item);
+      });
+    },
   },
   mounted() {
     this.init();
+    this.getAllGroup();
   },
 };
 </script>

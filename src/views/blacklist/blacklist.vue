@@ -19,7 +19,7 @@
           <FormItem prop="qtype" class="leftBtnForm" style="width: 100px">
             <Select v-model="searchForm.qtype" placeholder="请选择">
               <Option value="login_id">登录名</Option>
-              <Option value="company_name">用户名</Option>
+              <Option value="company_name">公司名</Option>
               <Option value="member_id">用户ID</Option>
             </Select>
           </FormItem>
@@ -50,7 +50,7 @@
           @on-selection-change="changeSelect"
         ></Table>
       </Row>
-      <Row type="flex" justify="end" class="page">
+      <Row type="flex" justify="end" class="page" style="margin-top:10px;">
         <Page
           :current="searchForm.page"
           :total="total"
@@ -106,13 +106,13 @@
         <FormItem label="allowCopy:" prop="allow_copy">
           <Checkbox v-model="form.allow_copy"></Checkbox>
         </FormItem>
-        <div slot="footer">
-          <Button type="text" @click="modalVisible = false">取消</Button>
-          <Button type="primary" :loading="submitLoading" @click="handleSubmit"
-            >提交</Button
-          >
-        </div>
       </Form>
+      <div slot="footer">
+        <Button type="text" @click="modalVisible = false">取消</Button>
+        <Button type="primary" :loading="submitLoading" @click="handleSubmit"
+          >提交</Button
+        >
+      </div>
     </Modal>
   </div>
 </template>
@@ -126,7 +126,9 @@ export default {
   data() {
     const validateTime = (rule, value, callback) => {
       const reg = /(^[1-9]([0-9]+)?(\.[0-9]{1,2})?$)|(^(0){1}$)|(^[0-9]\.[0-9]([0-9])?$)/;
-      if (!reg.test(value)) {
+      if (value === "") {
+        callback();
+      } else if (!reg.test(value)) {
         callback(new Error("请输入合法的数字！"));
       } else {
         callback();
@@ -148,13 +150,13 @@ export default {
         allow_copy: false,
       },
       formValidate: {
-        member_id:{ validator: validateNum, trigger: "blur" },
+        member_id: { validator: validateNum, trigger: "blur" },
         daily: { validator: validateNum, trigger: "blur" },
         weekly: { validator: validateNum, trigger: "blur" },
         monthly: { validator: validateNum, trigger: "blur" },
         delay_time: { validator: validateTime, trigger: "blur" },
-        IP_not_allow: { validator: validateIP, trigger: "blur" },
-        IP_allow: { validator: validateIP, trigger: "blur" },
+        /* IP_not_allow: { validator: validateIP, trigger: "blur" },
+        IP_allow: { validator: validateIP, trigger: "blur" }, */
       },
       loading: true, // 表单加载状态
       searchForm: {
@@ -183,19 +185,16 @@ export default {
           width: 120,
           align: "center",
           key: "member_id",
-          sortable: true,
         },
         {
           title: "登录名",
           key: "login_id",
           width: 120,
           align: "center",
-          sortable: true,
         },
         {
           title: "公司名",
           key: "company_name",
-          sortable: true,
           minWidth: 120,
           align: "center",
         },
@@ -204,75 +203,85 @@ export default {
           key: "daily",
           align: "center",
           width: 140,
-          sortable: true,
         },
         {
           title: "每周浏览信息",
           key: "weekly",
           align: "center",
           width: 140,
-          sortable: true,
         },
         {
           title: "每月浏览信息",
           key: "monthly",
           align: "center",
           width: 140,
-          sortable: true,
         },
         {
           title: "延时",
           key: "delay_time",
           align: "center",
-          width: 130,
-          sortable: true,
+          width: 120,
         },
         {
           title: "禁止IP",
           key: "IP_not_allow",
           align: "center",
-          width: 130,
-          sortable: true,
+          width: 120,
         },
         {
           title: "允许IP",
           key: "IP_allow",
           align: "center",
-          width: 130,
-          sortable: true,
+          width: 120,
         },
         {
           title: "混淆信息",
           key: "is_hunxiao",
           align: "center",
-          width: 130,
-          sortable: true,
+          width: 120,
         },
         {
           title: "转换图片",
           key: "is_pic",
           align: "center",
-          width: 130,
-          sortable: true,
+          width: 120,
+          render: (h, params) => {
+            return h(
+              'span',
+              {
+                style: {
+                },
+              },
+              params.row.is_pic ? '是' : '否'
+            )
+          }
         },
         {
           title: "允许复制",
           key: "allow_copy",
           align: "center",
-          width: 130,
-          sortable: true,
+          width: 120,
+          render: (h, params) => {
+            return h(
+              'span',
+              {
+                style: {
+                },
+              },
+              params.row.allow_copy ? '是' : '否'
+            )
+          }
         },
         {
           title: "加入时间",
           key: "create_date",
           align: "center",
-          width: 150,
-          sortable: true,
+          width: 180,
         },
       ],
       data: [], // 表单数据
       total: 0, // 表单数据总数
-      updateId: ''
+      updateId: "",
     };
   },
   // 表格动态列 计算属性
@@ -302,6 +311,9 @@ export default {
           }
         }
       );
+    },
+    clearSelectAll() {
+      this.$refs.table.selectAll(false);
     },
     changeSelect(e) {
       this.selectList = e;
@@ -349,20 +361,21 @@ export default {
     },
     // 提交编辑/添加
     handleSubmit() {
-      console.log(this.form);
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.submitLoading = true;
           if (this.modalType == 0) {
             // 添加 避免编辑后传入id等数据 记得删除
-            postCrmRequest("/black/save", qs.stringify(this.form)).then(res => {
-              this.submitLoading = false;
-              if (res.success) {
-                this.$Message.success("添加成功");
-                this.getDataList();
-                this.modalVisible = false;
+            postCrmRequest("/black/save", this.form).then(
+              (res) => {
+                this.submitLoading = false;
+                if (res.success) {
+                  this.$Message.success("添加成功");
+                  this.getDataList();
+                  this.modalVisible = false;
+                }
               }
-            });
+            );
           } else {
             // 编辑
             let data = {
@@ -377,9 +390,9 @@ export default {
               is_hunxiao: this.form.is_hunxiao,
               is_pic: this.form.is_pic,
               allow_copy: this.form.allow_copy,
-              id: this.updateId
-            }
-            postCrmRequest("/black/save", qs.stringify(data)).then(res => {
+              id: this.updateId,
+            };
+            postCrmRequest("/black/save", data).then((res) => {
               this.submitLoading = false;
               if (res.success) {
                 this.$Message.success("修改成功");

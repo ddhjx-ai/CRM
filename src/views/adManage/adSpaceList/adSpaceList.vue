@@ -133,14 +133,14 @@
         <FormItem label="登录名" prop="name">
           <Input v-model="releaseForm.name" />
         </FormItem>
-        <FormItem label="广告">
+        <FormItem label="广告" prop='guanggaoId'>
           <Select v-model="releaseForm.guanggaoId">
             <Option v-for="item in adList" :key="item.id" :value="item.id">{{
               item.name
             }}</Option>
           </Select>
         </FormItem>
-        <FormItem label="关键字">
+        <FormItem label="关键字" prop='keywords'>
           <Input v-model="releaseForm.keywords" />
         </FormItem>
         <FormItem label="开始时间" prop="startDate">

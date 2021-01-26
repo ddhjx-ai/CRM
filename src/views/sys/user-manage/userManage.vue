@@ -261,7 +261,7 @@ export default {
         status: "",
         pageNumber: 1,
         pageSize: 10,
-        sort: "createTime",
+        sort: "username",
         order: "desc",
         startDate: "",
         endDate: ""
@@ -429,8 +429,8 @@ export default {
         {
           title: "创建时间",
           key: "createTime",
-          sortable: true,
-          sortType: "desc",
+          // sortable: true,  x-boot默认按照时间排序，但是存在相同时间的bug，取消时间排序
+          // sortType: "desc",
           width: 180
         },
         {

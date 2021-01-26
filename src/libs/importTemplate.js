@@ -80,3 +80,34 @@ export const userData = [
         defaultRole: 1
     }
 ]
+
+export const basicColumns = [
+    {
+        title: "访客编号",
+    },
+    {
+        title: "访客标签",
+    },
+    {
+        title: "对话数(客:访)",
+    },
+    {
+        title: "对话时间",
+    },
+    {
+        title: "访问来源",
+    },
+    {
+        title: "来源风格",
+    },
+    {
+        title: "咨询页面",
+    },
+    {
+        title: "访客地区",
+    }
+  ]
+  
+  export const basicData = [
+    {},
+  ]

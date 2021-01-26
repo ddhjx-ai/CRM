@@ -149,7 +149,9 @@ export const validateLimit = (rule, value, callback) => {
  */
 export const validateIP = (rule, value, callback) => {
   const reg = /^(\d{1}|[1-9]{1}\d{1}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1}|[1-9]{1}\d{1}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1}|[1-9]{1}\d{1}|1\d\d|2[0-4]\d|25[0-5])\.(\d{1}|[1-9]{1}\d{1}|1\d\d|2[0-4]\d|25[0-5])$/
-  if(!reg.test(value)) {
+  if(value === '') {
+    callback()
+  }else if(!reg.test(value)) {
     callback(new Error('请输入合法的IP地址'))
   }else {
     callback();
