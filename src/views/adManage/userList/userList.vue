@@ -27,10 +27,10 @@
       </Row>
       <Row class="operation" style="margin-bottom: 10px">
         <Button @click="add" type="primary" icon="md-add">添加</Button>
-        <Button @click="endPlan" type="primary" icon="ios-book-outline"
+        <Button @click="endPlan" :disabled="true" type="primary" icon="ios-book-outline"
           >结束所有发布计划</Button
         >
-        <Button @click="releasePlan" type="primary" icon="md-book"
+        <Button @click="releasePlan" :disabled="true" type="primary" icon="md-book"
           >所有发布计划出账</Button
         >
         <Button @click="addAd" type="primary" icon="md-add-circle"
@@ -333,11 +333,12 @@ export default {
       this.loading = true;
       // 请求后端获取表单数据 请自行修改接口
       getCrmRequest("/ad/yz/list", this.searchForm).then((res) => {
+        this.loading = false;
         if (res.success) {
-          this.loading = false;
           this.data = res.result.list;
           this.total = res.result.total;
         }
+        this.clearSelectAll();
       });
     },
     changePage(v) {

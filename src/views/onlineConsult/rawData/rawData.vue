@@ -8,6 +8,9 @@
         <Button type="primary" @click="handleImport" icon="md-cloud-upload"
           >批量导入数据</Button
         >
+        <Button @click="getDataList" icon="md-refresh"
+          >刷新</Button
+        >
       </Row>
       <Row>
         <Alert show-icon>上次上传时间：{{lastTime}}，成功添加{{successCount}}条数据，失败(重复){{failCount}}条数据</Alert>
@@ -86,7 +89,7 @@ export default {
     return {
       successCount:0,
       failCount:0,
-      lastTime: '',
+      lastTime: '-',
       importLoading: false, // 导入中
       loading: false,
       reading: false, // 读取中
@@ -164,6 +167,9 @@ export default {
       },
     };
   },
+  activated() {
+    this.getDataList();
+  },
   methods: {
     changePage(v) {
       this.searchForm.pageNum = v;
@@ -195,6 +201,7 @@ export default {
       const fileExt = file.name.split(".").pop().toLocaleLowerCase();
       if (fileExt == "xlsx" || fileExt == "xls") {
         this.uploadfile = file;
+        console.log(this.uploadfile)
       } else {
         this.$Notice.warning({
           title: "文件类型错误",
@@ -210,16 +217,15 @@ export default {
     importData() {
       this.importLoading = true;
       // 传入导入数据 后端接收body数组列表批量导入
-      console.log(this.uploadfile)
       let formData = new FormData();
       formData.append("file", this.uploadfile);
       postCrmRequest("/data_analysis/upload", formData).then((res) => {
         this.importLoading = false;
         if (res.success) {
-          this.importModalVisible = false;
-          this.getDataList();
           this.$Message.success("导入成功！");
         }
+        this.importModalVisible = false;
+        this.getDataList();
       });
     },
     // 下载模板

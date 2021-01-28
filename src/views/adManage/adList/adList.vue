@@ -493,11 +493,12 @@ export default {
       this.loading = true;
       // 请求后端获取表单数据 请自行修改接口
       getCrmRequest("/ad/gg/list", this.searchForm).then((res) => {
+        this.loading = false;
         if (res.success) {
-          this.loading = false;
           this.data = res.result.list;
           this.total = res.result.total;
         }
+        this.clearSelectAll();
       });
     },
     // 获取业主列表
@@ -838,7 +839,10 @@ export default {
     selectClear(v) {
       if(!v) {
         this.getDataList();
-        // this.clearSelectAll();
+        this.pageListFlag = false;
+        this.ggwListFlag = false;
+        this.pageList = [];
+        this.ggwList = [];
       }
     }
   },

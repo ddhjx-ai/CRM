@@ -89,10 +89,10 @@ export const basicColumns = [
         title: "访客标签",
     },
     {
-        title: "对话数(客:访)",
+        title: "对话时间",
     },
     {
-        title: "对话时间",
+        title: "对话数(客:访)",
     },
     {
         title: "访问来源",

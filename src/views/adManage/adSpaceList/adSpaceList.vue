@@ -535,11 +535,12 @@ export default {
       this.loading = true;
       // 请求后端获取表单数据 请自行修改接口
       getCrmRequest("/ad/ggw/list", this.searchForm).then((res) => {
+        this.loading = false;
         if (res.success) {
-          this.loading = false;
           this.data = res.result.list;
           this.total = res.result.total;
         }
+        this.clearSelectAll();
       });
     },
     changePage(v) {

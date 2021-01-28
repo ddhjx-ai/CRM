@@ -1166,7 +1166,7 @@
 
 /* 近一年使用报告 */
 /**
- * @api {post} /osc/up/report/year/apply_list 近一年报告申请/报告申请列表查询
+ * @api {post} /osc/up/report/year/apply_list 近一年报告申请/列表查询
  * @apiName apply_list
  * @apiGroup 近一年使用报告
  *
@@ -1184,7 +1184,7 @@
  * @apiSuccess {String}  kefuName 客服姓名
  * @apiSuccess {String}  memberEndTime 用户截止时间
  * @apiSuccess {Number}  memberId 用户id
- * @apiSuccess {Number}  status 收集状态
+ * @apiSuccess {Number}  status 收集状态 0-未收集，1-已收集
  * @apiSuccessExample Success-Response:
  *     {
  *        "success": true,
@@ -1265,7 +1265,7 @@
  */
 
  /**
- * @api {post} /osc/up/report/year/aimuser_list 近一年目标客户/目标客户列表查询
+ * @api {post} /osc/up/report/year/aimuser_list 近一年目标客户/列表查询
  * @apiName aimuser_list
  * @apiGroup 近一年使用报告
  *
@@ -1415,6 +1415,278 @@
  * @api {put} /osc/up/report/year/first/id 近一年参与项目/切换候选人状态
  * @apiName first
  * @apiGroup 近一年使用报告
+ *
+ * @apiParam {Number} isFirst 是否为第一候选人 0：是，1：否
+ *
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "修改成功",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+/* 2018年用户使用报告 */
+/**
+ * @api {post} /osc/up/report/apply_list 2018年报告申请/列表查询
+ * @apiName apply_list
+ * @apiGroup 2018年用户使用报告
+ *
+ * @apiParam {Number} page 当前页码数
+ * @apiParam {Number} size 当前页条数
+ * @apiParam {String} sortOrder 排序方式 asc：升序，desc：降序
+ * @apiParam {String} sortName 排序项 
+ * @apiParam {String} searchType 查询方式 [非必填] member_id：用户id，kefu：客服
+ * @apiParam {String} search 查询关键词 [非必填]
+ *
+ * @apiSuccess {Number}  id 栏目id
+ * @apiSuccess {String}  componyName 公司名称
+ * @apiSuccess {String}  createTime 创建时间
+ * @apiSuccess {Object}  jsonData 数据
+ * @apiSuccess {String}  kefuName 客服姓名
+ * @apiSuccess {String}  memberEndTime 用户截止时间
+ * @apiSuccess {Number}  memberId 用户id
+ * @apiSuccess {Number}  status 收集状态 0-未收集，1-已收集
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":{
+ *           "total": 1,
+ *           "list":[
+ *            {
+ *              "id": "200126806",							  
+ *              "componyName": "象山正方机械有限公司",		  
+ *              "createTime": "2020-12-03 11:52:57",			  
+ *              "jsonData":	null,				
+ *              "kefuName": "朱建新",		
+ *              "memberEndTime": null,	
+ *              "memberId": 1,					
+ *              "status": 1,						
+ *            }
+ *          ]
+ *        }
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+ /**
+ * @api {post} /osc/up/report/add_apply 2018年报告申请/添加报告申请
+ * @apiName add_apply
+ * @apiGroup 2018年用户使用报告
+ *
+ * @apiParam {Number} memberId 用户id
+ *
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+  /**
+ * @api {delete} /osc/up/report/delete 2018年报告申请/删除
+ * @apiName delete
+ * @apiGroup 2018年用户使用报告
+ *
+ * @apiParam {Array} ids 用户id
+ *
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "删除成功",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+
+ /**
+ * @api {post} /osc/up/report/aimuser_list 2018年目标客户/列表查询
+ * @apiName aimuser_list
+ * @apiGroup 2018年用户使用报告
+ *
+ * @apiParam {Number} page 当前页码数
+ * @apiParam {Number} size 当前页条数
+ * @apiParam {String} sortOrder 排序方式 asc：升序，desc：降序
+ * @apiParam {String} sortName 排序项 
+ * @apiParam {Number} memberId 用户id [非必填]
+ *
+ * @apiSuccess {Number}  id 目标客户id
+ * @apiSuccess {Number}  isShow 是否显示 1：显示，0：不显示
+ * @apiSuccess {String}  keyword 关键词
+ * @apiSuccess {Number}  memberId 用户id
+ * @apiSuccess {Number}  noReadNum 
+ * @apiSuccess {Number}  readNum 
+ * @apiSuccess {Number}  seachCount 搜索次数
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":{
+ *           "total": 1,
+ *           "list":[
+ *            {
+ *              "id": 1054721,					
+ *              "isShow": 1,						
+ *              "keyword": "合肥庐源电力工程有限公司",		
+ *              "memberId": 200338202,					
+ *              "noReadNum": 3.93857,						
+ *              "readNum": -2.09342,						
+ *              "seachCount": 254,							
+ *            }
+ *          ]
+ *        }
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+ /**
+ * @api {put} /osc/up/report/aimuser_update/id 2018年目标客户/切换目标客户状态
+ * @apiName aimuser_update
+ * @apiGroup 2018年用户使用报告
+ *
+ * @apiParam {Number} isShow 显示状态 0：不显示，1：显示
+ *
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "修改成功",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+
+ /**
+ * @api {put} /osc/up/report/year/aimuser_update/id 2018年目标客户/编辑关键词
+ * @apiName aimuser_update
+ * @apiGroup 2018年用户使用报告
+ *
+ * @apiParam {String} Keyword 关键词
+ *
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "修改成功",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+   /**
+ * @api {post} /osc/up/report/part_list 2018年参与项目/列表查询
+ * @apiName part_list
+ * @apiGroup 2018年用户使用报告
+ *
+ * @apiParam {Number} page 当前页码数
+ * @apiParam {Number} size 当前页条数
+ * @apiParam {String} sortOrder 排序方式 asc：升序，desc：降序
+ * @apiParam {String} sortName 排序项 
+ * @apiParam {Number} memberId 用户id [非必填]
+ *
+ * @apiSuccess {Number}  id 数据id
+ * @apiSuccess {Number}  infoId 信息id
+ * @apiSuccess {Number}  isFirst 是否为第一候选人 0：否，1：是
+ * @apiSuccess {Number}  isShow 是否显示
+ * @apiSuccess {Number}  memberId 用户id
+ * @apiSuccess {String}  publishDate 发布时间
+ * @apiSuccess {String}  title 信息标题
+ * @apiSuccess {String}  zbwUrl 信息标题链接
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":{
+ *           "total": 1,
+ *           "list":[
+ *            {
+ *              "id": 1054721,					
+ *              "infoId": 2070121357,		
+ *              "isFirst": 1,						
+ *              "isShow": 1,						
+ *              "memberId": 11687493,		
+ *              "publishDate": "2019-10-31 00:00:00",
+ *              "title": "贵州大唐物资有限公司制粉系统配件...",	
+ *              "zbwUrl":"/zbgs/nnmKZP.html",					
+ *            }
+ *          ]
+ *        }
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+   /**
+ * @api {put} /osc/up/first/id 2018年参与项目/切换候选人状态
+ * @apiName first
+ * @apiGroup 2018年用户使用报告
  *
  * @apiParam {Number} isFirst 是否为第一候选人 0：是，1：否
  *
@@ -2691,11 +2963,13 @@
  *        "message": "success",
  *        "code": 200,
  *        "timestamp": 1606957730894,
- *        "count":1
  *        "result":{
+ *          "count":1,
+ *          "list":[{
  *          alias: "采招英文网"
  *          id: 1
  *          name: "chinabidding_en"
+ *          }],
  *        },
  *     }
  *
@@ -2798,13 +3072,15 @@
  *        "message": "success",
  *        "code": 200,
  *        "timestamp": 1606957730894,
- *        "count":1
  *        "result":{
+ *          "count":1,
+ *          list:[{
  *          alias: "新闻"
  *          id: 3
  *          name: "cblen.News"
  *          siteId: 1
  *          siteName: "采招英文网"
+ *          }],
  *        },
  *     }
  *
@@ -2913,8 +3189,9 @@
  *        "message": "success",
  *        "code": 200,
  *        "timestamp": 1606957730894,
- *        "count":1
  *        "result":{
+ *          "count":1,
+ *          list:[{
  *          alias: "首页",
  *          channelId: 2,
  *          channelName: "Infos",
@@ -2924,6 +3201,7 @@
  *          keywords: null,
  *          name: "cblen.Infos.index",
  *          title: null,
+ *          }]
  *        },
  *     }
  *
@@ -3039,8 +3317,9 @@
  *        "message": "success",
  *        "code": 200,
  *        "timestamp": 1606957730894,
- *        "count":1
  *        "result":{
+ *          "count":1,
+ *          list:[{
  *          alias: "mainFlash",
  *          id: 1,
  *          isShowDescription: 0,
@@ -3055,6 +3334,7 @@
  *          sphinx_table_name: null,
  *          sphinx_table_name2: null,
  *          url: "/public/cblen/flash/flash.swf",
+ *        }]
  *        },
  *     }
  *
@@ -3140,6 +3420,543 @@
  * @apiName del
  * @apiGroup 网站管理
  *
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+/* 产品管理 */
+   /**
+ * @api {get} /xmallend/item/cat/list 分类管理/列表
+ * @apiName list
+ * @apiGroup 产品管理
+ *
+ * @apiParam {Number} id id
+ *
+ * @apiSuccess {String} name 分类名称
+ * @apiSuccess {Number} id 分类id
+ * @apiSuccess {Boolean} isParent 是否为父级分类
+ * @apiSuccess {Number} pid 父级id
+ * @apiSuccessExample Success-Response:
+ *  [
+ *    {
+ *      icon: null,
+ *      id: 1183,
+ *      isParent: true,
+ *      limitNum: 0,
+ *      name: "品牌周边",
+ *      open: null,
+ *      pid: 0,
+ *      remark: null,
+ *      sortOrder: 1,
+ *      status: 1,
+ *      type: 0,
+ *    }
+ *    
+ *  ]
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+  /**
+ * @api {post} /xmallend/item/cat/add 分类管理/添加
+ * @apiName add
+ * @apiGroup 产品管理
+ *
+ * @apiParam {String} name 分类名称
+ * @apiParam {Number} sortOrder 排序
+ * @apiParam {Number} status 是否启用
+ * @apiParam {Number} isParent 是否为父节点
+ * @apiParam {String} remark 备注
+ * @apiParam {Number} parentId 父节点id
+ *
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+   /**
+ * @api {post} /xmallend/item/cat/update 分类管理/编辑
+ * @apiName update
+ * @apiGroup 产品管理
+ *
+ * @apiParam {Number} id 分类id
+ * @apiParam {String} name 分类名称
+ * @apiParam {Number} sortOrder 排序
+ * @apiParam {Number} status 是否启用
+ * @apiParam {Number} isParent 是否为父节点
+ * @apiParam {String} remark 备注
+ * @apiParam {Number} parentId 父节点id
+ * @apiParam {Number} parentName 父节点名称
+ *
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+
+ /**
+ * @api {delete} /xmallend/item/cat/del/id 分类管理/删除
+ * @apiName del
+ * @apiGroup 产品管理
+ *
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+/**
+ * @api {get} /xmallend/item/list 商品列表/列表
+ * @apiName list
+ * @apiGroup 产品管理
+ *
+ * @apiParam {Number} page 页码数
+ * @apiParam {Number} size 每页条数
+ * @apiParam {Number} cid 分类id
+ *
+ * @apiSuccess {Number} cid 分类id
+ * @apiSuccess {String} title 商品名称
+ * @apiSuccess {String} created 创建时间
+ * @apiSuccess {String} image 图片路径
+ * @apiSuccess {Number} id 商品id
+ * @apiSuccess {Number} price 价格
+ * @apiSuccess {String} sellPoint 描述
+ * @apiSuccess {Number} status 状态 1-已发布，0-已下架
+ * @apiSuccess {String} updated 更新日期
+ * @apiSuccess {String} url 频道链接
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":{
+ *          "count":1
+ *          itemList:
+ *            [{
+ *              cid: -1,
+ *              created: "2020-09-23T09:59:03.000+0800",
+ *              id: 1600825527424,
+ *              image: "http://gys-public.oss-cn-beijing.aliyuncs.com/mall/1600825527424/1601284873116.jpg",
+ *              limitNum: 1,
+ *              num: 10,
+ *              price: 0,
+ *              sellPoint: "【免费试用】 木材 石材 混凝土油漆和涂料  砂石  水泥 钢材  ",
+ *              status: 1,
+ *              title: "工程建材",
+ *              updated: "2021-01-18T10:55:53.000+0800",
+ *              url: "https://www.chinabidding.cn/public/2020/html/channel.html?channelid=5",
+ *              validity: 12,
+ *            }]
+ *        },
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+    /**
+ * @api {get} /xmallend/item/count 商品列表/总数据
+ * @apiName count
+ * @apiGroup 产品管理
+ *
+ * @apiSuccess {Number} result 商品总条数
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":10
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+    /**
+ * @api {put} /xmallend/item/changestatus 商品列表/发布
+ * @apiName count
+ * @apiGroup 产品管理
+ *
+ * @apiParam {Number} id 商品id
+ * @apiParam {Number} status 商品状态
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+ 
+/**
+ * @api {get} /xmallend/item/id 商品列表/详情
+ * @apiName item
+ * @apiGroup 产品管理
+ *
+ * @apiSuccess {Number} cid 分类id
+ * @apiSuccess {String} cname 分类名称
+ * @apiSuccess {String} title 产品标题
+ * @apiSuccess {String} created 创建时间
+ * @apiSuccess {String} image 图片路径
+ * @apiSuccess {String} detail 商品详情
+ * @apiSuccess {Number} id 商品id
+ * @apiSuccess {Number} price 价格
+ * @apiSuccess {String} sellPoint 描述
+ * @apiSuccess {Number} status 状态 1-已发布，0-已下架
+ * @apiSuccess {String} updated 更新日期
+ * @apiSuccess {String} url 频道链接
+ * @apiSuccess {Number} validity 有效期
+ * @apiSuccess {Number} limitNum 限制购买数量
+ * @apiSuccess {Number} num 库存数量
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":{
+ *          cid: -1,
+ *          cname: "所有商品",
+ *          created: "2020-09-23T09:59:03.000+0800",
+ *          id: 1600825527424,
+ *          image: "http://gys-public.oss-cn-beijing.aliyuncs.com/mall/1600825527424/1601284873116.jpg",
+ *          limitNum: 1,
+ *          num: 10,
+ *          price: 0,
+ *          sellPoint: "【免费试用】 木材 石材 混凝土油漆和涂料  砂石  水泥 钢材  ",
+ *          status: 1,
+ *          title: "工程建材",
+ *          updated: "2021-01-18T10:55:53.000+0800",
+ *          url: "https://www.chinabidding.cn/public/2020/html/channel.html?channelid=5",
+ *          validity: 12,
+ *          detail: "<p></p>",
+ *        },
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+/**
+ * @api {post} /xmallend/item/update/id 商品列表/编辑
+ * @apiName update
+ * @apiGroup 产品管理
+ *
+ * @apiParam {String} title 产品标题
+ * @apiParam {String} sellPoint 描述
+ * @apiParam {Number} cid 分类id
+ * @apiParam {String} cname 分类名称
+ * @apiParam {Number} num 库存数量
+ * @apiParam {Number} price 价格
+ * @apiParam {Number} limitNum 限制购买数量
+ * @apiParam {String} image 图片路径
+ * @apiParam {String} detail 商品详情
+ * @apiParam {Number} validity 有效期
+ * @apiParam {String} url 频道链接
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+/**
+ * @api {post} /xmallend/item/add 商品列表/添加
+ * @apiName add
+ * @apiGroup 产品管理
+ *
+ * @apiParam {String} title 产品标题
+ * @apiParam {String} sellPoint 描述
+ * @apiParam {Number} cid 分类id
+ * @apiParam {String} cname 分类名称
+ * @apiParam {Number} num 库存数量
+ * @apiParam {Number} price 价格
+ * @apiParam {Number} limitNum 限制购买数量
+ * @apiParam {String} image 图片路径
+ * @apiParam {String} detail 商品详情
+ * @apiParam {Number} validity 有效期
+ * @apiParam {String} url 频道链接
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+ /**
+ * @api {delete} /xmallend/item/del/[ids] 商品列表/删除
+ * @apiName del
+ * @apiGroup 产品管理
+ *
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+ /**
+ * @api {get} /xmallend/item/search 商品列表/搜索
+ * @apiName search
+ * @apiGroup 产品管理
+ *
+ * @apiParam {Number} page 页码数
+ * @apiParam {Number} size 每页条数
+ * @apiParam {String} search 关键词
+ * @apiParam {String} start 起始时间
+ * @apiParam {String} end 截止时间
+ *
+ * @apiSuccess {Number} cid 分类id
+ * @apiSuccess {String} title 商品名称
+ * @apiSuccess {String} created 创建时间
+ * @apiSuccess {String} image 图片路径
+ * @apiSuccess {Number} id 商品id
+ * @apiSuccess {Number} price 价格
+ * @apiSuccess {String} sellPoint 描述
+ * @apiSuccess {Number} status 状态 1-已发布，0-已下架
+ * @apiSuccess {String} updated 更新日期
+ * @apiSuccess {String} url 频道链接
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":{
+ *          "count":1
+ *          itemList:
+ *            [{
+ *              cid: -1,
+ *              created: "2020-09-23T09:59:03.000+0800",
+ *              id: 1600825527424,
+ *              image: "http://gys-public.oss-cn-beijing.aliyuncs.com/mall/1600825527424/1601284873116.jpg",
+ *              limitNum: 1,
+ *              num: 10,
+ *              price: 0,
+ *              sellPoint: "【免费试用】 木材 石材 混凝土油漆和涂料  砂石  水泥 钢材  ",
+ *              status: 1,
+ *              title: "工程建材",
+ *              updated: "2021-01-18T10:55:53.000+0800",
+ *              url: "https://www.chinabidding.cn/public/2020/html/channel.html?channelid=5",
+ *              validity: 12,
+ *            }]
+ *        },
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+/**
+ * @api {get} /xmallend/order-manager/list 订单管理/列表
+ * @apiName list
+ * @apiGroup 产品管理
+ *
+ * @apiParam {Number} page 页码数
+ * @apiParam {Number} size 每页条数
+ * @apiParam {String} search 关键词
+ *
+ * @apiSuccess {Number} orderId 订单id
+ * @apiSuccess {Number} userId 用户id
+ * @apiSuccess {String} buyerNick 用户账号
+ * @apiSuccess {String} itemName 产品名称
+ * @apiSuccess {Number} payment 支付金额
+ * @apiSuccess {String} buyerMessage 备注
+ * @apiSuccess {String} createTime 创建时间
+ * @apiSuccess {String} paymentTime 支付时间
+ * @apiSuccess {Number} status 订单状态 0-等待付款，1-已付款
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":{
+ *          "count":1
+ *          list:
+ *            [{
+ *              buyerMessage: "",
+ *              buyerNick: "路遥",
+ *              createTime: "2020-09-30T21:19:06.000+0800",
+ *              itemName: "办公家具频道",
+ *              orderId: "1311294500395683840",
+ *              payment: null,
+ *              paymentTime: null,
+ *              status: 0,
+ *              userId: 1291221272486875100,
+ *            }]
+ *        },
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+/**
+ * @api {get} /xmallend/order-manager/count 订单管理/总数据
+ * @apiName count
+ * @apiGroup 产品管理
+ *
+ * @apiSuccess {Number} result 订单总条数
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":10
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+ /**
+ * @api {delete} /xmallend/order-manager/del/[id] 订单管理/删除
+ * @apiName del
+ * @apiGroup 产品管理
+ *
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+  /**
+ * @api {put} /xmallend/order-manager/update/id 订单管理/编辑
+ * @apiName update
+ * @apiGroup 产品管理
+ *
+ * @apiParam {String} note 备注
  * @apiSuccessExample Success-Response:
  *     {
  *        "success": true,

@@ -66,7 +66,7 @@ export const getProductList = (params) => {
   })
 }
 
-// 获取总数居
+// 获取总数据
 export const getCount = () => {
   return axios({
     method: 'get',

@@ -127,14 +127,14 @@
             v-model="isFullScreen"
             @on-change="fullscreenChange"
           ></full-screen>
-          <Dropdown @on-click="handleLanDropdown" class="options">
+         <!--  <Dropdown @on-click="handleLanDropdown" class="options">
             <Icon type="md-globe" :size="24" class="language"></Icon>
             <DropdownMenu slot="list">
               <DropdownItem name="zh-CN">中文</DropdownItem>
               <DropdownItem name="en-US">English</DropdownItem>
             </DropdownMenu>
-          </Dropdown>
-          <lock-screen></lock-screen>
+          </Dropdown> -->
+          <!-- <lock-screen></lock-screen> -->
           <message-tip v-model="mesCount"></message-tip>
           <div class="user-dropdown-menu-con">
             <Row

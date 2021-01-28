@@ -31,7 +31,7 @@
       <Row class="operation" style="margin-bottom: 10px">
         <Button @click="add" type="primary" icon="md-add">添加</Button>
         <Button @click="endPlan" type="primary">结束</Button>
-        <Button @click="releasePlan" type="primary">重发</Button>
+        <Button @click="releasePlan" :disabled="true" type="primary">重发</Button>
         <!-- <Button @click="addAd" type="primary" icon="ios-create-outline">编辑广告</Button> -->
         <Button @click="getDataList" icon="md-refresh">刷新</Button>
       </Row>
@@ -497,10 +497,10 @@ export default {
       getCrmRequest("/ad/fbjh/list", this.searchForm).then((res) => {
         this.loading = false;
         if (res.success) {
-          this.loading = false;
           this.data = res.result.list;
           this.total = res.result.total;
         }
+        this.clearSelectAll();
       });
     },
     // 获取广告下拉列表

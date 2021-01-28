@@ -1,5 +1,13 @@
-<style lang="less">
+<style lang="less" scoped>
 @import "../../../styles/table-common.less";
+.selectWidth /deep/ .ivu-select-dropdown {
+  width: 100% !important;
+  /deep/ .ivu-select-dropdown-list li {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
 </style>
 <template>
   <div>
@@ -17,80 +25,128 @@
               type="text"
               v-model="searchForm.number"
               style="width: 260px"
+              @on-keyup="searchForm.number=searchForm.number.replace(/[, ]/g,'')"
             />
           </Form-item>
-          <Form-item label="对话时间" prop="startTime">
-            <DatePicker
-              type="datetimerange"
-              placeholder="请选择时间"
-              format="yyyy-MM-dd HH:mm"
+          <Form-item label="信息ID" prop="infoId">
+            <Input
+              type="text"
+              v-model="searchForm.infoId"
               style="width: 260px"
-              @on-change="timeChange"
-            ></DatePicker>
+              @on-keyup="searchForm.infoId=searchForm.infoId.replace(/[, ]/g,'')"
+            />
           </Form-item>
           <span v-if="drop">
             <FormItem prop="tag" label="访客标签">
-              <Select v-model="searchForm.tag" multiple style="width: 260px">
+              <Select
+                v-model="searchForm.tag"
+                multiple
+                style="width: 260px"
+                class="selectWidth"
+              >
                 <Option
                   v-for="item in tagList"
+                  :value="item"
+                  :key="item"
+                  :title="item"
+                  >{{ item }}</Option
+                >
+              </Select>
+            </FormItem>
+            <FormItem prop="visitedAreaDealed" label="访客地区处理后">
+              <Select
+                v-model="searchForm.visitedAreaDealed"
+                multiple
+                style="width: 260px"
+              >
+                <Option
+                  v-for="item in handleProvinceList"
                   :value="item.value"
                   :key="item.value"
                   >{{ item.label }}</Option
                 >
               </Select>
             </FormItem>
-            <FormItem prop="totalStart" label="总对话数">
-              <Row style="width: 260px">
-                <Col :span="11">
-                  <Input type="number" v-model="searchForm.totalStart" number />
-                </Col>
-                <Col :span="2" style="text-align: center">-</Col>
-                <Col :span="11">
-                  <Input type="number" v-model="searchForm.totalEnd" number />
-                </Col>
-              </Row>
-            </FormItem>
-            <FormItem prop="serviceStart" label="客服对话数">
+            <Form-item label="对话时间">
+              <DatePicker
+                type="datetimerange"
+                placeholder="请选择时间"
+                format="yyyy-MM-dd HH:mm"
+                style="width: 260px"
+                @on-change="timeChange"
+                v-model="timeRange"
+              ></DatePicker>
+            </Form-item>
+            <FormItem prop="minX" label="总对话数">
               <Row style="width: 260px">
                 <Col :span="11">
                   <Input
-                    type="number"
-                    v-model="searchForm.serviceStart"
-                    number
+                    type="text"
+                    v-model="searchForm.minX"
+                    @on-keyup="handleNumber('minX')"
                   />
                 </Col>
                 <Col :span="2" style="text-align: center">-</Col>
                 <Col :span="11">
-                  <Input type="number" v-model="searchForm.serviceEnd" number />
+                  <Input
+                    type="text"
+                    v-model="searchForm.maxX"
+                    @on-keyup="handleNumber('maxX')"
+                  />
                 </Col>
               </Row>
             </FormItem>
-            <FormItem prop="" label="访客对话数">
+            <FormItem prop="minY" label="客服对话数">
               <Row style="width: 260px">
                 <Col :span="11">
                   <Input
-                    type="number"
-                    v-model="searchForm.visitorStart"
-                    number
+                    type="text"
+                    v-model="searchForm.minY"
+                    @on-keyup="handleNumber('minY')"
                   />
                 </Col>
                 <Col :span="2" style="text-align: center">-</Col>
                 <Col :span="11">
-                  <Input type="number" v-model="searchForm.visitorEnd" number />
+                  <Input
+                    type="text"
+                    v-model="searchForm.maxY"
+                    @on-keyup="handleNumber('maxY')"
+                  />
                 </Col>
               </Row>
             </FormItem>
-            <FormItem prop="visitedSource" label="访客来源处理后">
+            <FormItem prop="minZ" label="访客对话数">
+              <Row style="width: 260px">
+                <Col :span="11">
+                  <Input
+                    type="text"
+                    v-model="searchForm.minZ"
+                    @on-keyup="handleNumber('minZ')"
+                  />
+                </Col>
+                <Col :span="2" style="text-align: center">-</Col>
+                <Col :span="11">
+                  <Input
+                    type="text"
+                    v-model="searchForm.maxZ"
+                    @on-keyup="handleNumber('maxZ')"
+                  />
+                </Col>
+              </Row>
+            </FormItem>
+            <FormItem prop="visitedSourceDealed" label="访客来源处理后">
               <Select
-                v-model="searchForm.visitedSource"
+                v-model="searchForm.visitedSourceDealed"
                 multiple
                 style="width: 260px"
+                class="selectWidth"
               >
                 <Option
                   v-for="item in visitedSourceList"
-                  :value="item.value"
-                  :key="item.value"
-                  >{{ item.label }}</Option
+                  :value="item"
+                  :key="item"
+                  :title="item"
+                  >{{ item }}</Option
                 >
               </Select>
             </FormItem>
@@ -99,53 +155,37 @@
                 v-model="searchForm.sourceStyle"
                 multiple
                 style="width: 260px"
+                class="selectWidth"
               >
                 <Option
                   v-for="item in sourceStyleList"
-                  :value="item.value"
-                  :key="item.value"
-                  >{{ item.label }}</Option
+                  :value="item"
+                  :key="item"
+                  :title="item"
+                  >{{ item }}</Option
                 >
               </Select>
             </FormItem>
-            <FormItem prop="visitedPage" label="咨询页面处理后">
+            <FormItem prop="visitedPageDealed" label="咨询页面处理后">
               <Select
-                v-model="searchForm.visitedPage"
+                v-model="searchForm.visitedPageDealed"
                 multiple
                 style="width: 260px"
+                class="selectWidth"
               >
                 <Option
                   v-for="item in visitedPageList"
-                  :value="item.value"
-                  :key="item.value"
-                  >{{ item.label }}</Option
+                  :value="item"
+                  :key="item"
+                  :title="item"
+                  >{{ item }}</Option
                 >
               </Select>
             </FormItem>
-            <FormItem prop="areaList" label="访客地区">
+
+            <FormItem prop="category" label="一级行业">
               <Select
-                v-model="searchForm.areaList"
-                multiple
-                style="width: 260px"
-              >
-                <Option
-                  v-for="item in provinceList"
-                  :value="item.value"
-                  :key="item.value"
-                  >{{ item.label }}</Option
-                >
-              </Select>
-            </FormItem>
-            <Form-item label="信息ID" prop="infoId">
-              <Input
-                type="text"
-                v-model="searchForm.infoId"
-                style="width: 260px"
-              />
-            </Form-item>
-            <FormItem prop="industry" label="一级行业">
-              <Select
-                v-model="searchForm.industry"
+                v-model="searchForm.category"
                 multiple
                 style="width: 260px"
               >
@@ -157,14 +197,10 @@
                 >
               </Select>
             </FormItem>
-            <FormItem prop="infoArea" label="信息所在地区">
-              <Select
-                v-model="searchForm.infoArea"
-                multiple
-                style="width: 260px"
-              >
+            <FormItem prop="area" label="信息所在地区">
+              <Select v-model="searchForm.area" multiple style="width: 260px">
                 <Option
-                  v-for="item in infoAreaList"
+                  v-for="item in provinceList"
                   :value="item.value"
                   :key="item.value"
                   >{{ item.label }}</Option
@@ -184,8 +220,22 @@
           </Form-item>
         </Form>
       </Row>
-      <Row class="operation" style="margin-bottom: 10px">
-        <Button @click="getDataList" icon="md-refresh">刷新</Button>
+      <Row
+        class="operation"
+        style="margin-bottom: 10px"
+        type="flex"
+        justify="space-between"
+      >
+        <Button
+          @click="downloadData"
+          type="info"
+          icon="ios-cloud-download-outline"
+          :disabled="downloadFlag"
+          >数据下载</Button
+        >
+        <Button @click="getDataList" type="primary" icon="md-refresh"
+          >刷新</Button
+        >
       </Row>
       <Row>
         <Table
@@ -215,38 +265,44 @@
 </template>
 <script>
 import { getCrmRequest, postCrmRequest } from "@/api/crm";
-import { provinceList } from "./provinceList";
+import { provinceList, tradeList, handleProvinceList } from "./provinceList";
+import qs from "qs";
 export default {
   name: "filterData",
   data() {
     return {
+      timeRange: [new Date(new Date() - 7 * 24 * 3600 * 1000), new Date()],
       tagList: [],
       visitedSourceList: [],
       sourceStyleList: [],
       visitedPageList: [],
-      industryList:[],
-      infoArea:[],
-      provinceList: provinceList,
+      industryList: tradeList, // 一级行业
+      provinceList: provinceList, // 访客地区
+      handleProvinceList: handleProvinceList, // 访客地区处理后
       searchForm: {
         pageSize: 20,
         pageNum: 1,
+        flag: 0,
         number: "",
-        startTime: "",
-        endTime: "",
-        totalStart: "",
-        totalEnd: "",
-        serviceStart: "",
-        serviceEnd: "",
-        visitorStart: "",
-        visitorEnd: "",
-        areaList: [],
+        infoId: "",
         tag: [],
+        visitedAreaDealed: [],
+        startcontactTime: this.format(
+          new Date(new Date() - 7 * 24 * 3600 * 1000),
+          "yyyy-MM-dd HH:mm"
+        ),
+        endcontactTime: this.format(new Date(), "yyyy-MM-dd HH:mm"),
+        minX: "",
+        maxX: "",
+        minY: "",
+        maxY: "",
+        minZ: "",
+        maxZ: "",
+        visitedSourceDealed: [],
         sourceStyle: [],
-        visitedSource: [],
-        visitedPage: [],
-        infoId:'',
-        industry:[],
-        infoArea:[]
+        visitedPageDealed: [],
+        category: [],
+        area: [],
       },
       loading: false,
       columns: [
@@ -257,6 +313,12 @@ export default {
           key: "number",
         },
         {
+          title: "信息id",
+          minWidth: 120,
+          align: "center",
+          key: "infoId",
+        },
+        {
           title: "访客标签",
           minWidth: 120,
           align: "center",
@@ -264,19 +326,19 @@ export default {
         },
         {
           title: "总对话数",
-          width: 120,
+          width: 100,
           align: "center",
           key: "x",
         },
         {
           title: "客服对话数",
-          width: 120,
+          width: 110,
           align: "center",
           key: "y",
         },
         {
           title: "访客对话数",
-          width: 120,
+          width: 110,
           align: "center",
           key: "z",
         },
@@ -294,9 +356,9 @@ export default {
         },
         {
           title: "访问来源处理后",
-          minWidth: 120,
+          minWidth: 140,
           align: "center",
-          key: "visitedSource",
+          key: "visitedSourceDealed",
         },
         {
           title: "来源风格",
@@ -312,33 +374,28 @@ export default {
         },
         {
           title: "咨询页面处理后",
-          minWidth: 120,
+          minWidth: 140,
           align: "center",
-          key: "visitedPage",
+          key: "visitedPageDealed",
         },
-        {
-          title: "信息id",
-          minWidth: 120,
-          align: "center",
-          key: "visitedPage",
-        },
+
         {
           title: "一级行业",
           minWidth: 120,
           align: "center",
-          key: "visitedPage",
+          key: "category",
         },
         {
           title: "信息地区",
           minWidth: 120,
           align: "center",
-          key: "visitedPage",
+          key: "area",
         },
         {
           title: "访客地区处理后",
-          minWidth: 120,
+          minWidth: 140,
           align: "center",
-          key: "visitedPage",
+          key: "visitedAreaDealed",
         },
       ],
       data: [],
@@ -346,10 +403,23 @@ export default {
       dropDownContent: "展开",
       dropDownIcon: "ios-arrow-down",
       drop: false,
+      downloadFlag: true,
     };
   },
+  activated() {
+    this.getDataList()
+  },
   methods: {
-    getDataList() {},
+    getDataList() {
+      this.loading = true;
+      postCrmRequest("/data_analysis/search", this.searchForm).then((res) => {
+        this.loading = false;
+        if (res.success) {
+          this.data = res.result.content;
+          this.total = res.result.totalElements;
+        }
+      });
+    },
     changePage(v) {
       this.searchForm.pageNum = v;
       this.getDataList();
@@ -358,24 +428,89 @@ export default {
       this.searchForm.pageSize = v;
       this.getDataList();
     },
+    // 数据下载
+    downloadData() {
+      let data = { ...this.searchForm };
+      delete data.pageSize;
+      delete data.pageNum;
+      delete data.flag;
+      postCrmRequest('/data_analysis/search_dowload', data).then(res => {
+        if(res.success){
+          this.$Message.success('操作成功！');
+          this.downloadFlag = true;
+        }
+      })
+      console.log(data, this.searchForm);
+    },
+    // 访问标签下拉选
+    getTagList() {
+      getCrmRequest("/data_analysis/select_tag").then((res) => {
+        if (res.success) {
+          this.tagList = res.result;
+        }
+      });
+    },
+    // 访问来源下拉选
+    getVisitedSource() {
+      getCrmRequest("/data_analysis/select_fwly").then((res) => {
+        if (res.success) {
+          this.visitedSourceList = res.result;
+        }
+      });
+    },
+    // 咨询页面下拉选
+    getVisitedPage() {
+      getCrmRequest("/data_analysis/select_zxym").then((res) => {
+        if (res.success) {
+          this.visitedPageList = res.result;
+        }
+      });
+    },
+    // 来源风格下拉选
+    getSourceStyle() {
+      getCrmRequest("/data_analysis/select_lystyle").then((res) => {
+        if (res.success) {
+          this.sourceStyleList = res.result;
+        }
+      });
+    },
     // 重置
     handleReset() {
       this.$refs.searchForm.resetFields();
+      this.downloadFlag = true;
       this.searchForm.pageNum = 1;
       this.searchForm.pageSize = 20;
+      this.searchForm.flag = 1;
+      this.searchForm.startcontactTime = this.format(
+        new Date(new Date() - 7 * 24 * 3600 * 1000),
+        "yyyy-MM-dd HH:mm"
+      );
+      this.searchForm.endcontactTime = this.format(
+        new Date(),
+        "yyyy-MM-dd HH:mm"
+      );
+      this.timeRange = [
+        new Date(new Date() - 7 * 24 * 3600 * 1000),
+        new Date(),
+      ];
+      this.searchForm.maxX = "";
+      this.searchForm.maxY = "";
+      this.searchForm.maxZ = "";
       this.getDataList();
     },
     // 查询
     handleSearch() {
       this.searchForm.pageNum = 1;
       this.searchForm.pageSize = 20;
+      this.searchForm.flag = 1;
+      this.downloadFlag = false;
+      console.log(this.searchForm);
       this.getDataList();
     },
     // 时间选择
     timeChange(v) {
-      console.log(v);
-      this.searchForm.startTime = v[0];
-      this.searchForm.endTime = v[1];
+      this.searchForm.startcontactTime = v[0];
+      this.searchForm.endcontactTime = v[1];
     },
     dropDown() {
       if (this.drop) {
@@ -387,9 +522,24 @@ export default {
       }
       this.drop = !this.drop;
     },
+    // 输入数字
+    handleNumber(name) {
+      if ((this.searchForm[name].length === 1) & (parseInt(this.searchForm[name]) === 0)) {
+        this.searchForm[name] = 0;
+      } else {
+        this.searchForm[name] = this.searchForm[name].replace(
+          /^(0+)|[^\d]+/g,
+          ""
+        );
+      }
+    },
   },
   mounted() {
     this.getDataList();
+    this.getTagList();
+    this.getVisitedSource();
+    this.getVisitedPage();
+    this.getSourceStyle();
   },
 };
 </script>
