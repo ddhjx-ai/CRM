@@ -185,6 +185,7 @@
                 v-model="releaseForm.channelId"
                 @on-change="selectChange1"
                 placeholder="请选择"
+                filterable
               >
                 <Option
                   v-for="item in channelList"
@@ -199,6 +200,7 @@
                 v-model="releaseForm.pageId"
                 @on-change="selectChange2"
                 placeholder="请选择页面"
+                filterable
               >
                 <Option
                   v-for="item in pageList"
@@ -212,6 +214,7 @@
               <Select
                 v-model="releaseForm.guanggaoweiId"
                 @on-change="selectChange3"
+                filterable
                 :placeholder="
                   ggwList.length > 0 ? '请选择广告位' : '该页面没有广告位'
                 "
@@ -480,7 +483,7 @@ export default {
   },
   // 表格动态列 计算属性
   computed: {},
-  mounted() {
+  activated() {
     this.init();
   },
   methods: {
@@ -688,6 +691,9 @@ export default {
       });
     },
     selectChange1(v) {
+      if(v === undefined){
+        return
+      }
       this.pageList = [];
       this.ggwList = [];
       this.releaseForm.pageId = '';

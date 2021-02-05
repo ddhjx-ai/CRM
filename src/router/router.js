@@ -5,7 +5,7 @@ export const loginRouter = {
     path: '/login',
     name: 'login',
     meta: {
-        title: '采购与招标网-运营中台'
+        title: '中台管理系统'
     },
     component: () => import('@/views/login.vue')
 };
@@ -15,7 +15,7 @@ export const wuhanRouter = {
     path: '/wuhan',
     name: 'wuhan',
     meta: {
-        title: '采购与招标网-运营中台'
+        title: '中台管理系统'
     },
     component: () => import('@/views/weiXin/wuHan.vue')
 };
@@ -23,7 +23,7 @@ export const beijingRouter = {
     path: '/beijing',
     name: 'beijing',
     meta: {
-        title: '采购与招标网-运营中台'
+        title: '中台管理系统'
     },
     component: () => import('@/views/weiXin/beiJing.vue')
 };
@@ -32,7 +32,7 @@ export const registRouter = {
     path: '/regist',
     name: 'regist',
     meta: {
-        title: '采购与招标网-运营中台'
+        title: '中台管理系统'
     },
     component: () => import('@/views/regist.vue')
 };
@@ -41,7 +41,7 @@ export const registResult = {
     path: '/regist-result',
     name: 'regist-result',
     meta: {
-        title: '采购与招标网-运营中台'
+        title: '中台管理系统'
     },
     component: () => import('@/views/regist-result.vue')
 };
@@ -50,7 +50,7 @@ export const reset = {
     path: '/reset',
     name: 'reset',
     meta: {
-        title: '采购与招标网-运营中台'
+        title: '中台管理系统'
     },
     component: () => import('@/views/reset.vue')
 };
@@ -59,7 +59,7 @@ export const relateRouter = {
     path: '/relate',
     name: 'relate',
     meta: {
-        title: '采购与招标网-运营中台'
+        title: '中台管理系统'
     },
     component: () => import('@/views/relate.vue')
 };
@@ -68,7 +68,7 @@ export const authorizeRouter = {
     path: '/authorize',
     name: 'authorize',
     meta: {
-        title: '采购与招标网-运营中台'
+        title: '中台管理系统'
     },
     component: () => import('@/views/authorize.vue')
 };

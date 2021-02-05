@@ -2,6 +2,30 @@
 <template>
   <div class="search">
     <Card>
+      <Row>
+        <Form
+          ref="searchForm"
+          :model="searchForm"
+          inline
+          :label-width="80"
+          label-position="right"
+        >
+          <Form-item label="快速查找" prop="alias">
+            <Input
+              type="text"
+              v-model="searchForm.alias"
+              placeholder="根据别名查找"
+              style="width: 200px"
+            />
+          </Form-item>
+          <Form-item class="operation">
+            <Button @click="handleSearch" type="primary" icon="ios-search"
+              >查询</Button
+            >
+            <Button @click="handleReset">重置</Button>
+          </Form-item>
+        </Form>
+      </Row>
       <Row class="operation" style="margin-bottom:10px">
         <Button @click="add" type="primary" icon="md-add">添加</Button>
         <Button @click="getDataList" icon="md-refresh">刷新</Button>
@@ -17,7 +41,7 @@
           @on-selection-change="changeSelect"
         ></Table>
       </Row>
-      <Row type="flex" justify="end" class="page">
+      <Row type="flex" justify="end" class="page" style="margin-top:10px;">
         <Page
           :current="searchForm.page"
           :total="total"
@@ -86,6 +110,7 @@ export default {
         // 搜索框对应data对象
         page: 1, // 当前页数
         size: 10, // 页面大小
+        alias:'',
       },
       modalType: 0, // 添加或编辑标识
       modalVisible: false, // 添加或编辑显示
@@ -346,6 +371,19 @@ export default {
     changeSelect(e) {
       this.selectList = e;
       this.selectCount = e.length;
+    },
+    // 查询
+    handleSearch() {
+      this.searchForm.page = 1;
+      this.searchForm.size = 10;
+      this.getDataList();
+    },
+    // 重置
+    handleReset() {
+      this.searchForm.page = 1;
+      this.searchForm.size = 10;
+      this.$refs.searchForm.resetFields();
+      this.getDataList();
     },
     delAll() {
       if (this.selectCount <= 0) {

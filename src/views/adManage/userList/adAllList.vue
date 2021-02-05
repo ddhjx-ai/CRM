@@ -214,7 +214,7 @@ export default {
       this.getDataList();
     },
   },
-  mounted() {
+  activated() {
     this.init();
   },
 };

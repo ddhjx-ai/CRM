@@ -1,19 +1,32 @@
 <template>
   <div class="app_container">
     <Card>
-      <Row class="operation" style="margin-bottom:10px">
-        <Form ref="searchForm" :model="searchForm" inline :label-width="80" label-position="right">
+      <Row class="operation" style="margin-bottom: 10px">
+        <Form
+          ref="searchForm"
+          :model="searchForm"
+          inline
+          :label-width="80"
+          label-position="right"
+        >
           <Form-item label="IP" prop="ipRaw">
-            <Input type="text" v-model="searchForm.ipRaw" clearable style="width: 200px;" />
+            <Input
+              type="text"
+              v-model="searchForm.ipRaw"
+              clearable
+              style="width: 200px"
+            />
           </Form-item>
-          <Form-item style="margin-left:-35px;" class="br">
-            <Button @click="handleSearch" type="primary" icon="ios-search">查询</Button>
+          <Form-item style="margin-left: -35px" class="br">
+            <Button @click="handleSearch" type="primary" icon="ios-search"
+              >查询</Button
+            >
             <Button @click="handleReset">重置</Button>
           </Form-item>
         </Form>
       </Row>
-      <Row class="operation" style="margin-bottom:10px">
-        <Button @click="add" type="primary" icon="md-add">添加</Button>
+      <Row class="operation" style="margin-bottom: 10px">
+        <Button @click="add" type="primary" icon="md-add">添加IP</Button>
         <Button @click="getDataList" icon="md-refresh">刷新</Button>
       </Row>
       <Row>
@@ -29,12 +42,12 @@
       </Row>
       <Row type="flex" justify="end" class="page">
         <Page
-          :current="searchForm.page"
+          :current="searchForm.offset"
           :total="total"
-          :page-size="searchForm.size"
+          :page-size="searchForm.limit"
           @on-change="changePage"
           @on-page-size-change="changesize"
-          :page-size-opts="[10,20,50]"
+          :page-size-opts="[10, 20, 50]"
           size="small"
           show-total
           show-elevator
@@ -43,7 +56,12 @@
       </Row>
     </Card>
 
-    <Modal :title="modalTitle" v-model="modalVisible" :mask-closable="false" :width="500">
+    <Modal
+      :title="modalTitle"
+      v-model="modalVisible"
+      :mask-closable="false"
+      :width="500"
+    >
       <Form ref="form" :model="form" :label-width="80" :rules="formValidate">
         <FormItem label="IP" prop="ipRaw">
           <Input v-model="form.ipRaw" />
@@ -54,89 +72,27 @@
       </Form>
       <div slot="footer">
         <Button type="text" @click="handleCancel">取消</Button>
-        <Button type="primary" :loading="submitLoading" @click="handleSubmit">提交</Button>
+        <Button type="primary" :loading="submitLoading" @click="handleSubmit"
+          >提交</Button
+        >
       </div>
     </Modal>
   </div>
 </template>
 
 <script>
+import { getCrmRequest, removeCrm, postCrmRequest } from "@/api/crm";
 import { validateIP } from "@/libs/validate";
 export default {
   name: "whiteList",
   data() {
     return {
       searchForm: {
-        page: 1,
-        size: 10,
+        offset: 1,
+        limit: 10,
         ipRaw: "",
       },
-      data: [
-        {
-          comments: "测试1",
-          id: 2,
-          ip: 3232237727,
-          ipRaw: "192.168.8.159",
-          lastModify: 1562033166000,
-        },
-        {
-          comments: "测试2",
-          id: 3,
-          ip: 3232237725,
-          ipRaw: "192.168.8.157",
-          lastModify: 1562033461000,
-        },
-        {
-          comments: "测试3",
-          id: 4,
-          ip: 187475323,
-          ipRaw: "11.44.165.123",
-          lastModify: 1562033623000,
-        },
-        {
-          comments: "测试4",
-          id: 5,
-          ip: 4294967295,
-          ipRaw: "255.255.255.255",
-          lastModify: 1562033575000,
-        },
-        {
-          comments: "公司内部IP",
-          id: 7,
-          ip: 2051446435,
-          ipRaw: "122.70.150.163",
-          lastModify: 1562835966000,
-        },
-        {
-          comments: "公司内部IP",
-          id: 8,
-          ip: 2051446436,
-          ipRaw: "122.70.150.164",
-          lastModify: 1562835978000,
-        },
-        {
-          comments: "公司内部IP",
-          id: 9,
-          ip: 2051446437,
-          ipRaw: "122.70.150.165",
-          lastModify: 1562835990000,
-        },
-        {
-          comments: "公司内部IP",
-          id: 10,
-          ip: 2051446434,
-          ipRaw: "122.70.150.162",
-          lastModify: 1563156730000,
-        },
-        {
-          comments: "广告部",
-          id: 11,
-          ip: 3395498806,
-          ipRaw: "202.99.51.54",
-          lastModify: 1591262390000,
-        },
-      ],
-
+      data: [],
       total: 0,
       columns: [
         {
@@ -163,7 +119,14 @@ export default {
           minWidth: 150,
           align: "center",
           render: (h, params) => {
-            return h("div", {}, this.formateDate(params.row.lastModify));
+            return h(
+              "div",
+              {},
+              this.format(
+                new Date(params.row.lastModify),
+                "yyyy-MM-dd HH:mm:ss"
+              )
+            );
           },
         },
         {
@@ -236,42 +199,43 @@ export default {
     this.getDataList();
   },
   methods: {
-    //   时间处理
-    formateDate(date) {
-      date = new Date(date);
-      let year = date.getFullYear();
-      let month = (date.getMonth() + 1).toString().padStart(2, "0");
-      let day = date.getDate().toString().padStart(2, "0");
-      let hour = date.getHours().toString().padStart(2, "0");
-      let minute = date.getMinutes().toString().padStart(2, "0");
-      let second = date.getSeconds().toString().padStart(2, "0");
-
-      return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
-    },
     changePage(v) {
-      this.searchForm.page = v;
+      this.searchForm.offset = v;
       this.getDataList();
-      this.clearSelectAll();
     },
     changesize(v) {
-      this.searchForm.size = v;
+      this.searchForm.limit = v;
       this.getDataList();
     },
     clearSelectAll() {
       this.$refs.table.selectAll(false);
     },
     // 获取列表数据
-    getDataList() {},
+    getDataList() {
+      this.loading = true;
+      getCrmRequest("/manageinfo/whiteip/list", this.searchForm).then((res) => {
+        this.loading = false;
+        if (res.success) {
+          this.total = res.result.count;
+          this.data = res.result.list;
+          this.clearSelectAll();
+        }
+      });
+    },
     // 重置
     handleReset() {
       this.$refs.searchForm.resetFields();
-      this.searchForm.page = 1;
-      this.searchForm.size = 10;
+      this.searchForm.offset = 1;
+      this.searchForm.limit = 10;
       // 重新加载数据
       this.getDataList();
     },
     // 查询
-    handleSearch() {},
+    handleSearch() {
+      this.searchForm.offset = 1;
+      this.searchForm.limit = 10;
+      this.getDataList();
+    },
     // 添加
     add() {
       this.modalType = 0;
@@ -299,36 +263,19 @@ export default {
     handleCancel() {
       this.modalVisible = false;
     },
-    // 搜索
-    handleSearch() {
-      this.searchForm.page = 1;
-      this.searchForm.size = 10;
-      let data = {
-        ...this.searchForm,
-      };
-      this.loading = true;
-      searchProduct(data).then((res) => {
-        this.loading = false;
-        if (res.success) {
-          this.data = res.result.itemList;
-          this.total = res.result.count;
-        }
-      });
-    },
     // 删除
     remove(v) {
-      console.log(v);
       this.$Modal.confirm({
         title: "确认删除",
         // 记得确认修改此处
-        content: "您确认要删除 " + v.name + " ?",
+        content: "您确认要删除该数据?",
         loading: true,
         onOk: () => {
           // 模拟请求成功
-          removeCrm("/website/sites" + [v.id]).then((res) => {
+          removeCrm("/manageinfo/whiteip/delete/" + v.id).then((res) => {
             this.$Modal.remove();
             if (res.success) {
-              this.$Message.success("操作成功");
+              this.$Message.success("删除成功");
               this.getDataList();
             }
           });
@@ -337,18 +284,16 @@ export default {
     },
     // 提交
     handleSubmit() {
-      console.log(this.form);
-      let data = {
-        ipRaw: this.form.ipRaw,
-        comments: this.form.comments,
-      };
-      console.log(data);
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.submitLoading = true;
           if (this.modalType == 0) {
+            let data = {
+              ipRaw: this.form.ipRaw,
+              comments: this.form.comments,
+            };
             // 添加 避免编辑后传入id等数据 记得删除
-            postCrmRequest("/website/sites/add", qs.stringify(this.form)).then(
+            postCrmRequest("/manageinfo/whiteip/save_ip_info", data).then(
               (res) => {
                 this.submitLoading = false;
                 if (res.success) {
@@ -360,28 +305,24 @@ export default {
             );
           } else {
             // 编辑
-            postCrmRequest(
-              "/website/sites/update/" + this.updateId,
-              qs.stringify(data)
-            ).then((res) => {
-              this.submitLoading = false;
-              if (res.success) {
-                this.$Message.success("操作成功");
-                this.getDataList();
-                this.modalVisible = false;
+            let data = {
+              ipRaw: this.form.ipRaw,
+              comments: this.form.comments,
+              id: this.updateId,
+            };
+            postCrmRequest("/manageinfo/whiteip/save_ip_info", data).then(
+              (res) => {
+                this.submitLoading = false;
+                if (res.success) {
+                  this.$Message.success("操作成功");
+                  this.getDataList();
+                  this.modalVisible = false;
+                }
               }
-            });
+            );
           }
         }
       });
-    },
-    // 重置
-    handleReset() {
-      this.$refs.searchForm.resetFields();
-      this.searchForm.page = 1;
-      this.searchForm.size = 10;
-      // 重新加载数据
-      this.getDataList();
     },
   },
 };

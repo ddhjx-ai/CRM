@@ -61,7 +61,7 @@
                 <Input
                   v-model="mainUrlModalForm.title"
                   placeholder="请输入导航名，如 xx频道分类"
-                  @on-keyup="mainUrlModalForm.title=mainUrlModalForm.title.replace(/[, ]/g,'')"
+                  @on-keyup="mainUrlModalForm.title=mainUrlModalForm.title.trim().replace(/[ ]/g,'')"
                 />
               </FormItem>
             </Row>
@@ -390,7 +390,7 @@
                       type="text"
                       v-model="newModalForm.name"
                       placeholder="请输入新模块标题"
-                      @on-keyup="newModalForm.name=newModalForm.name.replace(/[, ]/g,'')"
+                      @on-keyup="newModalForm.name=newModalForm.name.trim().replace(/[ ]/g,'')"
                     ></Input>
                   </FormItem>
                 </Col>
@@ -613,7 +613,7 @@
                       type="text"
                       v-model="downloadModalForm.name"
                       placeholder="请输入附件下载模块标题"
-                      @on-keyup="downloadModalForm.name=downloadModalForm.name.replace(/[, ]/g,'')"
+                      @on-keyup="downloadModalForm.name=downloadModalForm.name.trim().replace(/[ ]/g,'')"
                     ></Input>
                   </FormItem>
                 </Col>
@@ -782,7 +782,7 @@
                         type="text"
                         v-model="asideModalForm.name"
                         placeholder="请输入右边模块标题"
-                        @on-keyup="asideModalForm.name=asideModalForm.name.replace(/[, ]/g,'')"
+                        @on-keyup="asideModalForm.name=asideModalForm.name.trim().replace(/[ ]/g,'')"
                       ></Input>
                     </FormItem>
                   </Col>
@@ -807,7 +807,7 @@
                         type="text"
                         v-model="item.name"
                         placeholder="必填，请输入内容"
-                        @on-keyup="item.name=item.name.replace(/[, ]/g,'')"
+                        @on-keyup="item.name=item.name.trim().replace(/[ ]/g,'')"
                       ></Input>
                     </FormItem>
                   </Col>
@@ -957,7 +957,7 @@
                 type="text"
                 v-model="labelModalForm.name"
                 placeholder="请输入数据展示模块标题"
-                @on-keyup="labelModalForm.name=labelModalForm.name.replace(/[, ]/g,'')"
+                @on-keyup="labelModalForm.name=labelModalForm.name.trim().replace(/[ ]/g,'')"
               ></Input>
             </FormItem>
           </Col>
@@ -1147,7 +1147,7 @@
                 type="text"
                 v-model="contentModalForm.name"
                 placeholder="请输入中间模块标题"
-                @on-keyup="contentModalForm.name=contentModalForm.name.replace(/[, ]/g,'')"
+                @on-keyup="contentModalForm.name=contentModalForm.name.trim().replace(/[ ]/g,'')"
               ></Input>
             </FormItem>
           </Col>
@@ -1276,7 +1276,7 @@
                 type="text"
                 v-model="item.name"
                 placeholder="请输入"
-                @on-keyup="item.name=item.name.replace(/[, ]/g,'')"
+                @on-keyup="item.name=item.name.trim().replace(/[ ]/g,'')"
               ></Input>
             </FormItem>
           </Col>

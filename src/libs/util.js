@@ -9,7 +9,7 @@ let util = {
 };
 
 util.title = function (title) {
-    title = '采购与招标网-运营中心';
+    title = '中台管理系统';
     // title = "OSC-" + title;
     window.document.title = title;
 };

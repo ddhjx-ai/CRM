@@ -1,19 +1,32 @@
 <template>
   <div class="app_container">
     <Card>
-      <Row class="operation" style="margin-bottom:10px">
-        <Form ref="searchForm" :model="searchForm" inline :label-width="80" label-position="right">
+      <Row class="operation" style="margin-bottom: 10px">
+        <Form
+          ref="searchForm"
+          :model="searchForm"
+          inline
+          :label-width="80"
+          label-position="right"
+        >
           <Form-item label="用户名" prop="loginId">
-            <Input type="text" v-model="searchForm.loginId" clearable style="width: 200px;" />
+            <Input
+              type="text"
+              v-model="searchForm.loginId"
+              clearable
+              style="width: 200px"
+            />
           </Form-item>
-          <Form-item style="margin-left:-35px;" class="br">
-            <Button @click="handleSearch" type="primary" icon="ios-search">查询</Button>
+          <Form-item style="margin-left: -35px" class="br">
+            <Button @click="handleSearch" type="primary" icon="ios-search"
+              >查询</Button
+            >
             <Button @click="handleReset">重置</Button>
           </Form-item>
         </Form>
       </Row>
-      <Row class="operation" style="margin-bottom:10px">
-        <Button @click="add" type="primary" icon="md-add">添加</Button>
+      <Row class="operation" style="margin-bottom: 10px">
+        <Button @click="add" type="primary" icon="md-add">添加用户</Button>
         <Button @click="getDataList" icon="md-refresh">刷新</Button>
       </Row>
       <Row>
@@ -29,12 +42,12 @@
       </Row>
       <Row type="flex" justify="end" class="page">
         <Page
-          :current="searchForm.page"
+          :current="searchForm.offset"
           :total="total"
-          :page-size="searchForm.size"
+          :page-size="searchForm.limit"
           @on-change="changePage"
           @on-page-size-change="changesize"
-          :page-size-opts="[10,20,50]"
+          :page-size-opts="[10, 20, 50]"
           size="small"
           show-total
           show-elevator
@@ -43,7 +56,12 @@
       </Row>
     </Card>
 
-    <Modal :title="modalTitle" v-model="modalVisible" :mask-closable="false" :width="500">
+    <Modal
+      :title="modalTitle"
+      v-model="modalVisible"
+      :mask-closable="false"
+      :width="500"
+    >
       <Form ref="form" :model="form" :label-width="80" :rules="formValidate">
         <FormItem label="用户名" prop="loginId">
           <Input v-model="form.loginId" />
@@ -54,40 +72,27 @@
       </Form>
       <div slot="footer">
         <Button type="text" @click="handleCancel">取消</Button>
-        <Button type="primary" :loading="submitLoading" @click="handleSubmit">提交</Button>
+        <Button type="primary" :loading="submitLoading" @click="handleSubmit"
+          >提交</Button
+        >
       </div>
     </Modal>
   </div>
 </template>
 
 <script>
+import { getCrmRequest, removeCrm, postCrmRequest } from "@/api/crm";
 import { validateIP } from "@/libs/validate";
 export default {
   name: "userWhiteList",
   data() {
     return {
       searchForm: {
-        page: 1,
-        size: 10,
+        offset: 1,
+        limit: 10,
         loginId: "",
       },
-      data: [
-        {
-          comments: "测试1",
-          id: 1,
-          lastModify: 1562033181000,
-          loginId: "zhanghaitao",
-          memberId: 7927182,
-        },
-        {
-          comments: "测试2",
-          id: 2,
-          lastModify: 1562033234000,
-          loginId: "wangwu",
-          memberId: 4400571,
-        },
-      ],
-
+      data: [],
       total: 0,
       columns: [
         {
@@ -114,7 +119,14 @@ export default {
           minWidth: 150,
           align: "center",
           render: (h, params) => {
-            return h("div", {}, this.formateDate(params.row.lastModify));
+            return h(
+              "div",
+              {},
+              this.format(
+                new Date(params.row.lastModify),
+                "yyyy-MM-dd HH:mm:ss"
+              )
+            );
           },
         },
         {
@@ -186,22 +198,9 @@ export default {
     this.getDataList();
   },
   methods: {
-    //   时间处理
-    formateDate(date) {
-      date = new Date(date);
-      let year = date.getFullYear();
-      let month = (date.getMonth() + 1).toString().padStart(2, "0");
-      let day = date.getDate().toString().padStart(2, "0");
-      let hour = date.getHours().toString().padStart(2, "0");
-      let minute = date.getMinutes().toString().padStart(2, "0");
-      let second = date.getSeconds().toString().padStart(2, "0");
-
-      return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
-    },
     changePage(v) {
-      this.searchForm.page = v;
+      this.searchForm.offset = v;
       this.getDataList();
-      this.clearSelectAll();
     },
     changesize(v) {
       this.searchForm.size = v;
@@ -211,17 +210,33 @@ export default {
       this.$refs.table.selectAll(false);
     },
     // 获取列表数据
-    getDataList() {},
+    getDataList() {
+      this.loading = true;
+      getCrmRequest("/manageinfo/whiteUser/findUserList", this.searchForm).then(
+        (res) => {
+          this.loading = false;
+          if (res.success) {
+            this.total = res.result.count;
+            this.data = res.result.list;
+            this.clearSelectAll();
+          }
+        }
+      );
+    },
     // 重置
     handleReset() {
       this.$refs.searchForm.resetFields();
-      this.searchForm.page = 1;
-      this.searchForm.size = 10;
+      this.searchForm.offset = 1;
+      this.searchForm.limit = 10;
       // 重新加载数据
       this.getDataList();
     },
     // 查询
-    handleSearch() {},
+    handleSearch() {
+      this.searchForm.offset = 1;
+      this.searchForm.limit = 10;
+      this.getDataList();
+    },
     // 添加
     add() {
       this.modalType = 0;
@@ -249,33 +264,17 @@ export default {
     handleCancel() {
       this.modalVisible = false;
     },
-    // 搜索
-    handleSearch() {
-      this.searchForm.page = 1;
-      this.searchForm.size = 10;
-      let data = {
-        ...this.searchForm,
-      };
-      this.loading = true;
-      searchProduct(data).then((res) => {
-        this.loading = false;
-        if (res.success) {
-          this.data = res.result.itemList;
-          this.total = res.result.count;
-        }
-      });
-    },
     // 删除
     remove(v) {
       console.log(v);
       this.$Modal.confirm({
         title: "确认删除",
         // 记得确认修改此处
-        content: "您确认要删除 " + v.name + " ?",
+        content: "您确认要删除当前数据?",
         loading: true,
         onOk: () => {
           // 模拟请求成功
-          removeCrm("/website/sites" + [v.id]).then((res) => {
+          removeCrm("/manageinfo/whiteUser/delete" + v.id).then((res) => {
             this.$Modal.remove();
             if (res.success) {
               this.$Message.success("操作成功");
@@ -287,22 +286,21 @@ export default {
     },
     // 提交
     handleSubmit() {
-      console.log(this.form);
-      let data = {
-        ipRaw: this.form.ipRaw,
-        comments: this.form.comments,
-      };
-      console.log(data);
       this.$refs.form.validate((valid) => {
         if (valid) {
           this.submitLoading = true;
           if (this.modalType == 0) {
+            let data = {
+              loginId: this.form.loginId,
+              comments: this.form.comments,
+            };
+            console.log(data);
             // 添加 避免编辑后传入id等数据 记得删除
-            postCrmRequest("/website/sites/add", qs.stringify(this.form)).then(
+            postCrmRequest("/manageinfo/whiteUser/save_user_info", data).then(
               (res) => {
                 this.submitLoading = false;
                 if (res.success) {
-                  this.$Message.success("操作成功");
+                  this.$Message.success("添加成功");
                   this.getDataList();
                   this.modalVisible = false;
                 }
@@ -310,28 +308,25 @@ export default {
             );
           } else {
             // 编辑
-            postCrmRequest(
-              "/website/sites/update/" + this.updateId,
-              qs.stringify(data)
-            ).then((res) => {
-              this.submitLoading = false;
-              if (res.success) {
-                this.$Message.success("操作成功");
-                this.getDataList();
-                this.modalVisible = false;
+            let data = {
+              loginId: this.form.loginId,
+              comments: this.form.comments,
+              id: this.updateId,
+            };
+            console.log(data);
+            postCrmRequest("/manageinfo/whiteUser/save_user_info", data).then(
+              (res) => {
+                this.submitLoading = false;
+                if (res.success) {
+                  this.$Message.success("编辑成功");
+                  this.getDataList();
+                  this.modalVisible = false;
+                }
               }
-            });
+            );
           }
         }
       });
-    },
-    // 重置
-    handleReset() {
-      this.$refs.searchForm.resetFields();
-      this.searchForm.page = 1;
-      this.searchForm.size = 10;
-      // 重新加载数据
-      this.getDataList();
     },
   },
 };

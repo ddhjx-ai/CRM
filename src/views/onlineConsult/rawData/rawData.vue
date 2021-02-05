@@ -8,12 +8,17 @@
         <Button type="primary" @click="handleImport" icon="md-cloud-upload"
           >批量导入数据</Button
         >
-        <Button @click="getDataList" icon="md-refresh"
-          >刷新</Button
-        >
+        <Button @click="getDataList" icon="md-refresh">刷新</Button>
       </Row>
       <Row>
-        <Alert show-icon>上次上传时间：{{lastTime}}，成功添加{{successCount}}条数据，失败(重复){{failCount}}条数据</Alert>
+        <Alert show-icon>
+          <p v-if="lastTime">
+            上次上传时间：{{ lastTime }}，成功添加{{
+              successCount
+            }}条数据，失败(重复){{ failCount }}条数据
+          </p>
+          <p v-else>您还没有上传记录！</p>
+        </Alert>
         <Table
           :loading="loading"
           border
@@ -40,7 +45,13 @@
 
     <Modal title="导入数据" closable v-model="importModalVisible" width="500">
       <!-- <Alert type="warning" show-icon>第一步：下载模板；第二步，编写内容；第三步，批量导入</Alert> -->
-      <Button @click="downloadTemple" type="info" style="margin-bottom:20px;" icon="ios-cloud-download-outline">下载Excel模板</Button>
+      <Button
+        @click="downloadTemple"
+        type="info"
+        style="margin-bottom: 20px"
+        icon="ios-cloud-download-outline"
+        >下载Excel模板</Button
+      >
       <div
         style="
           display: flex;
@@ -87,9 +98,9 @@ export default {
   name: "rawData",
   data() {
     return {
-      successCount:0,
-      failCount:0,
-      lastTime: '-',
+      successCount: 0,
+      failCount: 0,
+      lastTime: "",
       importLoading: false, // 导入中
       loading: false,
       reading: false, // 读取中
@@ -185,9 +196,11 @@ export default {
         if (res.success) {
           this.total = res.result.result.totalElements;
           this.data = res.result.result.content;
-          this.successCount = res.result.message.successNum;
-          this.failCount = res.result.message.failNum;
-          this.lastTime = res.result.message.uploadTime;
+          if (res.result.message) {
+            this.successCount = res.result.message.successNum;
+            this.failCount = res.result.message.failNum;
+            this.lastTime = res.result.message.uploadTime;
+          }
         }
         this.loading = false;
       });
@@ -201,7 +214,6 @@ export default {
       const fileExt = file.name.split(".").pop().toLocaleLowerCase();
       if (fileExt == "xlsx" || fileExt == "xls") {
         this.uploadfile = file;
-        console.log(this.uploadfile)
       } else {
         this.$Notice.warning({
           title: "文件类型错误",
@@ -222,7 +234,15 @@ export default {
       postCrmRequest("/data_analysis/upload", formData).then((res) => {
         this.importLoading = false;
         if (res.success) {
-          this.$Message.success("导入成功！");
+          this.$Modal.success({
+            title: "提示",
+            // 记得确认修改此处
+            content: "数据导入成功！",
+            loading: true,
+            onOk: () => {
+              this.$Modal.remove();
+            },
+          });
         }
         this.importModalVisible = false;
         this.getDataList();
@@ -251,7 +271,7 @@ export default {
     },
   },
   mounted() {
-    this.getDataList();
+    // this.getDataList();
   },
 };
 </script>

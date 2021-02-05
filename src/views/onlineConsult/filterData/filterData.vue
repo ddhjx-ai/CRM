@@ -25,7 +25,7 @@
               type="text"
               v-model="searchForm.number"
               style="width: 260px"
-              @on-keyup="searchForm.number=searchForm.number.replace(/[, ]/g,'')"
+              @on-keyup="searchForm.number=searchForm.number.trim().replace(/[ ]/g,'')"
             />
           </Form-item>
           <Form-item label="信息ID" prop="infoId">
@@ -33,7 +33,7 @@
               type="text"
               v-model="searchForm.infoId"
               style="width: 260px"
-              @on-keyup="searchForm.infoId=searchForm.infoId.replace(/[, ]/g,'')"
+              @on-keyup="searchForm.infoId=searchForm.infoId.trim().replace(/[ ]/g,'')"
             />
           </Form-item>
           <span v-if="drop">
@@ -266,7 +266,6 @@
 <script>
 import { getCrmRequest, postCrmRequest } from "@/api/crm";
 import { provinceList, tradeList, handleProvinceList } from "./provinceList";
-import qs from "qs";
 export default {
   name: "filterData",
   data() {
@@ -364,7 +363,7 @@ export default {
           title: "来源风格",
           width: 120,
           align: "center",
-          key: "sourceNet",
+          key: "sourceStyle",
         },
         {
           title: "咨询页面",
@@ -405,9 +404,6 @@ export default {
       drop: false,
       downloadFlag: true,
     };
-  },
-  activated() {
-    this.getDataList()
   },
   methods: {
     getDataList() {
@@ -504,7 +500,6 @@ export default {
       this.searchForm.pageSize = 20;
       this.searchForm.flag = 1;
       this.downloadFlag = false;
-      console.log(this.searchForm);
       this.getDataList();
     },
     // 时间选择
@@ -534,7 +529,7 @@ export default {
       }
     },
   },
-  mounted() {
+  activated() {
     this.getDataList();
     this.getTagList();
     this.getVisitedSource();

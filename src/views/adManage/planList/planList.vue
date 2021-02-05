@@ -68,14 +68,15 @@
       :mask-closable="false"
       :width="600"
       @on-visible-change="modelCancel"
+      class="planList"
     >
       <Form ref="form" :model="form" :label-width="90" :rules="formValidate">
         <FormItem label="登录名" prop="name">
           <Input v-model="form.name" />
         </FormItem>
         <FormItem label="广告" prop="guanggaoId">
-          <Select v-model="form.guanggaoId">
-            <Option v-for="item in adList" :key="item.id" :value="item.id">{{
+          <Select v-model="form.guanggaoId" filterable>
+            <Option v-for="item in adList" :title="item.name" :key="item.id" :value="item.id">{{
               item.name
             }}</Option>
           </Select>
@@ -122,6 +123,7 @@
                 v-model="form.channelId"
                 @on-change="selectChange1"
                 placeholder="请选择"
+                filterable
               >
                 <Option
                   v-for="item in channelList"
@@ -138,6 +140,7 @@
                 v-model="form.pageId"
                 @on-change="selectChange2"
                 placeholder="请选择页面"
+                filterable
               >
                 <Option
                   v-for="item in pageList"
@@ -153,6 +156,7 @@
               <Select
                 v-model="form.guanggaoweiId"
                 @on-change="selectChange3"
+                filterable
                 :placeholder="
                   ggwList.length > 0 ? '请选择广告位' : '该页面没有广告位'
                 "
@@ -199,7 +203,7 @@
           <Input v-model="adForm.title" />
         </FormItem>
         <FormItem label="业主">
-          <Select v-model="form.owner">
+          <Select v-model="form.owner" filterable>
             <Option v-for="item in ownerList" :key="item" :value="item.value">{{
               item.label
             }}</Option>
@@ -713,6 +717,7 @@ export default {
         onOk: () => {
           // 结束
           getCrmRequest("/ad/fbjh/over/" + id).then((res) => {
+            this.$Modal.remove();
             if (res.success) {
               this.$Message.success("操作成功");
               this.getDataList();
@@ -827,7 +832,7 @@ export default {
       }
     },
   },
-  mounted() {
+  activated() {
     this.init();
   },
 };

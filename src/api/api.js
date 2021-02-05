@@ -3973,3 +3973,270 @@
  * @apiErrorExample Error-Response:
  * HTTP/1.1 code404 Not Found
  */
+
+ /* 在线咨询数据分析 */
+/**
+ * @api {post} /osc/data_analysis/upload 原始数据/上传
+ * @apiName upload
+ * @apiGroup 在线咨询数据分析
+ *
+ * @apiParam {File} file 文件
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+/**
+ * @api {get} /osc/data_analysis/list 原始数据/列表
+ * @apiName list
+ * @apiGroup 在线咨询数据分析
+ *
+ * @apiParam {Number} pageNum 页码数
+ * @apiParam {Number} pageSize 每页条数
+ * 
+ * @apiSuccess {Number} failNum 上次上传失败条数
+ * @apiSuccess {Number} id 信息id
+ * @apiSuccess {Number} successNum 上次上传成功条数
+ * @apiSuccess {String} uploadTime 上次上传时间
+ * @apiSuccess {String} contactTime 对话时间
+ * @apiSuccess {Number} id 上次上传时间
+ * @apiSuccess {String} number 访客编号
+ * @apiSuccess {String} sourceStyle 来源风格
+ * @apiSuccess {String} tag 访客标签
+ * @apiSuccess {String} visitedArea 访客地区
+ * @apiSuccess {String} visitedPage 咨询页面
+ * @apiSuccess {String} visitedSource 访问来源
+ * @apiSuccess {Number} x 总对话数
+ * @apiSuccess {Number} y 客服对话数
+ * @apiSuccess {Number} z 访客对话数
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":{
+ *          message:{
+ *            failNum: 0,
+ *            id: 1,
+ *            successNum: 30000,
+ *            uploadTime: "2021/02/01 17:18:04",
+ *          },
+ *          result:{
+ *            content:{
+ *              contactTime: "2021/01/29 17:25:03",
+ *              id: 27166,
+ *              number: "146249661805",
+ *              sourceStyle: "弹窗游客",
+ *              tag: "",
+ *              visitedArea: "北京市北京市[鹏博士]",
+ *              visitedPage: "https://www.chinabidding.cn/zbgg/nUVNFE.html",
+ *              visitedSource: "直接访问",
+ *              x: 2
+ *              y: 2
+ *              z: 0
+ *            }
+ *            totalElements: 30000,
+ *            totalPages: 1500,
+ *          }
+ *        }
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+/**
+ * @api {post} /osc/data_analysis/search 数据筛选/列表查询
+ * @apiName search
+ * @apiGroup 在线咨询数据分析
+ *
+ * @apiParam {Number} pageSize 页码数
+ * @apiParam {Number} pageNum 每页条数
+ * @apiParam {Number} flag 查询标识
+ * @apiParam {Number} number 访客编号
+ * @apiParam {Number} infoId 信息id
+ * @apiParam {Array} tag 访客标签
+ * @apiParam {Array} visitedAreaDealed 访客地区处理后
+ * @apiParam {Number} startcontactTime 起始对话时间
+ * @apiParam {Number} endcontactTime 截止对话时间
+ * @apiParam {File} minX 最小总对话数
+ * @apiParam {File} maxX 最大总对话数
+ * @apiParam {File} minY 最小客服对话数
+ * @apiParam {File} maxY 最大客服对话数
+ * @apiParam {File} minZ 最小访客对话数
+ * @apiParam {File} maxZ 最大访客对话数
+ * @apiParam {Array} visitedSourceDealed 访客来源处理后
+ * @apiParam {Array} sourceStyle 来源风格
+ * @apiParam {Array} visitedPageDealed 咨询页面处理后
+ * @apiParam {Array} category 一级行业
+ * @apiParam {Array} area 信息所在地区
+ * 
+ * @apiSuccess {String} area 信息地区
+ * @apiSuccess {String} category 一级行业
+ * @apiSuccess {String} contactTime 对话时间
+ * @apiSuccess {Number} id 27166
+ * @apiSuccess {Number} infoId 信息id
+ * @apiSuccess {String} number 访客编号
+ * @apiSuccess {Number} sourceStyle 来源风格
+ * @apiSuccess {String} tag 访客标签
+ * @apiSuccess {String} visitedAreaDealed 访客地区处理后
+ * @apiSuccess {String} visitedPage 咨询页面
+ * @apiSuccess {String} visitedPageDealed 咨询页面处理后
+ * @apiSuccess {String} visitedSource 访问来源
+ * @apiSuccess {String} visitedSourceDealed 访问来源处理后
+ * @apiSuccess {Number} x 总对话数
+ * @apiSuccess {Number} y 客服对话数
+ * @apiSuccess {Number} z 访客对话数
+ * 
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":{
+ *          content:{
+ *            area: null,
+ *            category: null,
+ *            contactTime: "2021/01/29 17:25:03",
+ *            id: 27166,
+ *            infoId: 2052758032,
+ *            number: "146249661805",
+ *            sourceStyle: "弹窗游客",
+ *            tag: "",
+ *            visitedAreaDealed: "北京",
+ *            visitedPage: "https://www.chinabidding.cn/zbgg/nUVNFE.html",
+ *            visitedPageDealed: "招标公告详情页",
+ *            visitedSource: "直接访问",
+ *            visitedSourceDealed: "直接访问",
+ *            x: 2,
+ *            y: 2,
+ *            z: 0,
+ *          },
+ *          totalElements: 13091,
+ *          totalPages: 655
+ *        }
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+ /**
+ * @api {post} /osc/data_analysis/search_dowload 数据筛选/数据下载
+ * @apiName search_dowload
+ * @apiGroup 在线咨询数据分析
+ *
+ * @apiParam {Number} number 访客编号
+ * @apiParam {Number} infoId 信息id
+ * @apiParam {Array} tag 访客标签
+ * @apiParam {Array} visitedAreaDealed 访客地区处理后
+ * @apiParam {Number} startcontactTime 起始对话时间
+ * @apiParam {Number} endcontactTime 截止对话时间
+ * @apiParam {File} minX 最小总对话数
+ * @apiParam {File} maxX 最大总对话数
+ * @apiParam {File} minY 最小客服对话数
+ * @apiParam {File} maxY 最大客服对话数
+ * @apiParam {File} minZ 最小访客对话数
+ * @apiParam {File} maxZ 最大访客对话数
+ * @apiParam {Array} visitedSourceDealed 访客来源处理后
+ * @apiParam {Array} sourceStyle 来源风格
+ * @apiParam {Array} visitedPageDealed 咨询页面处理后
+ * @apiParam {Array} category 一级行业
+ * @apiParam {Array} area 信息所在地区
+ * 
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":null
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+  /**
+ * @api {get} /osc/data_analysis/data_download 数据下载/列表
+ * @apiName data_download
+ * @apiGroup 在线咨询数据分析
+ *
+ * @apiParam {Number} pageNum 页码数
+ * @apiParam {Number} pageSize 每页条数
+ * 
+ * @apiParam {String} downloadTime 下载时间
+ * @apiParam {Number} id id
+ * @apiParam {String} query 检索条件
+ * @apiParam {Number} status 下载状态 0-不可下载，1-可下载
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        "success": true,
+ *        "message": "success",
+ *        "code": 200,
+ *        "timestamp": 1606957730894,
+ *        "result":{
+ *          content:{
+ *            downloadTime: "2021-02-02 09:45:07"
+ *            id: 1
+ *            query: "2021-01-26 09:44:00--2021-02-02 09:44:00;<1;"
+ *            status: 1
+ *          },
+ *          totalElements: 13091,
+ *          totalPages: 655
+ *        }
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
+
+   /**
+ * @api {get} /osc/data_analysis/download 数据下载/下载
+ * @apiName download
+ * @apiGroup 在线咨询数据分析
+ *
+ * @apiParam {Number} id 下载数据id
+ * 
+ * @apiSuccessExample Success-Response:
+ *     {
+ *        数据流
+ *     }
+ *
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code401 Unauthorized
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code403 Forbidden
+ * @apiErrorExample Error-Response:
+ * HTTP/1.1 code404 Not Found
+ */
