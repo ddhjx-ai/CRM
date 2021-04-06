@@ -219,13 +219,13 @@ export default {
           sortable: true,
           minWidth: 150,
         },
-        {
+        /* {
           title: "完成时间",
           key: "memberEndTime",
           align: "center",
           sortable: true,
           minWidth: 150,
-        },
+        }, */
       ],
       data: [], // 表单数据
       total: 0, // 表单数据总数

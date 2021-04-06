@@ -137,6 +137,8 @@ export const otherRouter = {
         {path: 'preSale/preSaleDetail', title: '报告详情', name: 'preSaleDetail',meta: { permTypes: []}, component: () => import("@/views/preSale/preSaleDetail/preSaleDetail.vue")},
         {path: 'subjectManage/keywordsList', title: '关键词列表', name: 'keywordsList',meta: { permTypes: []}, component: () => import("@/views/subjectManage/keywordsList/keywordsList.vue")},
         // { path: 'subjectManage/channelManage', title: '频道管理', name: 'channelManage', component: () => import('@/views/subjectManage/channelManage/channelManage.vue') },
+
+        { path: '/tenderPublish/tenderDetail', title: '自主招标详情', name: 'tenderPublishDetail', component: () => import('@/views/tenderPublish/tenderDetail.vue') },
     ]
 };
 

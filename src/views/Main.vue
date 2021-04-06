@@ -25,7 +25,7 @@
         </div> -->
         <div slot="top" class="logo-con">
           <h3 v-show="!shrink" style="color: #fff; font-size: 25px">
-            运营中心
+            中台管理系统
           </h3>
           <h3 v-show="shrink" style="color: #fff; font-size: 20px">OSC</h3>
         </div>

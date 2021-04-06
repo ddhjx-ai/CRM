@@ -1,6 +1,6 @@
 <template>
   <div @click="showMessage" class="message-con">
-    <Tooltip :always="value>0" :content="value > 0 ? '有' + value + '条未读消息' : '无未读消息'" placement="bottom">
+    <Tooltip :content="value > 0 ? '有' + value + '条未读消息' : '无未读消息'" placement="bottom">
       <Badge :count="value" dot>
         <Icon type="md-notifications" :size="22" />
       </Badge>
